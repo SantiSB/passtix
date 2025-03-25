@@ -12,5 +12,4 @@ export interface Assistant {
   createdAt: Date;
   updatedAt: Date;
   checkedInAt: Date | null;
-  cedula: string;
 }
