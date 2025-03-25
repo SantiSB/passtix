@@ -5,10 +5,23 @@ const CreateAssistantModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
 
   if (!isOpen) return null;
 
+  // Add a transition to the modal for smooth opening and closing
+  const modalTransition = "transition-opacity duration-300 ease-in-out";
+
+  // Add an event listener to close the modal when clicking outside
+  const handleOutsideClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg">
-        <h1 className="text-2xl font-bold mb-6">Registrar asistente</h1>
+    <div
+      className={`fixed inset-0 flex items-center justify-center ${modalTransition} ${isOpen ? 'opacity-100 backdrop-blur-xs' : 'opacity-0 pointer-events-none'}`}
+      onClick={handleOutsideClick}
+    >
+      <div className="bg-white p-6 rounded-lg shadow-2xl max-w-md w-full mx-4 border border-gray-300">
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Registrar asistente</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -18,7 +31,7 @@ const CreateAssistantModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             value={form.name}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="email"
@@ -27,7 +40,7 @@ const CreateAssistantModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
@@ -35,7 +48,7 @@ const CreateAssistantModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             placeholder="Celular"
             value={form.cellPhone}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
@@ -43,13 +56,13 @@ const CreateAssistantModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             placeholder="Cédula"
             value={form.identificationCard}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
             name="ticketType"
             value={form.ticketType}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="" disabled>Seleccione una opción</option>
             <option value="General">General</option>
@@ -57,20 +70,24 @@ const CreateAssistantModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
             <option value="Backstage">Backstage</option>
           </select>
 
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            disabled={loading}
-          >
-            {loading ? 'Guardando...' : 'Guardar asistente'}
-          </button>
+          <div className="flex space-x-4">
+            <button
+              type="submit"
+              className="bg-emerald-800 text-white px-4 py-3 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-300 ease-in-out"
+              disabled={loading}
+            >
+              {loading ? 'Registrando...' : 'Registrar'}
+            </button>
+
+            <button onClick={onClose} className="bg-red-800 text-white px-4 py-3 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 ease-in-out">
+              Cerrar
+            </button>
+          </div>
 
           {success && (
-            <p className="text-green-600 text-sm font-semibold">✅ Asistente registrado con éxito</p>
+            <p className="text-emerald-800 text-sm font-semibold">✅ Asistente registrado con éxito</p>
           )}
         </form>
-
-        <button onClick={onClose} className="mt-4 text-red-600">Cerrar</button>
       </div>
     </div>
   );

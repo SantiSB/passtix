@@ -10,7 +10,7 @@ export default function ScannerPage() {
   const [assistantName, setAssistantName] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
-  const hasScannedRef = useRef(false); // Para evitar escaneos dobles
+  const hasScannedRef = useRef(false);
 
   useEffect(() => {
     if (scannerRef.current && !scanning) {
@@ -21,7 +21,7 @@ export default function ScannerPage() {
         { fps: 10, qrbox: 250 },
         false
       );
-      
+
       scanner.render(
         async (qrText) => {
           if (hasScannedRef.current) return;
@@ -53,7 +53,6 @@ export default function ScannerPage() {
             setStatus('❌ Error al procesar el QR');
           }
 
-          // Reiniciar escaneo luego de 3 segundos
           setTimeout(() => {
             hasScannedRef.current = false;
             setStatus(null);
@@ -67,16 +66,49 @@ export default function ScannerPage() {
     }
   }, [scanning]);
 
+  const getStatusStyles = (status: string | null) => {
+    if (!status) return '';
+    if (status.includes('✅')) return 'text-emerald-800';  // Éxito
+    if (status.includes('❌')) return 'text-red-500';      // Error
+    if (status.includes('⚠️')) return 'text-yellow-400';  // Advertencia
+    return 'text-white'; // Default
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
-      <h1 className="text-2xl font-bold mb-4">Escáner de Ingreso</h1>
-      <div id="qr-reader" className="w-full max-w-sm" ref={scannerRef}></div>
-      {status && (
-        <div className="mt-6 text-center space-y-2">
-          {assistantName && <p className="text-xl font-semibold">{assistantName}</p>}
-          <p className="text-lg">{status}</p>
-        </div>
-      )}
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4 py-8">
+      {/* Título principal */}
+      <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
+        🎟️ Escáner de Ingreso
+      </h1>
+
+      {/* Contenedor del escáner */}
+      <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-4 ring-2 ring-emerald-800">
+        <div
+          id="qr-reader"
+          className="w-full h-auto mx-auto"
+          ref={scannerRef}
+        ></div>
+      </div>
+
+      {/* Mensajes de estado */}
+      <div className="mt-6 text-center">
+        {status ? (
+          <div className="space-y-2 transition-all duration-300">
+            {assistantName && (
+              <p className="text-xl font-semibold text-white">
+                {assistantName}
+              </p>
+            )}
+            <p className={`text-lg font-medium ${getStatusStyles(status)}`}>
+              {status}
+            </p>
+          </div>
+        ) : (
+          <p className="text-gray-400 mt-4 animate-pulse">
+            📷 Escaneando código QR...
+          </p>
+        )}
+      </div>
     </div>
   );
 }
