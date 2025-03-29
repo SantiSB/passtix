@@ -1,5 +1,5 @@
 import React from 'react';
-import { Assistant } from '../types/Assistant';
+import { Assistant } from '../interfaces/Assistant';
 
 interface AssistantsTableProps {
   assistants: Assistant[];

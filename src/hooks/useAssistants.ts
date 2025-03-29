@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getAssistants } from '@/lib/assistant';
-import { Assistant } from '@/types/Assistant';
+import { Assistant } from '@/interfaces/Assistant';
 
 const useAssistants = () => {
   const [assistants, setAssistants] = useState<Assistant[]>([]);

@@ -1,6 +1,6 @@
 // services/assistants.ts
 
-import { Assistant } from '@/types/Assistant';
+import { Assistant } from '@/interfaces/Assistant';
 import { db, storage } from './firebase'; // Asegúrate de exportar también "storage" en tu configuración
 import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
