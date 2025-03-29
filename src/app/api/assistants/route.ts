@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid';
 export async function POST(req: NextRequest) {
   try {
     // 1. Leer datos del body
-    const { name, email, cellPhone, identificationCard, ticketType } = await req.json();
+    const { name, email, cellPhone, identificationCard, ticketType, promoter, phase } = await req.json();
     const id = uuid();
 
     // 2. Generar Buffer del QR
@@ -32,6 +32,14 @@ export async function POST(req: NextRequest) {
       ticketType,
       status: 'enabled',
       qrCode: qrCodeUrl,
+      event: 'Bichiyal',
+      producer: 'Piso 12',
+      promoter,
+      locality: 'General',
+      phase,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      checkedInAt: null,
     };
 
     await setDoc(doc(collection(db, 'assistants'), id), assistant);
