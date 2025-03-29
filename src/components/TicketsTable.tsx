@@ -10,6 +10,7 @@ interface EnrichedTicket {
   createdAt: Date | null;
   updatedAt: Date | null;
   checkedInAt: Date | null;
+  identificationNumber: string;
 
   assistantName: string;
   assistantEmail: string;
@@ -71,6 +72,7 @@ const TicketsTable: React.FC = () => {
             <th className="py-3 px-4 border-b">Fase</th>
             <th className="py-3 px-4 border-b">Localidad</th>
             <th className="py-3 px-4 border-b">Promotor</th>
+            <th className="py-3 px-4 border-b">Cedula</th>
             <th className="py-3 px-4 border-b">Estado</th>
             <th className="py-3 px-4 border-b">Ingreso</th>
           </tr>
@@ -90,6 +92,9 @@ const TicketsTable: React.FC = () => {
               <td className="py-3 px-4 border-b">{ticket.localityName}</td>
               <td className="py-3 px-4 border-b">
                 {ticket.promoterName ?? "—"}
+              </td>
+              <td className="py-3 px-4 border-b">
+                {ticket.identificationNumber}
               </td>
               <td
                 className={`py-3 px-4 border-b ${getStatusBadgeClass(

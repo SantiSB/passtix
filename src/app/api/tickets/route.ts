@@ -47,6 +47,9 @@ export async function GET() {
           phoneNumber: assistantSnap.exists()
             ? assistantSnap.data().phoneNumber ?? "—"
             : "—",
+          identificationNumber: assistantSnap.exists()
+            ? assistantSnap.data().identificationNumber ?? "—"
+            : "—",
 
           eventName: eventSnap.exists() ? eventSnap.data().name : "—",
           phaseName: phaseSnap.exists() ? phaseSnap.data().name : "—",
