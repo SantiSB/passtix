@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { db } from '@/lib/firebase/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 
 export default function ScannerPage() {
   const [status, setStatus] = useState<string | null>(null);
@@ -28,25 +28,28 @@ export default function ScannerPage() {
           hasScannedRef.current = true;
 
           setStatus('Verificando...');
+
           try {
-            const docRef = doc(db, 'assistants', qrText);
-            const docSnap = await getDoc(docRef);
+            const ticketRef = doc(db, 'tickets', qrText);
+            const ticketSnap = await getDoc(ticketRef);
 
-            if (docSnap.exists()) {
-              const data = docSnap.data();
-              setAssistantName(data.name);
-
-              if (data.status === 'joined') {
-                setStatus('⚠️ Este asistente ya ingresó.');
-              } else {
-                await updateDoc(docRef, {
-                  status: 'joined',
-                  checkedInAt: new Date(),
-                });
-                setStatus('✅ Ingreso registrado');
-              }
-            } else {
+            if (!ticketSnap.exists()) {
               setStatus('❌ QR no válido');
+            } else {
+              const ticket = ticketSnap.data();
+
+              if (ticket.status === 'joined') {
+                setStatus('⚠️ Este ticket ya fue registrado.');
+                setAssistantName(ticket.name);
+              } else {
+                await updateDoc(ticketRef, {
+                  status: 'joined',
+                  checkedInAt: new Date()
+                });
+
+                setStatus('✅ Ingreso registrado');
+                setAssistantName(ticket.name);
+              }
             }
           } catch (err) {
             console.error(err);
@@ -68,40 +71,29 @@ export default function ScannerPage() {
 
   const getStatusStyles = (status: string | null) => {
     if (!status) return '';
-    if (status.includes('✅')) return 'text-emerald-800';  // Éxito
-    if (status.includes('❌')) return 'text-red-500';      // Error
-    if (status.includes('⚠️')) return 'text-yellow-400';  // Advertencia
-    return 'text-white'; // Default
+    if (status.includes('✅')) return 'text-emerald-800';
+    if (status.includes('❌')) return 'text-red-500';
+    if (status.includes('⚠️')) return 'text-yellow-400';
+    return 'text-white';
   };
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4 py-8">
-      {/* Título principal */}
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
         🎟️ Escáner de Ingreso
       </h1>
 
-      {/* Contenedor del escáner */}
       <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-4 ring-2 ring-emerald-800">
-        <div
-          id="qr-reader"
-          className="w-full h-auto mx-auto"
-          ref={scannerRef}
-        ></div>
+        <div id="qr-reader" className="w-full h-auto mx-auto" ref={scannerRef}></div>
       </div>
 
-      {/* Mensajes de estado */}
       <div className="mt-6 text-center">
         {status ? (
           <div className="space-y-2 transition-all duration-300">
             {assistantName && (
-              <p className="text-xl font-semibold text-white">
-                {assistantName}
-              </p>
+              <p className="text-xl font-semibold text-white">{assistantName}</p>
             )}
-            <p className={`text-lg font-medium ${getStatusStyles(status)}`}>
-              {status}
-            </p>
+            <p className={`text-lg font-medium ${getStatusStyles(status)}`}>{status}</p>
           </div>
         ) : (
           <p className="text-gray-400 mt-4 animate-pulse">

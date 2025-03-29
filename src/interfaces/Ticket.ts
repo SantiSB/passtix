@@ -1,7 +1,6 @@
 import {
   DeliveryMethod,
   EmailStatus,
-  Locality,
   TicketStatus,
   TicketType,
 } from "@/types/enums";
@@ -12,7 +11,7 @@ export interface Ticket {
   eventId: string;
   promoterId?: string;
   ticketType: TicketType;
-  locality: Locality;
+  localityId: string;
   phaseId: string;
   price: number | null;
   discountId?: string;

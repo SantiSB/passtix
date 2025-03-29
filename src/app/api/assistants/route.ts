@@ -1,55 +1,71 @@
 // app/api/assistants/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { db, storage } from '@/lib/firebase'; // Ajusta la ruta a tu config de Firebase
-import { collection, doc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import QRCode from 'qrcode';
-import { v4 as uuid } from 'uuid';
+import { registerAssistantWithTicket } from '@/lib/actions/registerAssistantWithTicket';
+import {
+  IdentificationType,
+  TicketType,
+  DeliveryMethod
+} from '@/types/enums';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Leer datos del body
-    const { name, email, cellPhone, identificationCard, ticketType, promoter, phase } = await req.json();
-    const id = uuid();
+    const body = await req.json();
 
-    // 2. Generar Buffer del QR
-    const qrBuffer = await QRCode.toBuffer(id, { type: 'png' });
-
-    // 3. Subir la imagen a Firebase Storage
-    const storageRef = ref(storage, `qrcodes/${id}.png`);
-    await uploadBytes(storageRef, qrBuffer, { contentType: 'image/png' });
-
-    // 4. Obtener la URL de descarga
-    const qrCodeUrl = await getDownloadURL(storageRef);
-
-    // 5. Guardar el documento en Firestore
-    const assistant = {
-      id,
+    const {
       name,
       email,
       cellPhone,
-      identificationCard,
+      identificationNumber,
+      identificationType,
+      eventId,
+      phaseId,
       ticketType,
-      status: 'enabled',
-      qrCode: qrCodeUrl,
-      event: 'Bichiyal',
-      producer: 'Piso 12',
-      promoter,
-      locality: 'General',
-      phase,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      checkedInAt: null,
-    };
+      localityId,
+      price,
+      promoterId,
+      deliveryMethod,
+      discountId,
+      discountAmount
+    } = body;
 
-    await setDoc(doc(collection(db, 'assistants'), id), assistant);
-
-    // 6. Retornar el asistente creado
-    return NextResponse.json({ success: true, assistant });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    // Validación básica
+    if (
+      !name || !email || !identificationNumber ||
+      !identificationType || !eventId || !phaseId ||
+      !ticketType || !localityId
+    ) {
+      return NextResponse.json(
+        { success: false, error: 'Faltan campos obligatorios.' },
+        { status: 400 }
+      );
     }
-    return NextResponse.json({ success: false, error: 'An unknown error occurred' }, { status: 500 });
+
+    const { assistant, ticket } = await registerAssistantWithTicket({
+      name,
+      email,
+      cellPhone,
+      identificationNumber,
+      identificationType: identificationType as IdentificationType,
+      ticketType: ticketType as TicketType,
+      localityId,
+      eventId,
+      phaseId,
+      price,
+      promoterId,
+      deliveryMethod: deliveryMethod as DeliveryMethod,
+      discountId,
+      discountAmount
+    });
+
+    return NextResponse.json({ success: true, assistant, ticket });
+  } catch (error: unknown) {
+    console.error('Error al registrar asistente:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Error desconocido'
+      },
+      { status: 500 }
+    );
   }
 }

@@ -1,61 +1,85 @@
-// services/assistants.ts
-
 import { Assistant } from '@/interfaces/Assistant';
-import { db, storage } from './firebase'; // Asegúrate de exportar también "storage" en tu configuración
-import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
+import { Ticket } from '@/interfaces/Ticket';
+import { db, storage } from './firebase/firebase'; // Asegúrate de que "storage" también esté exportado
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import QRCode from 'qrcode';
 import { v4 as uuid } from 'uuid';
+import { IdentificationType, TicketType, DeliveryMethod } from '@/types/enums';
 
-export async function createAssistant(
+/**
+ * Crea un nuevo asistente y un ticket asociado
+ */
+export async function createAssistantWithTicket(
   name: string,
   email: string,
   cellPhone: string,
-  identificationCard: string,
-  ticketType: 'General' | 'VIP' | 'Backstage'
-): Promise<Assistant> {
-  const id = uuid(); // ID único para el invitado
+  identificationNumber: string,
+  identificationType: IdentificationType,
+  ticketType: TicketType,
+  eventId: string,
+  phaseId: string,
+  localityId: string,
+  price: number,
+  promoterId?: string,
+  deliveryMethod?: DeliveryMethod,
+  discountId?: string,
+  discountAmount?: number
+): Promise<{ assistant: Assistant; ticket: Ticket }> {
+  const assistantId = uuid(); // ID único para el asistente
 
-  // Texto o contenido que deseas en el QR (puede ser el id o una URL con query params)
-  const qrText = id;
-
-  // Generar el QR como Buffer en formato PNG
-  const qrBuffer = await QRCode.toBuffer(qrText, { type: 'png' });
-
-  // Crea una referencia en Storage con el nombre del archivo
-  // Aquí usamos la carpeta 'qrcodes' en Storage
-  const storageRef = ref(storage, `qrcodes/${id}.png`);
-
-  // Subir el buffer del QR a Firebase Storage
-  await uploadBytes(storageRef, qrBuffer, { contentType: 'image/png' });
-
-  // Obtener la URL de descarga que guardaremos en Firestore
-  const qrCodeUrl = await getDownloadURL(storageRef);
-
-  // Estructuramos nuestro objeto "Assistant" para guardar
+  // Crear asistente
   const assistant: Assistant = {
-    id,
-    identificationCard,
+    id: assistantId,
     name,
     email,
     cellPhone,
+    identificationNumber,
+    identificationType,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  // Guardar asistente en Firestore
+  await setDoc(doc(db, 'assistants', assistantId), assistant);
+
+  // Crear ticket asociado al asistente
+  const ticketId = uuid(); // ID único para el ticket
+
+  // Generar QR para el ticket
+  const qrBuffer = await QRCode.toBuffer(ticketId, { type: 'png' });
+  const qrRef = ref(storage, `qrcodes/${ticketId}.png`);
+  await uploadBytes(qrRef, qrBuffer, { contentType: 'image/png' });
+  const qrCodeUrl = await getDownloadURL(qrRef);
+
+  // Crear ticket con los datos faltantes
+  const ticket: Ticket = {
+    id: ticketId,
+    assistantId,
+    eventId,
+    phaseId,
+    localityId,
     ticketType,
+    price,
+    promoterId,
     status: 'enabled',
     qrCode: qrCodeUrl,
+    emailStatus: 'pending',
+    deliveryMethod: deliveryMethod || 'manual',
+    discountId,
+    discountAmount,
     createdAt: new Date(),
     updatedAt: new Date(),
     checkedInAt: null,
   };
 
-  // Guardar los datos del asistente en Firestore
-  await setDoc(doc(collection(db, 'assistants'), id), assistant);
+  // Guardar ticket en Firestore
+  await setDoc(doc(db, 'tickets', ticketId), ticket);
 
-  return assistant;
+  return { assistant, ticket };
 }
 
 export async function getAssistants(): Promise<Assistant[]> {
-  const assistantsCollection = collection(db, 'assistants');
-  const assistantsSnapshot = await getDocs(assistantsCollection);
-  const assistantsList = assistantsSnapshot.docs.map((doc) => doc.data() as Assistant);
-  return assistantsList;
+  const snapshot = await getDocs(collection(db, 'assistants'));
+  return snapshot.docs.map((doc) => doc.data() as Assistant);
 }
