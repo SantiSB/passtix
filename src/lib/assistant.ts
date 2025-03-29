@@ -13,7 +13,7 @@ import { IdentificationType, TicketType, DeliveryMethod } from '@/types/enums';
 export async function createAssistantWithTicket(
   name: string,
   email: string,
-  cellPhone: string,
+  phoneNumber: string,
   identificationNumber: string,
   identificationType: IdentificationType,
   ticketType: TicketType,
@@ -33,7 +33,7 @@ export async function createAssistantWithTicket(
     id: assistantId,
     name,
     email,
-    cellPhone,
+    phoneNumber,
     identificationNumber,
     identificationType,
     createdAt: new Date(),

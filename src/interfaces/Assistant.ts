@@ -1,13 +1,12 @@
 import { IdentificationType } from "@/types/enums";
-
+import { Timestamp } from "firebase/firestore";
 export interface Assistant {
   id: string;
-  userId?: string;               
   name: string;
   email: string;
   identificationNumber: string;
   identificationType: IdentificationType;
-  cellPhone?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  phoneNumber?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }

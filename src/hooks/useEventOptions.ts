@@ -19,9 +19,9 @@ const useEventOptions = () => {
     const fetchOptions = async () => {
       try {
         const [eventsSnap, phasesSnap, localitiesSnap] = await Promise.all([
-          getDocs(collection(db, 'events')),
-          getDocs(collection(db, 'phases')),
-          getDocs(collection(db, 'localities'))
+          getDocs(collection(db, 'event')),
+          getDocs(collection(db, 'phase')),
+          getDocs(collection(db, 'locality'))
         ]);
 
         setEvents(

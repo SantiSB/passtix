@@ -2,6 +2,5 @@ export interface Locality {
   id: string;
   name: string;
   eventId: string;
-  capacity: number;
-  locationMapUrl?: string;
+  capacity?: number;
 }

@@ -1,15 +1,15 @@
-import { TicketType } from "@/types/enums";
+import { Timestamp } from "firebase/firestore";
+
 export interface Phase {
   id: string;
   eventId: string;
   name: string;                  
   description?: string;
   price: number;
-  ticketType: TicketType;
   order: number;                 
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: Timestamp;
+  endDate?: Timestamp;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }

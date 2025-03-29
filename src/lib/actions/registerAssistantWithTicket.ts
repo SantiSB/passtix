@@ -9,7 +9,7 @@ import { IdentificationType, TicketType, DeliveryMethod } from "@/types/enums";
 export async function registerAssistantWithTicket(params: {
   name: string;
   email: string;
-  cellPhone: string;
+  phoneNumber: string;
   identificationNumber: string;
   identificationType: IdentificationType;
   eventId: string;
@@ -25,7 +25,7 @@ export async function registerAssistantWithTicket(params: {
   const {
     name,
     email,
-    cellPhone,
+    phoneNumber,
     identificationNumber,
     identificationType,
     eventId,
@@ -42,7 +42,7 @@ export async function registerAssistantWithTicket(params: {
   const assistant = await createAssistantWithTicket(
     name,
     email,
-    cellPhone,
+    phoneNumber,
     identificationNumber,
     identificationType,
     ticketType,

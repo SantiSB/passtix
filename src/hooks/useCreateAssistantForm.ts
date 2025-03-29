@@ -11,7 +11,7 @@ import {
 type FormData = {
   name: string;
   email: string;
-  cellPhone: string;
+  phoneNumber: string;
   identificationNumber: string;
   identificationType: IdentificationType;
   eventId: string;
@@ -29,7 +29,7 @@ const useCreateAssistantForm = () => {
   const [form, setForm] = useState<FormData>({
     name: '',
     email: '',
-    cellPhone: '',
+    phoneNumber: '',
     identificationNumber: '',
     identificationType: 'cc',
     eventId: '',
@@ -73,7 +73,7 @@ const useCreateAssistantForm = () => {
       setForm({
         name: '',
         email: '',
-        cellPhone: '',
+        phoneNumber: '',
         identificationNumber: '',
         identificationType: 'cc',
         eventId: '',

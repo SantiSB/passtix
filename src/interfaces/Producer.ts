@@ -1,13 +1,12 @@
 import { IdentificationType } from "@/types/enums";
-
+import { Timestamp } from "firebase/firestore";
 export interface Producer {
   id: string;
   name: string;
-  contactEmail: string;
+  email: string;
   phoneNumber: string;
   identificationNumber: string;
   identificationType: IdentificationType;
-  staffIds: string[];            
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }

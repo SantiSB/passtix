@@ -16,7 +16,7 @@ const usePromoterOptions = () => {
   useEffect(() => {
     const fetchPromoters = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "promoters"));
+        const snapshot = await getDocs(collection(db, "promoter"));
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           name: doc.data().name,
