@@ -72,8 +72,9 @@ const useRegisterTicketForm = () => {
         promoterId: "",
         price: 0,
       });
-    } catch (err: any) {
-      setError(err.message || "Error inesperado");
+    } catch (err) {
+      const error = err instanceof Error ? err.message : "Error desconocido";
+      setError(error);
     } finally {
       setLoading(false);
     }

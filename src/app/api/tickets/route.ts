@@ -39,22 +39,33 @@ export async function GET() {
           checkedInAt: data.checkedInAt?.toDate?.() ?? null,
 
           // Enriquecidos
-          assistantName: assistantSnap.exists() ? assistantSnap.data().name : "—",
-          assistantEmail: assistantSnap.exists() ? assistantSnap.data().email : "—",
-          phoneNumber: assistantSnap.exists() ? assistantSnap.data().phoneNumber ?? "—" : "—",
-          identificationNumber: assistantSnap.exists() ? assistantSnap.data().identificationNumber ?? "—" : "—",
+          assistantName: assistantSnap.exists()
+            ? assistantSnap.data().name
+            : "—",
+          assistantEmail: assistantSnap.exists()
+            ? assistantSnap.data().email
+            : "—",
+          phoneNumber: assistantSnap.exists()
+            ? assistantSnap.data().phoneNumber ?? "—"
+            : "—",
+          identificationNumber: assistantSnap.exists()
+            ? assistantSnap.data().identificationNumber ?? "—"
+            : "—",
 
           eventName: eventSnap.exists() ? eventSnap.data().name : "—",
           phaseName: phaseSnap.exists() ? phaseSnap.data().name : "—",
           localityName: localitySnap.exists() ? localitySnap.data().name : "—",
-          promoterName: promoterSnap?.exists() ? promoterSnap.data().name : null,
+          promoterName: promoterSnap?.exists()
+            ? promoterSnap.data().name
+            : null,
         };
       })
     );
 
     return NextResponse.json({ success: true, tickets });
-  } catch (error: any) {
-    console.error("Error al obtener tickets:", error);
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error("Unknown error");
+    console.error("Error al obtener tickets:", err);
     return NextResponse.json(
       { success: false, error: "Error al obtener tickets" },
       { status: 500 }
@@ -68,10 +79,12 @@ export async function POST(req: NextRequest) {
     const { assistant, ticket } = await registerAssistantWithTicket(body);
 
     return NextResponse.json({ success: true, assistant, ticket });
-  } catch (error: any) {
-    console.error("Error al registrar ticket:", error);
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error("Unknown error");
+    console.error("Error al crear ticket:", err);
+
     return NextResponse.json(
-      { success: false, error: error.message || "Error desconocido" },
+      { success: false, error: err.message || "Error desconocido" },
       { status: 500 }
     );
   }
