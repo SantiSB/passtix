@@ -1,5 +1,5 @@
 import { IdentificationType } from "@/types/enums";
-import { Timestamp } from "firebase/firestore";
+
 export interface Assistant {
   id: string;
   name: string;
@@ -7,6 +7,6 @@ export interface Assistant {
   identificationNumber: string;
   identificationType: IdentificationType;
   phoneNumber?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import TicketsTable from '@/components/TicketsTable';
-import CreateAssistantModal from '@/components/CreateAssistantModal';
+import CreateAssistantModal from '@/components/RegisterTicketModal';
 import useTickets from '@/hooks/useTickets';
 import { useState } from 'react';
 

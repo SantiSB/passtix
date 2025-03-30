@@ -1,36 +1,35 @@
 import { db, storage } from "./firebase/firebase";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import QRCode from "qrcode";
 import { v4 as uuid } from "uuid";
 import { Ticket } from "@/interfaces/Ticket";
+import { TicketType, EmailStatus, TicketStatus } from "@/types/enums";
 
 /**
- * Crea un ticket con QR vinculado a un asistente
+ * Crea un ticket con QR
  */
-export async function createTicketForAssistant(params: {
-  assistantId: string;
+export async function createTicket(params: {
   eventId: string;
+  assistantId: string;
   phaseId: string;
-  promoterId?: string;
-  ticketType: "ticket" | "courtesy";
+  ticketType: TicketType;
   localityId: string;
-  price: number;
-  deliveryMethod?: "email" | "manual" | "whatsapp";
-  discountId?: string;
-  discountAmount?: number;
+  price: number | null;
+  promoterId?: string;
+  emailStatus: EmailStatus;
+  status: TicketStatus;
 }): Promise<Ticket> {
   const {
-    assistantId,
     eventId,
+    assistantId,
     phaseId,
-    promoterId,
     ticketType,
     localityId,
     price,
-    deliveryMethod = "manual",
-    discountId,
-    discountAmount,
+    promoterId,
+    emailStatus,
+    status,
   } = params;
 
   const ticketId = uuid();
@@ -41,37 +40,25 @@ export async function createTicketForAssistant(params: {
   await uploadBytes(qrRef, qrBuffer, { contentType: "image/png" });
   const qrCodeUrl = await getDownloadURL(qrRef);
 
+  const now = new Date();
+
   const ticket: Ticket = {
     id: ticketId,
-    assistantId,
     eventId,
+    assistantId,
     phaseId,
     promoterId,
     ticketType,
     localityId,
     price,
     qrCode: qrCodeUrl,
-    status: "enabled",
-    emailStatus: "pending",
-    deliveryMethod,
-    discountId,
-    discountAmount,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    status,
+    emailStatus,
+    createdAt: now,
+    updatedAt: now,
     checkedInAt: null,
   };
 
-  await setDoc(doc(collection(db, "tickets"), ticketId), ticket);
-
+  await setDoc(doc(db, "ticket", ticketId), ticket);
   return ticket;
-}
-
-export async function getTicketsByAssistantId(
-  assistantId: string
-): Promise<Ticket[]> {
-  const ticketsRef = collection(db, 'tickets');
-  const q = query(ticketsRef, where('assistantId', '==', assistantId));
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map((doc) => doc.data() as Ticket);
 }

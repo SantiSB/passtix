@@ -1,15 +1,12 @@
-import { Timestamp } from "firebase/firestore";
-
 export interface Phase {
   id: string;
+  name: string;
   eventId: string;
-  name: string;                  
-  description?: string;
   price: number;
-  order: number;                 
-  startDate?: Timestamp;
-  endDate?: Timestamp;
+  order: number;
+  startDate?: Date;
+  endDate?: Date;
   isActive: boolean;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }

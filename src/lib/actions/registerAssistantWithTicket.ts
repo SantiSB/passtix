@@ -1,8 +1,9 @@
 import { Assistant } from "@/interfaces/Assistant";
 import { Ticket } from "@/interfaces/Ticket";
-import { createAssistantWithTicket } from "../assistant";
-import { createTicketForAssistant } from "../ticket";
-import { IdentificationType, TicketType, DeliveryMethod } from "@/types/enums";
+import { createAssistant } from "../assistant";
+import { createTicket } from "../ticket";
+import { IdentificationType, TicketType } from "@/types/enums";
+
 /**
  * Flujo completo para registrar un asistente y su ticket
  */
@@ -16,11 +17,8 @@ export async function registerAssistantWithTicket(params: {
   phaseId: string;
   ticketType: TicketType;
   localityId: string;
-  price: number;
+  price: number | null;
   promoterId?: string;
-  deliveryMethod?: DeliveryMethod;
-  discountId?: string;
-  discountAmount?: number;
 }): Promise<{ assistant: Assistant; ticket: Ticket }> {
   const {
     name,
@@ -34,40 +32,29 @@ export async function registerAssistantWithTicket(params: {
     localityId,
     price,
     promoterId,
-    deliveryMethod,
-    discountId,
-    discountAmount
   } = params;
 
-  const assistant = await createAssistantWithTicket(
+  // ✅ Crear asistente
+  const assistant = await createAssistant(
     name,
     email,
     phoneNumber,
     identificationNumber,
-    identificationType,
-    ticketType,
-    eventId,
-    phaseId,
-    localityId,
-    price,
-    promoterId,
-    deliveryMethod,
-    discountId,
-    discountAmount
+    identificationType
   );
 
-  const ticket = await createTicketForAssistant({
-    assistantId: assistant.assistant.id,
+  // ✅ Crear ticket vinculado al asistente
+  const ticket = await createTicket({
+    assistantId: assistant.id,
     eventId,
     phaseId,
     ticketType,
     localityId,
     price,
     promoterId,
-    deliveryMethod,
-    discountId,
-    discountAmount
+    emailStatus: "pending",
+    status: "enabled",
   });
 
-  return { assistant: assistant.assistant, ticket };
+  return { assistant, ticket };
 }

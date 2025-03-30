@@ -1,6 +1,7 @@
 import { db } from "@/lib/firebase/firebase";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { registerAssistantWithTicket } from "@/lib/actions/registerAssistantWithTicket";
 
 export async function GET() {
   try {
@@ -38,25 +39,15 @@ export async function GET() {
           checkedInAt: data.checkedInAt?.toDate?.() ?? null,
 
           // Enriquecidos
-          assistantName: assistantSnap.exists()
-            ? assistantSnap.data().name
-            : "—",
-          assistantEmail: assistantSnap.exists()
-            ? assistantSnap.data().email
-            : "—",
-          phoneNumber: assistantSnap.exists()
-            ? assistantSnap.data().phoneNumber ?? "—"
-            : "—",
-          identificationNumber: assistantSnap.exists()
-            ? assistantSnap.data().identificationNumber ?? "—"
-            : "—",
+          assistantName: assistantSnap.exists() ? assistantSnap.data().name : "—",
+          assistantEmail: assistantSnap.exists() ? assistantSnap.data().email : "—",
+          phoneNumber: assistantSnap.exists() ? assistantSnap.data().phoneNumber ?? "—" : "—",
+          identificationNumber: assistantSnap.exists() ? assistantSnap.data().identificationNumber ?? "—" : "—",
 
           eventName: eventSnap.exists() ? eventSnap.data().name : "—",
           phaseName: phaseSnap.exists() ? phaseSnap.data().name : "—",
           localityName: localitySnap.exists() ? localitySnap.data().name : "—",
-          promoterName: promoterSnap?.exists()
-            ? promoterSnap.data().name
-            : null,
+          promoterName: promoterSnap?.exists() ? promoterSnap.data().name : null,
         };
       })
     );
@@ -66,6 +57,21 @@ export async function GET() {
     console.error("Error al obtener tickets:", error);
     return NextResponse.json(
       { success: false, error: "Error al obtener tickets" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { assistant, ticket } = await registerAssistantWithTicket(body);
+
+    return NextResponse.json({ success: true, assistant, ticket });
+  } catch (error: any) {
+    console.error("Error al registrar ticket:", error);
+    return NextResponse.json(
+      { success: false, error: error.message || "Error desconocido" },
       { status: 500 }
     );
   }

@@ -1,3 +1,4 @@
+import { TicketEnriched } from "@/interfaces/TicketEnriched";
 import { useEffect, useState } from "react";
 
 interface EnrichedTicket {
@@ -37,7 +38,11 @@ const getStatusBadgeClass = (status: string) => {
   }
 };
 
-const TicketsTable: React.FC = () => {
+interface TicketsTableProps {
+  tickets: TicketEnriched[];
+}
+
+const TicketsTable: React.FC<TicketsTableProps> = () => {
   const [tickets, setTickets] = useState<EnrichedTicket[]>([]);
   const [loading, setLoading] = useState(true);
 

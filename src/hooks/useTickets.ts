@@ -1,10 +1,8 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { Ticket } from "@/interfaces/Ticket";
+import { TicketEnriched } from "@/interfaces/TicketEnriched";
 
 const useTickets = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<TicketEnriched[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
