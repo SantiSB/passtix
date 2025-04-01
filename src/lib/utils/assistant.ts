@@ -1,5 +1,5 @@
 import { Assistant } from "@/interfaces/Assistant";
-import { db } from "./firebase/firebase";
+import { db } from "../firebase/firebase";
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 import { IdentificationType } from "@/types/enums";

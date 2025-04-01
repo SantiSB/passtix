@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Phase } from "@/interfaces/Phase";
 import useEventOptions from "@/hooks/useEventOptions";
 import usePromoterOptions from "@/hooks/usePromoterOptions";
-
+import { getTicket } from "@/lib/utils/ticket";
 const DEFAULT_EVENT_ID = "kZEZ4x42RtwELpkO3dEf";
 
 const useRegisterTicketForm = () => {
@@ -72,6 +72,27 @@ const useRegisterTicketForm = () => {
         promoterId: "",
         price: 0,
       });
+
+      const ticket = await getTicket(json.ticket.id);
+      console.log(ticket);
+
+      if (success) {
+        await fetch("/api/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firstName: form.name,
+            eventName: "Bichiyal",
+            eventDate: "2025-04-12",
+            eventTime: "20:00",
+            venueName: "Hotel V1501",
+            venueAddress: "Cl 20 #33-60, Pasto",
+            ticketStatus: "Confirmado",
+            qrCodeUrl: ticket.qrCode,
+            producerName: "Piso 12"
+          }),
+        });
+      }
     } catch (err) {
       const error = err instanceof Error ? err.message : "Error desconocido";
       setError(error);

@@ -1,7 +1,7 @@
 import { Assistant } from "@/interfaces/Assistant";
 import { Ticket } from "@/interfaces/Ticket";
-import { createAssistant } from "../assistant";
-import { createTicket } from "../ticket";
+import { createAssistant } from "../utils/assistant";
+import { createTicket } from "../utils/ticket";
 import { IdentificationType, TicketType } from "@/types/enums";
 
 /**

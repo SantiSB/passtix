@@ -1,27 +1,5 @@
-import { TicketEnriched } from "@/interfaces/TicketEnriched";
-import { useEffect, useState } from "react";
-
-interface EnrichedTicket {
-  id: string;
-  ticketType: string;
-  price: number | null;
-  status: string;
-  emailStatus: string;
-  qrCode: string;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  checkedInAt: Date | null;
-  identificationNumber: string;
-
-  assistantName: string;
-  assistantEmail: string;
-  phoneNumber: string;
-  phaseName: string;
-  localityName: string;
-  promoterName?: string;
-  discountAmount?: number;
-  discountType?: string;
-}
+import usePaginatedTickets from "@/hooks/usePaginatedTickets";
+import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
 const getStatusBadgeClass = (status: string) => {
   switch (status.toLowerCase()) {
@@ -38,30 +16,40 @@ const getStatusBadgeClass = (status: string) => {
   }
 };
 
-interface TicketsTableProps {
-  tickets: TicketEnriched[];
-}
+const TicketRow: React.FC<{ ticket: EnrichedTicket; index: number }> = ({
+  ticket,
+  index,
+}) => (
+  <tr key={ticket.id} className="hover:bg-gray-100">
+    <td className="py-3 px-4 border-b">{index + 1}</td>
+    <td className="py-3 px-4 border-b">{ticket.assistantName}</td>
+    <td className="py-3 px-4 border-b">{ticket.assistantEmail}</td>
+    <td className="py-3 px-4 border-b">{ticket.phoneNumber}</td>
+    <td className="py-3 px-4 border-b">{ticket.ticketType}</td>
+    <td className="py-3 px-4 border-b">
+      {ticket.price ? `$${ticket.price}` : "—"}
+    </td>
+    <td className="py-3 px-4 border-b">{ticket.phaseName}</td>
+    <td className="py-3 px-4 border-b">{ticket.localityName}</td>
+    <td className="py-3 px-4 border-b">{ticket.promoterName ?? "—"}</td>
+    <td className="py-3 px-4 border-b">{ticket.identificationNumber}</td>
+    <td className={`py-3 px-4 border-b ${getStatusBadgeClass(ticket.status)}`}>
+      {ticket.status}
+    </td>
+    <td className="py-3 px-4 border-b">
+      {ticket.checkedInAt ? new Date(ticket.checkedInAt).toLocaleString() : "—"}
+    </td>
+  </tr>
+);
 
-const TicketsTable: React.FC<TicketsTableProps> = () => {
-  const [tickets, setTickets] = useState<EnrichedTicket[]>([]);
-  const [loading, setLoading] = useState(true);
+const TicketsTable: React.FC = () => {
+  const { tickets, isLoading, isFetching, isError, hasMore, nextPage, prevPage, canGoBack, pageIndex } =
+    usePaginatedTickets();
 
-  useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const res = await fetch("/api/tickets");
-        const data = await res.json();
-        if (data.success) setTickets(data.tickets);
-      } catch (err) {
-        console.error("Error fetching tickets", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTickets();
-  }, []);
-
-  if (loading) return <p className="p-4 text-gray-500">Cargando tickets...</p>;
+  if (isLoading)
+    return <p className="p-4 text-gray-500">Cargando tickets...</p>;
+  if (isError)
+    return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
 
   return (
     <div className="overflow-x-auto bg-white text-black">
@@ -84,39 +72,32 @@ const TicketsTable: React.FC<TicketsTableProps> = () => {
         </thead>
         <tbody>
           {tickets.map((ticket, index) => (
-            <tr key={ticket.id} className="hover:bg-gray-100">
-              <td className="py-3 px-4 border-b">{index + 1}</td>
-              <td className="py-3 px-4 border-b">{ticket.assistantName}</td>
-              <td className="py-3 px-4 border-b">{ticket.assistantEmail}</td>
-              <td className="py-3 px-4 border-b">{ticket.phoneNumber}</td>
-              <td className="py-3 px-4 border-b">{ticket.ticketType}</td>
-              <td className="py-3 px-4 border-b">
-                {ticket.price ? `$${ticket.price}` : "—"}
-              </td>
-              <td className="py-3 px-4 border-b">{ticket.phaseName}</td>
-              <td className="py-3 px-4 border-b">{ticket.localityName}</td>
-              <td className="py-3 px-4 border-b">
-                {ticket.promoterName ?? "—"}
-              </td>
-              <td className="py-3 px-4 border-b">
-                {ticket.identificationNumber}
-              </td>
-              <td
-                className={`py-3 px-4 border-b ${getStatusBadgeClass(
-                  ticket.status
-                )}`}
-              >
-                {ticket.status}
-              </td>
-              <td className="py-3 px-4 border-b">
-                {ticket.checkedInAt
-                  ? new Date(ticket.checkedInAt).toLocaleString()
-                  : "—"}
-              </td>
-            </tr>
+            <TicketRow key={ticket.id} ticket={ticket} index={index} />
           ))}
         </tbody>
       </table>
+
+      <div className="flex items-center justify-between mt-4 px-4">
+        <button
+          onClick={prevPage}
+          disabled={!canGoBack || isFetching}
+          className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
+        >
+          ← Anterior
+        </button>
+
+        <span className="text-sm text-gray-600">
+          Página <strong>{pageIndex}</strong>
+        </span>
+
+        <button
+          onClick={nextPage}
+          disabled={!hasMore || isFetching}
+          className="bg-emerald-800 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-emerald-700"
+        >
+          Siguiente →
+        </button>
+      </div>
     </div>
   );
 };
