@@ -1,28 +1,14 @@
 import React from 'react';
-import { Html, Head, Body, Container, Section, Text, Heading, Button, Img } from '@react-email/components';
+import { Html, Head, Body, Container, Section, Text, Heading, Img } from '@react-email/components';
 
 interface TicketEmailProps {
-  firstName: string;
-  eventName: string;
-  eventDate: string;
-  eventTime: string;
-  venueName: string;
-  venueAddress: string;
-  ticketStatus: string;
+  name: string;
   qrCodeUrl: string;
-  producerName: string;
 }
 
 const TicketEmail: React.FC<TicketEmailProps> = ({
-  firstName,
-  eventName,
-  eventDate,
-  eventTime,
-  venueName,
-  venueAddress,
-  ticketStatus,
+  name,
   qrCodeUrl,
-  producerName,
 }) => {
   return (
     <Html>
@@ -30,11 +16,11 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
       <Body>
         <Container>
           <Section>
-            <Heading>¡Tu entrada para {eventName} está lista!</Heading>
+            <Heading>¡Tu entrada para BICHIYAL está lista!</Heading>
           </Section>
           <Section>
-            <Text>Hola {firstName},</Text>
-            <Text>¡Gracias por registrarte en {eventName}!</Text>
+            <Text>Hola {name},</Text>
+            <Text>¡Gracias por registrarte en BICHIYAL!</Text>
           </Section>
           <Section>
             <Text>Te confirmamos que tu entrada ha sido generada con éxito. A continuación encontrarás tu código QR, que deberás presentar al ingresar.</Text>
@@ -43,10 +29,10 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             <Img src={qrCodeUrl} alt="Código QR" style={{ maxWidth: '200px', margin: '0 auto' }} />
           </Section>
           <Section>
-            <Text>Evento: {eventName}</Text>
-            <Text>Fecha y hora: {eventDate}, {eventTime}</Text>
-            <Text>Lugar: {venueName} – {venueAddress}</Text>
-            <Text>Estado del ticket: {ticketStatus}</Text>
+            <Text>Evento: BICHIYAL</Text>
+            <Text>Fecha y hora: 12 de abril, 20:00</Text>
+            <Text>Lugar: Hotel V1501 – Cl 20 #33-60, Pasto</Text>
+            <Text>Estado del ticket: Confirmado</Text>
           </Section>
           <Section>
             <Text>Instrucciones importantes:</Text>
@@ -55,17 +41,12 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             <Text>El ticket es personal e intransferible.</Text>
             <Text>En caso de duda, respondé a este correo.</Text>
           </Section>
-          {/* <Section>
-            <Button href="#">Descargar Ticket PDF</Button>
-          </Section> */}
           <Section>
             <Text>Nos vemos en el evento,</Text>
-            <Text>El equipo de {producerName}</Text>
+            <Text>El equipo de Piso 12</Text>
           </Section>
           <Section>
-            <Text>Redes sociales (opcional)</Text>
-            <Text>Información legal o disclaimer</Text>
-            <Text>Link para contacto o soporte</Text>
+            <Text>Instagram: @piso12___</Text>
           </Section>
         </Container>
       </Body>

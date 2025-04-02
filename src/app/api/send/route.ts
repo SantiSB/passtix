@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(request: Request) {
   try {
     const {
-      firstName,
+      name,
       eventName,
       eventDate,
       eventTime,
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     } = await request.json();
 
     const emailContent = await TicketEmail({
-      firstName,
+      name,
       eventName,
       eventDate,
       eventTime,

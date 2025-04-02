@@ -5,7 +5,6 @@ interface EnrichedTicket {
   ticketType: string;
   price: number | null;
   status: string;
-  emailStatus: string;
   qrCode: string;
   createdAt: Date | null;
   updatedAt: Date | null;

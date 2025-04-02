@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { Phase } from "@/interfaces/Phase";
 import useEventOptions from "@/hooks/useEventOptions";
 import usePromoterOptions from "@/hooks/usePromoterOptions";
-import { getTicket } from "@/lib/utils/ticket";
-const DEFAULT_EVENT_ID = "kZEZ4x42RtwELpkO3dEf";
 
 const useRegisterTicketForm = () => {
+  // Hooks para obtener las opciones de los inputs de eventos y promotores
   const { phases, localities, loading: loadingOptions } = useEventOptions();
   const { promoters, loading: loadingPromoters } = usePromoterOptions();
 
+  // Estado del formulario
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -24,11 +24,12 @@ const useRegisterTicketForm = () => {
     price: 0,
   });
 
+  // Estado de la carga, éxito y error
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Auto-set price from selected phase
+  // Cambia el precio del ticket según la fase seleccionada
   useEffect(() => {
     const selectedPhase = phases.find((p: Phase) => p.id === form.phaseId);
     if (selectedPhase?.price !== undefined) {
@@ -36,6 +37,7 @@ const useRegisterTicketForm = () => {
     }
   }, [form.phaseId, phases]);
 
+  // Cambia el valor de un input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -43,22 +45,31 @@ const useRegisterTicketForm = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Envía el formulario
   const handleSubmit = async (e: React.FormEvent) => {
+    // Prevenir el envío del formulario
     e.preventDefault();
+
+    // Iniciar el proceso de carga
     setLoading(true);
     setSuccess(false);
     setError(null);
 
+    // Intentar registrar el ticket
     try {
-      const res = await fetch("/api/tickets", {
+      const res = await fetch("/api/register-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, eventId: DEFAULT_EVENT_ID }),
+        body: JSON.stringify({ ...form }),
       });
 
+      // Obtener la respuesta
       const json = await res.json();
+
+      // Si la respuesta no es exitosa, lanzar un error
       if (!res.ok || !json.success) throw new Error(json.error || "Error");
 
+      // Si la respuesta es exitosa, limpiar el formulario
       setSuccess(true);
       setForm({
         name: "",
@@ -72,31 +83,12 @@ const useRegisterTicketForm = () => {
         promoterId: "",
         price: 0,
       });
-
-      const ticket = await getTicket(json.ticket.id);
-      console.log(ticket);
-
-      if (success) {
-        await fetch("/api/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firstName: form.name,
-            eventName: "Bichiyal",
-            eventDate: "2025-04-12",
-            eventTime: "20:00",
-            venueName: "Hotel V1501",
-            venueAddress: "Cl 20 #33-60, Pasto",
-            ticketStatus: "Confirmado",
-            qrCodeUrl: ticket.qrCode,
-            producerName: "Piso 12"
-          }),
-        });
-      }
     } catch (err) {
+      // Si hay un error, mostrarlo
       const error = err instanceof Error ? err.message : "Error desconocido";
       setError(error);
     } finally {
+      // Finalizar el proceso de carga
       setLoading(false);
     }
   };

@@ -1,8 +1,4 @@
-import {
-  EmailStatus,
-  TicketStatus,
-  TicketType,
-} from "@/types/enums";
+import { TicketStatus, TicketType } from "@/types/enums";
 
 export interface Ticket {
   id: string;
@@ -15,7 +11,6 @@ export interface Ticket {
   price: number | null;
   qrCode: string;
   status: TicketStatus;
-  emailStatus: EmailStatus;
   createdAt: Date;
   updatedAt: Date;
   checkedInAt: Date | null;

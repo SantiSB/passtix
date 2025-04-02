@@ -8,8 +8,6 @@ export type TicketStatus = 'enabled' | 'joined';
 
 export type DeliveryMethod = 'email' | 'manual' | 'whatsapp';
 
-export type EmailStatus = 'pending' | 'sent' | 'failed';
-
 export type PaymentMethod = 'card' | 'pse' | 'nequi';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed';

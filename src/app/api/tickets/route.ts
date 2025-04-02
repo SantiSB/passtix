@@ -31,7 +31,6 @@ export async function GET() {
           id: docSnap.id,
           ticketType: data.ticketType,
           status: data.status,
-          emailStatus: data.emailStatus,
           price: data.price,
           qrCode: data.qrCode,
           createdAt: data.createdAt?.toDate?.() ?? null,

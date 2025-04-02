@@ -52,7 +52,6 @@ export async function registerAssistantWithTicket(params: {
     localityId,
     price,
     promoterId,
-    emailStatus: "pending",
     status: "enabled",
   });
 

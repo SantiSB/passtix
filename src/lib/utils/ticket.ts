@@ -15,48 +15,53 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import QRCode from "qrcode";
 import { v4 as uuid } from "uuid";
 import { Ticket } from "@/interfaces/Ticket";
-import { TicketType, EmailStatus, TicketStatus } from "@/types/enums";
+import { TicketType, TicketStatus } from "@/types/enums";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
-/**
- * Crea un ticket con QR
- */
+const BICHIYAL_EVENT_ID = "kZEZ4x42RtwELpkO3dEf";
+
+// Crea un ticket con QR
 export async function createTicket(params: {
-  eventId: string;
   assistantId: string;
   phaseId: string;
   ticketType: TicketType;
   localityId: string;
   price: number | null;
   promoterId?: string;
-  emailStatus: EmailStatus;
   status: TicketStatus;
 }): Promise<Ticket> {
   const {
-    eventId,
     assistantId,
     phaseId,
     ticketType,
     localityId,
     price,
     promoterId,
-    emailStatus,
     status,
   } = params;
 
+  // Generar ID del ticket
   const ticketId = uuid();
 
   // Generar QR con el ID del ticket
   const qrBuffer = await QRCode.toBuffer(ticketId, { type: "png" });
+
+  // Guardar QR en Firebase Storage
   const qrRef = ref(storage, `qrcodes/${ticketId}.png`);
+
+  // Subir QR a Firebase Storage
   await uploadBytes(qrRef, qrBuffer, { contentType: "image/png" });
+
+  // Obtener URL del QR
   const qrCodeUrl = await getDownloadURL(qrRef);
 
+  // Generar fecha y hora actual
   const now = new Date();
 
+  // Crear ticket
   const ticket: Ticket = {
     id: ticketId,
-    eventId,
+    eventId: BICHIYAL_EVENT_ID,
     assistantId,
     phaseId,
     promoterId,
@@ -65,28 +70,37 @@ export async function createTicket(params: {
     price,
     qrCode: qrCodeUrl,
     status,
-    emailStatus,
     createdAt: now,
     updatedAt: now,
     checkedInAt: null,
   };
 
-  await setDoc(doc(db, "ticket", ticketId), ticket);
+  // Devolver ticket creado
   return ticket;
 }
 
-/**
- * Obtiene un ticket por su ID
- */
+// Guarda un ticket en la base de datos
+export async function saveTicket(ticket: Ticket): Promise<void> {
+  // Obtener referencia del ticket
+  const ticketRef = doc(db, "ticket", ticket.id);
+
+  // Guardar ticket en Firestore
+  await setDoc(ticketRef, ticket);
+}
+
+// Obtiene un ticket por su ID
 export async function getTicket(id: string): Promise<Ticket> {
+  // Obtener referencia del ticket
   const ticketRef = doc(db, "ticket", id);
+
+  // Obtener ticket
   const ticketSnap = await getDoc(ticketRef);
+
+  // Devolver ticket
   return ticketSnap.data() as Ticket;
 }
 
-/**
- * Consulta tickets paginados para React Query
- */
+// Consulta tickets paginados para React Query
 export async function fetchPaginatedTickets(
   pageSize = 10,
   lastDoc: DocumentSnapshot | null = null

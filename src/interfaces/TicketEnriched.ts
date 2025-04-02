@@ -2,7 +2,6 @@ export interface TicketEnriched {
   id: string;
   ticketType: string;
   status: string;
-  emailStatus: string;
   price: number | null;
   qrCode: string;
   createdAt: Date | null;
