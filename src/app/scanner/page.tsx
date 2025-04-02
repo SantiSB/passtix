@@ -3,8 +3,10 @@
 import { useQrScanner } from "@/hooks/useQrScanner";
 
 export default function ScannerPage() {
+  // Estado del escaner
   const { status, assistantName, scannerRef } = useQrScanner();
 
+  // Estilos del estado
   const getStatusStyles = (status: string | null) => {
     if (!status) return "";
     if (status.includes("✅")) return "text-emerald-800";

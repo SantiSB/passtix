@@ -1,15 +1,5 @@
-export type UserRole = 'admin' | 'editor' | 'scanner' | 'viewer';
-
 export type IdentificationType = 'nit' | 'cc' | 'ce' | 'otro';
 
 export type TicketType = 'ticket' | 'courtesy';
 
 export type TicketStatus = 'enabled' | 'joined';
-
-export type DeliveryMethod = 'email' | 'manual' | 'whatsapp';
-
-export type PaymentMethod = 'card' | 'pse' | 'nequi';
-
-export type PaymentStatus = 'pending' | 'paid' | 'failed';
-
-export type DiscountType = 'percentage' | 'fixed';  

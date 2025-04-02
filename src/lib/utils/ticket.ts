@@ -18,6 +18,7 @@ import { Ticket } from "@/interfaces/Ticket";
 import { TicketType, TicketStatus } from "@/types/enums";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
+// ID del evento BICHIYAL
 const BICHIYAL_EVENT_ID = "kZEZ4x42RtwELpkO3dEf";
 
 // Crea un ticket con QR

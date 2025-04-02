@@ -4,7 +4,6 @@ import {  doc, getDoc, setDoc } from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 import { IdentificationType } from "@/types/enums";
 
-
 // Crea un nuevo asistente
 export async function createAssistant(
   name: string,
@@ -13,6 +12,7 @@ export async function createAssistant(
   identificationNumber: string,
   identificationType: IdentificationType
 ): Promise<Assistant> {
+
   // Generar ID del asistente
   const id = uuid();
 

@@ -1,16 +1,20 @@
 import { db } from "@/lib/firebase/firebase";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { NextRequest, NextResponse } from "next/server";
-import { registerAssistantWithTicket } from "@/lib/actions/registerAssistantWithTicket";
+import { NextResponse } from "next/server";
 
+// Endpoint para obtener todos los tickets
 export async function GET() {
   try {
+    // Obtener todos los tickets
     const snapshot = await getDocs(collection(db, "ticket"));
 
+    // Mapear los tickets
     const tickets = await Promise.all(
       snapshot.docs.map(async (docSnap) => {
+        // Obtener los datos del ticket
         const data = docSnap.data();
 
+        // Obtener los datos de los asistentes, eventos, fases, localidades y promotores
         const [
           assistantSnap,
           eventSnap,
@@ -27,6 +31,7 @@ export async function GET() {
             : Promise.resolve(null),
         ]);
 
+        // Devolver los datos del ticket
         return {
           id: docSnap.id,
           ticketType: data.ticketType,
@@ -37,7 +42,7 @@ export async function GET() {
           updatedAt: data.updatedAt?.toDate?.() ?? null,
           checkedInAt: data.checkedInAt?.toDate?.() ?? null,
 
-          // Enriquecidos
+          // Datos del asistente
           assistantName: assistantSnap.exists()
             ? assistantSnap.data().name
             : "—",
@@ -51,9 +56,16 @@ export async function GET() {
             ? assistantSnap.data().identificationNumber ?? "—"
             : "—",
 
+          // Datos del evento
           eventName: eventSnap.exists() ? eventSnap.data().name : "—",
+
+          // Datos de la fase
           phaseName: phaseSnap.exists() ? phaseSnap.data().name : "—",
+
+          // Datos de la localidad
           localityName: localitySnap.exists() ? localitySnap.data().name : "—",
+
+          // Datos del promotor
           promoterName: promoterSnap?.exists()
             ? promoterSnap.data().name
             : null,
@@ -67,23 +79,6 @@ export async function GET() {
     console.error("Error al obtener tickets:", err);
     return NextResponse.json(
       { success: false, error: "Error al obtener tickets" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const { assistant, ticket } = await registerAssistantWithTicket(body);
-
-    return NextResponse.json({ success: true, assistant, ticket });
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error("Unknown error");
-    console.error("Error al crear ticket:", err);
-
-    return NextResponse.json(
-      { success: false, error: err.message || "Error desconocido" },
       { status: 500 }
     );
   }

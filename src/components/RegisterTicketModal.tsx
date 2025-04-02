@@ -1,10 +1,10 @@
 "use client";
 
 import useRegisterTicketForm from "@/hooks/useRegisterTicketForm";
-import TextInput from './TextInput';
-import SelectInput from './SelectInput';
-import FormActions from './FormActions';
-import { SuccessMessage, ErrorMessage } from './Messages';
+import TextInput from './common/TextInput';
+import SelectInput from './common/SelectInput';
+import FormActions from './common/FormActions';
+import { SuccessMessage, ErrorMessage } from './common/Messages';
 
 const RegisterTicketModal = ({
   isOpen,

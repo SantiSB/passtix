@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import TicketEmail from "@/components/TicketEmail";
+import TicketEmail from "@/components/email/TicketEmail";
 
 // Initializar Resend
 const resend = new Resend(process.env.RESEND_API_KEY);

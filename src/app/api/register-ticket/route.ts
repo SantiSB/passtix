@@ -3,7 +3,7 @@ import { createTicket, saveTicket } from "@/lib/utils/ticket";
 import { sendTicketEmail } from "@/lib/utils/email";
 import { createAssistant, saveAssistant } from "@/lib/utils/assistant";
 
-// Registra un ticket
+// Endpoint para registrar un ticket
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

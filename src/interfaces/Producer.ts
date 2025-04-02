@@ -1,5 +1,5 @@
 import { IdentificationType } from "@/types/enums";
-import { Timestamp } from "firebase/firestore";
+
 export interface Producer {
   id: string;
   name: string;
@@ -7,6 +7,6 @@ export interface Producer {
   phoneNumber: string;
   identificationNumber: string;
   identificationType: IdentificationType;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }

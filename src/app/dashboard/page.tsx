@@ -1,13 +1,11 @@
-'use client';
+"use client";
 
-import TicketsTable from '@/components/TicketsTable';
-import CreateAssistantModal from '@/components/RegisterTicketModal';
-import useTickets from '@/hooks/useTickets';
-import { useState } from 'react';
+import TicketsTable from "@/components/TicketsTable";
+import CreateAssistantModal from "@/components/RegisterTicketModal";
+import { useState } from "react";
 
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { tickets, loading, error } = useTickets();
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -30,13 +28,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
           <div className="px-4 py-8 sm:px-0">
             <div className="border-2 border-emerald-800 rounded-lg shadow-inner overflow-auto">
-              {loading ? (
-                <p className="p-4 text-center">Cargando tickets...</p>
-              ) : error ? (
-                <p className="p-4 text-center text-red-500">{error}</p>
-              ) : (
-                <TicketsTable tickets={tickets} />
-              )}
+              <TicketsTable />
             </div>
           </div>
         </div>
