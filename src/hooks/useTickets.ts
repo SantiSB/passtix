@@ -10,7 +10,7 @@ interface EnrichedTicket {
   updatedAt: Date | null;
   checkedInAt: Date | null;
   identificationNumber: string;
-
+  identificationType: string;
   assistantName: string;
   assistantEmail: string;
   phoneNumber: string;

@@ -11,6 +11,7 @@ export interface EnrichedTicket {
   
   // Datos del asistente
   identificationNumber: string;
+  identificationType: string;
   assistantName: string;
   assistantEmail: string;
   phoneNumber: string;

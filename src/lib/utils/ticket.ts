@@ -148,6 +148,7 @@ export async function fetchPaginatedTickets(
         : null;
       const promoter = promoterSnap?.data();
 
+
       return {
         ...ticket,
         id: docSnap.id,
@@ -155,6 +156,7 @@ export async function fetchPaginatedTickets(
         assistantEmail: assistant?.email ?? "—",
         phoneNumber: assistant?.phoneNumber ?? "—",
         identificationNumber: assistant?.identificationNumber ?? "—",
+        identificationType: assistant?.identificationType ?? "—",
         phaseName: phase?.name ?? "—",
         localityName: locality?.name ?? "—",
         promoterName: promoter?.name ?? "—",
@@ -167,4 +169,68 @@ export async function fetchPaginatedTickets(
     lastDoc: snapshot.docs[snapshot.docs.length - 1] ?? null,
     hasMore: snapshot.docs.length === pageSize,
   };
+}
+
+// Actualiza un ticket en la base de datos
+export async function updateTicket(params: {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  identificationNumber: string;
+  identificationType: string;
+  ticketType: TicketType;
+  localityId: string;
+  phaseId: string;
+  promoterId: string;
+  price: number;
+}): Promise<{ success: boolean; ticket?: Ticket }> {
+  try {
+    const {
+      id,
+      name,
+      email,
+      phoneNumber,
+      identificationNumber,
+      identificationType,
+      ticketType,
+      localityId,
+      phaseId,
+      promoterId,
+      price,
+    } = params;
+
+    // Obtener el ticket existente
+    const ticketRef = doc(db, "ticket", id);
+    const ticketSnap = await getDoc(ticketRef);
+
+    if (!ticketSnap.exists()) {
+      return { success: false };
+    }
+
+    // Actualizar los detalles del ticket
+    const existingTicket = ticketSnap.data() as Ticket;
+    const updatedTicket = {
+      ...existingTicket,
+      name,
+      email,
+      phoneNumber,
+      identificationNumber,
+      identificationType,
+      ticketType,
+      localityId,
+      phaseId,
+      promoterId,
+      price,
+      updatedAt: new Date(),
+    };
+
+    // Guardar el ticket actualizado en Firestore
+    await setDoc(ticketRef, updatedTicket);
+
+    return { success: true, ticket: updatedTicket };
+  } catch (error) {
+    console.error("Error updating ticket:", error);
+    return { success: false };
+  }
 }
