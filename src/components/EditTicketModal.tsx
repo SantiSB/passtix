@@ -105,24 +105,24 @@ const EditTicketModal = ({
           />
           <SelectInput
             label="Localidad"
-            name="localityName"
-            value={form.localityName}
+            name="localityId"
+            value={form.localityId}
             onChange={handleChange}
             options={localities}
             required
           />
           <SelectInput
             label="Etapa"
-            name="phaseName"
-            value={form.phaseName}
+            name="phaseId"
+            value={form.phaseId}
             onChange={handleChange}
             options={phases}
             required
           />
           <SelectInput
             label="Promotor"
-            name="promoterName"
-            value={form.promoterName || ""}
+            name="promoterId"
+            value={form.promoterId || ""}
             onChange={handleChange}
             options={promoters}
           />

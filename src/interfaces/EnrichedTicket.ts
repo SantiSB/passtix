@@ -18,10 +18,13 @@ export interface EnrichedTicket {
 
   // Datos de la fase
   phaseName: string;
+  phaseId: string;
 
   // Datos de la localidad
   localityName: string;
+  localityId: string;
 
   // Datos del promotor
   promoterName?: string;
+  promoterId?: string;
 }
