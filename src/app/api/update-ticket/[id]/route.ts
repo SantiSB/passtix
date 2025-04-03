@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateTicket } from "@/lib/utils/ticket";
+import { updateAssistant } from "@/lib/utils/assistant";
 
-// Endpoint para actualizar un ticket
+// Endpoint para actualizar un ticket y su asistente
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
 
     const {
       id,
+      assistantId,
       name,
       email,
       phoneNumber,
@@ -23,6 +25,7 @@ export async function PUT(req: NextRequest) {
     // Validación básica
     if (
       !id ||
+      !assistantId ||
       !name ||
       !email ||
       !phoneNumber ||
@@ -39,11 +42,26 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Actualizar el ticket en Firestore
-    const updateResult = await updateTicket({
-      id,
+    // 1. Actualizar el asistente
+    const assistantResult = await updateAssistant(assistantId, {
       name,
       email,
+      phoneNumber,
+      identificationNumber,
+      identificationType,
+    });
+
+    if (!assistantResult.success) {
+      return NextResponse.json(
+        { success: false, error: "No se pudo actualizar el asistente." },
+        { status: 500 }
+      );
+    }
+
+    // 2. Actualizar el ticket
+    const ticketResult = await updateTicket({
+      id,
+      assistantId,
       phoneNumber,
       identificationNumber,
       identificationType,
@@ -54,16 +72,14 @@ export async function PUT(req: NextRequest) {
       price,
     });
 
-    // Si no se pudo actualizar el ticket, devolver un error
-    if (!updateResult.success) {
+    if (!ticketResult.success) {
       return NextResponse.json(
         { success: false, error: "No se pudo actualizar el ticket." },
         { status: 500 }
       );
     }
 
-    // Devolver el ticket actualizado
-    return NextResponse.json({ success: true, ticket: updateResult.ticket });
+    return NextResponse.json({ success: true, ticket: ticketResult.ticket });
   } catch (err: any) {
     console.error("Error en /update-ticket:", err);
     return NextResponse.json(

@@ -152,8 +152,8 @@ export async function fetchPaginatedTickets(
       return {
         ...ticket,
         id: docSnap.id,
-        assistantName: assistant?.name ?? "—",
-        assistantEmail: assistant?.email ?? "—",
+        name: assistant?.name ?? "—",
+        email: assistant?.email ?? "—",
         phoneNumber: assistant?.phoneNumber ?? "—",
         identificationNumber: assistant?.identificationNumber ?? "—",
         identificationType: assistant?.identificationType ?? "—",
@@ -174,8 +174,7 @@ export async function fetchPaginatedTickets(
 // Actualiza un ticket en la base de datos
 export async function updateTicket(params: {
   id: string;
-  name: string;
-  email: string;
+  assistantId: string;
   phoneNumber: string;
   identificationNumber: string;
   identificationType: string;
@@ -188,8 +187,7 @@ export async function updateTicket(params: {
   try {
     const {
       id,
-      name,
-      email,
+      assistantId,
       phoneNumber,
       identificationNumber,
       identificationType,
@@ -200,7 +198,6 @@ export async function updateTicket(params: {
       price,
     } = params;
 
-    // Obtener el ticket existente
     const ticketRef = doc(db, "ticket", id);
     const ticketSnap = await getDoc(ticketRef);
 
@@ -208,12 +205,10 @@ export async function updateTicket(params: {
       return { success: false };
     }
 
-    // Actualizar los detalles del ticket
     const existingTicket = ticketSnap.data() as Ticket;
     const updatedTicket = {
       ...existingTicket,
-      name,
-      email,
+      assistantId,
       phoneNumber,
       identificationNumber,
       identificationType,
@@ -225,7 +220,6 @@ export async function updateTicket(params: {
       updatedAt: new Date(),
     };
 
-    // Guardar el ticket actualizado en Firestore
     await setDoc(ticketRef, updatedTicket);
 
     return { success: true, ticket: updatedTicket };

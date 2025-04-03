@@ -43,3 +43,31 @@ export async function getAssistant(id: string): Promise<Assistant | null> {
   return snapshot.data() as Assistant | null;
 }
 
+// Actualiza un asistente existente en Firestore
+export async function updateAssistant(
+  id: string,
+  updates: Partial<Omit<Assistant, "id" | "createdAt">>
+): Promise<{ success: boolean }> {
+  try {
+    const assistantRef = doc(db, "assistant", id);
+    const assistantSnap = await getDoc(assistantRef);
+
+    if (!assistantSnap.exists()) {
+      return { success: false };
+    }
+
+    const existingData = assistantSnap.data() as Assistant;
+
+    const updatedAssistant: Assistant = {
+      ...existingData,
+      ...updates,
+      updatedAt: new Date(),
+    };
+
+    await setDoc(assistantRef, updatedAssistant);
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating assistant:", error);
+    return { success: false };
+  }
+}

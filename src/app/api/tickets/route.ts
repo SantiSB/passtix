@@ -43,10 +43,10 @@ export async function GET() {
           checkedInAt: data.checkedInAt?.toDate?.() ?? null,
 
           // Datos del asistente
-          assistantName: assistantSnap.exists()
+          name: assistantSnap.exists()
             ? assistantSnap.data().name
             : "—",
-          assistantEmail: assistantSnap.exists()
+          email: assistantSnap.exists()
             ? assistantSnap.data().email
             : "—",
           phoneNumber: assistantSnap.exists()

@@ -11,8 +11,8 @@ interface EnrichedTicket {
   checkedInAt: Date | null;
   identificationNumber: string;
   identificationType: string;
-  assistantName: string;
-  assistantEmail: string;
+  name: string;
+  email: string;
   phoneNumber: string;
   phaseName: string;
   localityName: string;

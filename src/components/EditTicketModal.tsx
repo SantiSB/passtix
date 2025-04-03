@@ -53,10 +53,10 @@ const EditTicketModal = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Campos de texto */}
           {[
-            { label: "Nombre", name: "assistantName", required: true },
+            { label: "Nombre", name: "name", required: true },
             {
               label: "Correo Electrónico",
-              name: "assistantEmail",
+              name: "email",
               required: true,
               type: "email",
             },

@@ -111,8 +111,8 @@ const TicketRow: React.FC<{ ticket: EnrichedTicket; index: number; handleEdit: (
 }) => (
   <tr key={ticket.id} className="hover:bg-gray-100">
     <td className="py-3 px-4 border-b">{index + 1}</td>
-    <td className="py-3 px-4 border-b">{ticket.assistantName}</td>
-    <td className="py-3 px-4 border-b">{ticket.assistantEmail}</td>
+    <td className="py-3 px-4 border-b">{ticket.name}</td>
+    <td className="py-3 px-4 border-b">{ticket.email}</td>
     <td className="py-3 px-4 border-b">{ticket.phoneNumber}</td>
     <td className="py-3 px-4 border-b">{ticket.ticketType}</td>
     <td className="py-3 px-4 border-b">

@@ -12,8 +12,8 @@ export interface EnrichedTicket {
   // Datos del asistente
   identificationNumber: string;
   identificationType: string;
-  assistantName: string;
-  assistantEmail: string;
+  name: string;
+  email: string;
   phoneNumber: string;
 
   // Datos de la fase
