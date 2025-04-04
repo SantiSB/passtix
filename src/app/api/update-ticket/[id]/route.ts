@@ -80,7 +80,7 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, ticket: ticketResult.ticket });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error en /update-ticket:", err);
     return NextResponse.json(
       { success: false, error: "Error interno al actualizar el ticket." },

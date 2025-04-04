@@ -34,8 +34,8 @@ export async function sendTicketEmail({
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
-    return { success: false, error: err.message || "Error al enviar el email" };
+    return { success: false, error: err instanceof Error ? err.message : "Error al enviar el email" };
   }
 }

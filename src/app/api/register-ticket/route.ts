@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     // Devolver el ticket creado
     return NextResponse.json({ success: true, ticket });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error en /register-ticket:", err);
     return NextResponse.json(
       { success: false, error: "Error interno al registrar el ticket." },
