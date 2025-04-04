@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
       to: email,
       name,
       qrCodeUrl: ticket.qrCode,
+      ticketId: ticket.id,      
     });
 
     // Si no se pudo enviar el correo, devolver un error
