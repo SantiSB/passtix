@@ -61,17 +61,17 @@ const TicketsTable: React.FC = () => {
       <table className="min-w-full border-collapse">
         <thead>
           <tr className="bg-emerald-800 text-white font-bold">
-            <th className="py-3 px-4 border-b">#</th>
-            <th className="py-3 px-4 border-b">Asistente</th>
-            <th className="py-3 px-4 border-b">Correo</th>
-            <th className="py-3 px-4 border-b">Celular</th>
-            <th className="py-3 px-4 border-b">Tipo Ticket</th>
+            <th className="py-3 px-4 border-b">🎫​</th>
+            <th className="py-3 px-4 border-b">Estado</th>
+            <th className="py-3 px-4 border-b">Nombre</th>
+            <th className="py-3 px-4 border-b">Cedula</th>
+            <th className="py-3 px-4 border-b">Tipo</th>
             <th className="py-3 px-4 border-b">Precio</th>
             <th className="py-3 px-4 border-b">Fase</th>
             <th className="py-3 px-4 border-b">Localidad</th>
             <th className="py-3 px-4 border-b">Promotor</th>
-            <th className="py-3 px-4 border-b">Cedula</th>
-            <th className="py-3 px-4 border-b">Estado</th>
+            <th className="py-3 px-4 border-b">Correo</th>
+            <th className="py-3 px-4 border-b">Celular</th>
             <th className="py-3 px-4 border-b">Ingreso</th>
             <th className="py-3 px-4 border-b">Acciones</th>
           </tr>
@@ -128,9 +128,11 @@ const TicketRow: React.FC<{
 }> = ({ ticket, index, handleEdit }) => (
   <tr key={ticket.id} className="hover:bg-gray-100">
     <td className="py-3 px-4 border-b">{index + 1}</td>
+    <td className={`py-3 px-4 border-b ${getStatusBadgeClass(ticket.status)}`}>
+      {ticket.status}
+    </td>
     <td className="py-3 px-4 border-b">{ticket.name}</td>
-    <td className="py-3 px-4 border-b">{ticket.email}</td>
-    <td className="py-3 px-4 border-b">{ticket.phoneNumber}</td>
+    <td className="py-3 px-4 border-b">{ticket.identificationNumber}</td>
     <td className="py-3 px-4 border-b">{ticket.ticketType}</td>
     <td className="py-3 px-4 border-b">
       {ticket.price ? `$${ticket.price}` : "—"}
@@ -138,10 +140,10 @@ const TicketRow: React.FC<{
     <td className="py-3 px-4 border-b">{ticket.phaseName}</td>
     <td className="py-3 px-4 border-b">{ticket.localityName}</td>
     <td className="py-3 px-4 border-b">{ticket.promoterName ?? "—"}</td>
-    <td className="py-3 px-4 border-b">{ticket.identificationNumber}</td>
-    <td className={`py-3 px-4 border-b ${getStatusBadgeClass(ticket.status)}`}>
-      {ticket.status}
-    </td>
+
+    <td className="py-3 px-4 border-b">{ticket.email}</td>
+    <td className="py-3 px-4 border-b">{ticket.phoneNumber}</td>
+    
     <td className="py-3 px-4 border-b">
       {ticket.checkedInAt
         ? ticket.checkedInAt instanceof Timestamp
