@@ -16,16 +16,16 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen h-[100dvh] overflow-hidden bg-black flex flex-col items-center justify-center px-4 py-8">
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
         🎟️ Escáner de Ingreso
       </h1>
 
-      <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-4 ring-2 ring-emerald-800">
+      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-emerald-600 to-black shadow-2xl ring-2 ring-emerald-800">
         <div
           id="qr-reader"
-          className="w-full h-auto mx-auto"
           ref={scannerRef}
+          className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
         ></div>
       </div>
 
