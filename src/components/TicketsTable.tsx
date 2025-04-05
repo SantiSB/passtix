@@ -2,6 +2,7 @@ import usePaginatedTickets from "@/hooks/usePaginatedTickets";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 import { useState } from "react";
 import EditTicketModal from "./EditTicketModal";
+import { Timestamp } from "firebase/firestore";
 
 const getStatusBadgeClass = (status: string) => {
   switch (status.toLowerCase()) {
@@ -19,11 +20,22 @@ const getStatusBadgeClass = (status: string) => {
 };
 
 const TicketsTable: React.FC = () => {
-  const { tickets, isLoading, isFetching, isError, hasMore, nextPage, prevPage, canGoBack, pageIndex } =
-    usePaginatedTickets();
+  const {
+    tickets,
+    isLoading,
+    isFetching,
+    isError,
+    hasMore,
+    nextPage,
+    prevPage,
+    canGoBack,
+    pageIndex,
+  } = usePaginatedTickets();
 
   const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
+    null
+  );
 
   const openEditModal = (ticket: EnrichedTicket) => {
     setSelectedTicket(ticket);
@@ -66,7 +78,12 @@ const TicketsTable: React.FC = () => {
         </thead>
         <tbody>
           {tickets.map((ticket, index) => (
-            <TicketRow key={ticket.id} ticket={ticket} index={index} handleEdit={handleEdit} />
+            <TicketRow
+              key={ticket.id}
+              ticket={ticket}
+              index={index}
+              handleEdit={handleEdit}
+            />
           ))}
         </tbody>
       </table>
@@ -104,11 +121,11 @@ const TicketsTable: React.FC = () => {
   );
 };
 
-const TicketRow: React.FC<{ ticket: EnrichedTicket; index: number; handleEdit: (ticket: EnrichedTicket) => void }> = ({
-  ticket,
-  index,
-  handleEdit,
-}) => (
+const TicketRow: React.FC<{
+  ticket: EnrichedTicket;
+  index: number;
+  handleEdit: (ticket: EnrichedTicket) => void;
+}> = ({ ticket, index, handleEdit }) => (
   <tr key={ticket.id} className="hover:bg-gray-100">
     <td className="py-3 px-4 border-b">{index + 1}</td>
     <td className="py-3 px-4 border-b">{ticket.name}</td>
@@ -126,8 +143,15 @@ const TicketRow: React.FC<{ ticket: EnrichedTicket; index: number; handleEdit: (
       {ticket.status}
     </td>
     <td className="py-3 px-4 border-b">
-      {ticket.checkedInAt ? new Date(ticket.checkedInAt).toLocaleString() : "—"}
+      {ticket.checkedInAt
+        ? ticket.checkedInAt instanceof Timestamp
+          ? ticket.checkedInAt.toDate().toLocaleString()
+          : ticket.checkedInAt instanceof Date
+            ? ticket.checkedInAt.toLocaleString()
+            : "—"
+        : "—"}
     </td>
+
     <td className="py-3 px-4 border-b">
       <button
         onClick={() => handleEdit(ticket)}
