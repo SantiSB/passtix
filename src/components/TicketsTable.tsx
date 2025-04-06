@@ -85,7 +85,7 @@ const TicketsTable: React.FC = () => {
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(ticket.status)}`}
                 >
-                  {ticket.status}
+                  {ticket.status === "enabled" ? "Habilitado" : ticket.status === "joined" ? "Ingresado" : ticket.status}
                 </span>
               </td>
               <td className="px-4 py-3 font-medium text-gray-900">

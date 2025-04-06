@@ -16,11 +16,10 @@ interface TicketModalProps {
 }
 
 const TicketModal = ({ isOpen, onClose, mode, ticket }: TicketModalProps) => {
-  // Elegir el hook correspondiente según el modo del modal
-  const formHook =
-    mode === "edit" && ticket
-      ? useEditTicketForm(ticket)
-      : useRegisterTicketForm();
+  const editFormHook = ticket ? useEditTicketForm(ticket) : null;
+  const registerFormHook = useRegisterTicketForm();
+
+  const formHook = mode === "edit" && editFormHook ? editFormHook : registerFormHook;
 
   const {
     form,
