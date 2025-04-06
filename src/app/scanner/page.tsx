@@ -21,7 +21,7 @@ export default function ScannerPage() {
         🎟️ Escáner de Ingreso
       </h1>
 
-      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-emerald-600 to-black shadow-2xl ring-2 ring-emerald-800">
+      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-slate-50 to-black shadow-2xl ring-2 ring-offset-slate-50">
         <div
           id="qr-reader"
           ref={scannerRef}

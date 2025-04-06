@@ -1,21 +1,27 @@
 "use client";
 
-import TextInput from './common/TextInput';
-import SelectInput from './common/SelectInput';
-import FormActions from './common/FormActions';
-import { SuccessMessage, ErrorMessage } from './common/Messages';
-import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
+import useRegisterTicketForm from "@/hooks/useRegisterTicketForm";
 import useEditTicketForm from "@/hooks/useEditTicketForm";
+import TextInput from "./common/TextInput";
+import SelectInput from "./common/SelectInput";
+import FormActions from "./common/FormActions";
+import { SuccessMessage, ErrorMessage } from "./common/Messages";
+import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
-const EditTicketModal = ({
-  isOpen,
-  onClose,
-  ticket,
-}: {
+interface TicketModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ticket: EnrichedTicket;
-}) => {
+  mode: "create" | "edit";
+  ticket?: EnrichedTicket;
+}
+
+const TicketModal = ({ isOpen, onClose, mode, ticket }: TicketModalProps) => {
+  // Elegir el hook correspondiente según el modo del modal
+  const formHook =
+    mode === "edit" && ticket
+      ? useEditTicketForm(ticket)
+      : useRegisterTicketForm();
+
   const {
     form,
     loading,
@@ -28,39 +34,50 @@ const EditTicketModal = ({
     promoters,
     loadingOptions,
     loadingPromoters,
-  } = useEditTicketForm(ticket);
+  } = formHook;
 
-  const handleOutsideClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose();
-  };
+  // Evitar cierre accidental al hacer clic fuera del modal
+  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`fixed inset-0 flex items-center justify-center ${
-        isOpen
-          ? "opacity-100 backdrop-blur-sm"
-          : "opacity-0 pointer-events-none"
-      } transition-opacity duration-300 ease-in-out`}
-      onClick={handleOutsideClick}
-    >
-      <div className="bg-white p-8 rounded-lg shadow-2xl max-w-lg w-full mx-4 border border-gray-300 max-h-[90vh] overflow-y-auto">
-        <h1 className="text-3xl font-extrabold mb-6 text-gray-900">
-          Editar Ticket
-        </h1>
+    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 ease-in-out z-50">
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto animate-fadeIn"
+        onClick={stopPropagation}
+      >
+        {/* Modal Header */}
+        <div className="sticky top-0 bg-white flex items-center justify-between px-6 py-4 border-b border-gray-200 z-10">
+          <h1 className="text-xl font-bold text-gray-900">
+            {mode === "edit" ? "Editar Ticket" : "Registrar asistente"}
+          </h1>
+          <button
+            className="text-gray-600 hover:text-gray-900 transition"
+            onClick={onClose}
+          >
+            ❌
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Campos de texto */}
+        {/* Modal Body */}
+        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-5">
           {[
-            { label: "Nombre", name: "name", required: true },
+            {
+              label: "Nombre",
+              name: "name",
+              required: true,
+            },
             {
               label: "Correo Electrónico",
               name: "email",
               required: true,
               type: "email",
             },
-            { label: "Celular", name: "phoneNumber" },
+            {
+              label: "Celular",
+              name: "phoneNumber",
+            },
             {
               label: "Número de documento",
               name: "identificationNumber",
@@ -78,7 +95,6 @@ const EditTicketModal = ({
             />
           ))}
 
-          {/* Selects */}
           <SelectInput
             label="Tipo de documento"
             name="identificationType"
@@ -92,6 +108,7 @@ const EditTicketModal = ({
             ]}
             required
           />
+
           <SelectInput
             label="Tipo de ticket"
             name="ticketType"
@@ -103,6 +120,7 @@ const EditTicketModal = ({
             ]}
             required
           />
+
           <SelectInput
             label="Localidad"
             name="localityId"
@@ -111,6 +129,7 @@ const EditTicketModal = ({
             options={localities}
             required
           />
+
           <SelectInput
             label="Etapa"
             name="phaseId"
@@ -119,6 +138,7 @@ const EditTicketModal = ({
             options={phases}
             required
           />
+
           <SelectInput
             label="Promotor"
             name="promoterId"
@@ -127,7 +147,6 @@ const EditTicketModal = ({
             options={promoters}
           />
 
-          {/* Acciones */}
           <FormActions
             onClose={onClose}
             loading={loading}
@@ -135,7 +154,15 @@ const EditTicketModal = ({
             loadingPromoters={loadingPromoters}
           />
 
-          {success && <SuccessMessage message="Ticket actualizado con éxito." />}
+          {success && (
+            <SuccessMessage
+              message={
+                mode === "edit"
+                  ? "Ticket actualizado con éxito."
+                  : "Asistente y ticket registrados con éxito."
+              }
+            />
+          )}
           {error && <ErrorMessage message={error} />}
         </form>
       </div>
@@ -143,4 +170,4 @@ const EditTicketModal = ({
   );
 };
 
-export default EditTicketModal; 
+export default TicketModal;

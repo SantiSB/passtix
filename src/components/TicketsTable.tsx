@@ -1,21 +1,17 @@
 import usePaginatedTickets from "@/hooks/usePaginatedTickets";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 import { useState } from "react";
-import EditTicketModal from "./EditTicketModal";
 import { Timestamp } from "firebase/firestore";
+import TicketModal from "./TicketModal";
 
 const getStatusBadgeClass = (status: string) => {
   switch (status.toLowerCase()) {
     case "enabled":
-      return "bg-blue-500 text-white";
+      return "bg-blue-800 text-white";
     case "joined":
-      return "bg-green-500 text-white";
-    case "pending":
-      return "bg-yellow-500 text-white";
-    case "failed":
-      return "bg-red-500 text-white";
+      return "bg-green-800 text-white";
     default:
-      return "bg-gray-500 text-white";
+      return "bg-gray-300 text-gray-700";
   }
 };
 
@@ -47,52 +43,91 @@ const TicketsTable: React.FC = () => {
     setSelectedTicket(null);
   };
 
-  const handleEdit = (ticket: EnrichedTicket) => {
-    openEditModal(ticket);
-  };
-
   if (isLoading)
     return <p className="p-4 text-gray-500">Cargando tickets...</p>;
   if (isError)
     return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
 
   return (
-    <div className="overflow-x-auto bg-white text-black">
-      <table className="min-w-full border-collapse">
-        <thead>
-          <tr className="bg-emerald-800 text-white font-bold">
-            <th className="py-3 px-4 border-b">🎫​</th>
-            <th className="py-3 px-4 border-b">Estado</th>
-            <th className="py-3 px-4 border-b">Nombre</th>
-            <th className="py-3 px-4 border-b">Cedula</th>
-            <th className="py-3 px-4 border-b">Tipo</th>
-            <th className="py-3 px-4 border-b">Precio</th>
-            <th className="py-3 px-4 border-b">Fase</th>
-            <th className="py-3 px-4 border-b">Localidad</th>
-            <th className="py-3 px-4 border-b">Promotor</th>
-            <th className="py-3 px-4 border-b">Correo</th>
-            <th className="py-3 px-4 border-b">Celular</th>
-            <th className="py-3 px-4 border-b">Ingreso</th>
-            <th className="py-3 px-4 border-b">Acciones</th>
+    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+      <table className="min-w-full text-sm text-left text-gray-700">
+        <thead className="text-xs uppercase bg-black/90 text-white">
+          <tr>
+            {[
+              "#",
+              "Estado",
+              "Nombre",
+              "Cédula",
+              "Tipo",
+              "Precio",
+              "Fase",
+              "Localidad",
+              "Promotor",
+              "Correo",
+              "Celular",
+              "Ingreso",
+              "Acciones",
+            ].map((header) => (
+              <th
+                key={header}
+                className="px-4 py-3 font-semibold tracking-wide"
+              >
+                {header}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {tickets.map((ticket, index) => (
-            <TicketRow
-              key={ticket.id}
-              ticket={ticket}
-              index={index}
-              handleEdit={handleEdit}
-            />
+            <tr key={ticket.id} className="even:bg-gray-50 hover:bg-gray-100">
+              <td className="px-4 py-3">{index + 1}</td>
+              <td className="px-4 py-3">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(ticket.status)}`}
+                >
+                  {ticket.status}
+                </span>
+              </td>
+              <td className="px-4 py-3 font-medium text-gray-900">
+                {ticket.name}
+              </td>
+              <td className="px-4 py-3">{ticket.identificationNumber}</td>
+              <td className="px-4 py-3">{ticket.ticketType}</td>
+              <td className="px-4 py-3">
+                {ticket.price ? `$${ticket.price}` : "—"}
+              </td>
+              <td className="px-4 py-3">{ticket.phaseName}</td>
+              <td className="px-4 py-3">{ticket.localityName}</td>
+              <td className="px-4 py-3">{ticket.promoterName ?? "—"}</td>
+              <td className="px-4 py-3">{ticket.email}</td>
+              <td className="px-4 py-3">{ticket.phoneNumber}</td>
+              <td className="px-4 py-3">
+                {ticket.checkedInAt
+                  ? ticket.checkedInAt instanceof Timestamp
+                    ? ticket.checkedInAt.toDate().toLocaleString()
+                    : ticket.checkedInAt instanceof Date
+                      ? ticket.checkedInAt.toLocaleString()
+                      : "—"
+                  : "—"}
+              </td>
+              <td className="px-4 py-3">
+                <button
+                  onClick={() => openEditModal(ticket)}
+                  className="px-3 py-1 bg-black/80 text-white rounded-lg text-xs transition transform hover:scale-105"
+                >
+                  ✏️
+                </button>
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="flex items-center justify-between mt-4 px-4">
+      <div className="flex justify-between items-center p-4">
         <button
           onClick={prevPage}
           disabled={!canGoBack || isFetching}
-          className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
+          className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           ← Anterior
         </button>
@@ -104,65 +139,22 @@ const TicketsTable: React.FC = () => {
         <button
           onClick={nextPage}
           disabled={!hasMore || isFetching}
-          className="bg-emerald-800 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-emerald-700"
+          className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Siguiente →
         </button>
       </div>
 
       {selectedTicket && (
-        <EditTicketModal
+        <TicketModal
+          mode="edit"
           isOpen={isEditModalOpen}
           onClose={closeEditModal}
-          ticket={selectedTicket}
+          ticket={selectedTicket!}
         />
       )}
     </div>
   );
 };
-
-const TicketRow: React.FC<{
-  ticket: EnrichedTicket;
-  index: number;
-  handleEdit: (ticket: EnrichedTicket) => void;
-}> = ({ ticket, index, handleEdit }) => (
-  <tr key={ticket.id} className="hover:bg-gray-100">
-    <td className="py-3 px-4 border-b">{index + 1}</td>
-    <td className={`py-3 px-4 border-b ${getStatusBadgeClass(ticket.status)}`}>
-      {ticket.status}
-    </td>
-    <td className="py-3 px-4 border-b">{ticket.name}</td>
-    <td className="py-3 px-4 border-b">{ticket.identificationNumber}</td>
-    <td className="py-3 px-4 border-b">{ticket.ticketType}</td>
-    <td className="py-3 px-4 border-b">
-      {ticket.price ? `$${ticket.price}` : "—"}
-    </td>
-    <td className="py-3 px-4 border-b">{ticket.phaseName}</td>
-    <td className="py-3 px-4 border-b">{ticket.localityName}</td>
-    <td className="py-3 px-4 border-b">{ticket.promoterName ?? "—"}</td>
-
-    <td className="py-3 px-4 border-b">{ticket.email}</td>
-    <td className="py-3 px-4 border-b">{ticket.phoneNumber}</td>
-    
-    <td className="py-3 px-4 border-b">
-      {ticket.checkedInAt
-        ? ticket.checkedInAt instanceof Timestamp
-          ? ticket.checkedInAt.toDate().toLocaleString()
-          : ticket.checkedInAt instanceof Date
-            ? ticket.checkedInAt.toLocaleString()
-            : "—"
-        : "—"}
-    </td>
-
-    <td className="py-3 px-4 border-b">
-      <button
-        onClick={() => handleEdit(ticket)}
-        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-      >
-        Edit
-      </button>
-    </td>
-  </tr>
-);
 
 export default TicketsTable;
