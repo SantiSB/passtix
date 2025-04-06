@@ -16,10 +16,10 @@ interface TicketModalProps {
 }
 
 const TicketModal = ({ isOpen, onClose, mode, ticket }: TicketModalProps) => {
-  const editFormHook = ticket ? useEditTicketForm(ticket) : null;
+  const editFormHook = useEditTicketForm(ticket || {} as EnrichedTicket);
   const registerFormHook = useRegisterTicketForm();
 
-  const formHook = mode === "edit" && editFormHook ? editFormHook : registerFormHook;
+  const formHook = mode === "edit" && ticket ? editFormHook : registerFormHook;
 
   const {
     form,
