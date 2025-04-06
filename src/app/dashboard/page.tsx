@@ -3,6 +3,7 @@
 import { useState } from "react";
 import TicketsTable from "@/components/TicketsTable";
 import TicketModal from "@/components/TicketModal";
+import { Img } from "@react-email/components";
 
 const DashboardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQrScanner } from "@/hooks/useQrScanner";
+import { Img } from "@react-email/components";
 
 export default function ScannerPage() {
   // Estado del escaner
@@ -17,9 +18,12 @@ export default function ScannerPage() {
 
   return (
     <div className="min-h-screen h-[100dvh] overflow-hidden bg-black flex flex-col items-center justify-center px-4 py-8">
-      <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">
-        🎟️ Escáner de Ingreso
-      </h1>
+      <Img
+        src="https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2Fpiso12.png?alt=media&token=b813493b-2582-446c-b061-d01dd6467248"
+        alt="Logo Piso 12"
+        width="220"
+        style={{ margin: "0 auto 16px" }}
+      />
 
       <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-slate-50 to-black shadow-2xl ring-2 ring-offset-slate-50">
         <div
