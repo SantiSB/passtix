@@ -19,7 +19,7 @@ export default function ScannerPage() {
   return (
     <div className="min-h-screen h-[100dvh] overflow-hidden bg-black flex flex-col items-center justify-center px-4 py-8">
       <Img
-        src="https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2Fpiso12.png?alt=media&token=b813493b-2582-446c-b061-d01dd6467248"
+        src="https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2Flogo_piso12_negro.png?alt=media&token=19ecaf49-ddec-48e2-bdfa-824f4ea8ebb4"
         alt="Logo Piso 12"
         width="220"
         style={{ margin: "0 auto 16px" }}
