@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Timestamp } from "firebase/firestore";
 import TicketModal from "./TicketModal";
 
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Helpers                                                                   */
+/* ────────────────────────────────────────────────────────────────────────── */
 const getStatusBadgeClass = (status: string) => {
   switch (status.toLowerCase()) {
     case "enabled":
@@ -15,7 +18,11 @@ const getStatusBadgeClass = (status: string) => {
   }
 };
 
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Component                                                                 */
+/* ────────────────────────────────────────────────────────────────────────── */
 const TicketsTable: React.FC = () => {
+  /* 🔸 Traemos los tickets paginados */
   const {
     tickets,
     isLoading,
@@ -26,34 +33,48 @@ const TicketsTable: React.FC = () => {
     prevPage,
     canGoBack,
     pageIndex,
-    refetch, // necesario para recargar luego de borrar
+    refetch,
   } = usePaginatedTickets();
 
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  /* 🔸 Estado del modal */
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<"edit" | "delete" | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
     null
   );
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
+  /* 🔸 Estado para eliminación */
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [errorDelete, setErrorDelete] = useState<string | null>(null);
+
+  /* ────────────────────────────────────────────────────────────────────── */
+  /* Abrir / cerrar modal                                                  */
+  /* ────────────────────────────────────────────────────────────────────── */
   const openEditModal = (ticket: EnrichedTicket) => {
     setSelectedTicket(ticket);
-    setEditModalOpen(true);
+    setModalMode("edit");
+    setModalOpen(true);
   };
 
-  const closeEditModal = () => {
-    setEditModalOpen(false);
+  const openDeleteModal = (ticket: EnrichedTicket) => {
+    setSelectedTicket(ticket);
+    setModalMode("delete");
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
     setSelectedTicket(null);
+    setModalMode(null);
+    setErrorDelete(null);
   };
 
-  /** DELETE vía body JSON */
+  /* ────────────────────────────────────────────────────────────────────── */
+  /* DELETE handler                                                        */
+  /* ────────────────────────────────────────────────────────────────────── */
   const handleDelete = async (ticketId: string) => {
-    if (!confirm("¿Eliminar definitivamente este ticket?")) return;
-
-    setLoading(true);
-    setSuccess(false);
-    setError(null);
+    setLoadingDelete(true);
+    setErrorDelete(null);
 
     try {
       const res = await fetch("/api/delete-ticket", {
@@ -67,23 +88,26 @@ const TicketsTable: React.FC = () => {
         throw new Error(json.error || "Error eliminando ticket");
       }
 
-      setSuccess(true);
-      refetch?.();
+      /* Actualizar la lista */
+      await refetch?.();
+      closeModal();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Error desconocido";
-      setError(message);
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      setErrorDelete(msg);
     } finally {
-      setLoading(false);
+      setLoadingDelete(false);
     }
   };
 
-  if (isLoading)
-    return <p className="p-4 text-gray-500">Cargando tickets...</p>;
-  if (isError)
-    return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
+  /* ────────────────────────────────────────────────────────────────────── */
+  /* Render                                                                */
+  /* ────────────────────────────────────────────────────────────────────── */
+  if (isLoading) return <p className="p-4 text-gray-500">Cargando tickets...</p>;
+  if (isError)   return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
 
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
+      {/* Tabla */}
       <table className="min-w-full text-sm text-left text-gray-700">
         <thead className="text-xs uppercase bg-black/90 text-white">
           <tr>
@@ -102,19 +126,18 @@ const TicketsTable: React.FC = () => {
               "Ingreso",
               "Acciones",
             ].map((header) => (
-              <th
-                key={header}
-                className="px-4 py-3 font-semibold tracking-wide"
-              >
+              <th key={header} className="px-4 py-3 font-semibold tracking-wide">
                 {header}
               </th>
             ))}
           </tr>
         </thead>
+
         <tbody>
           {tickets.map((ticket, index) => (
             <tr key={ticket.id} className="even:bg-gray-50 hover:bg-gray-100">
               <td className="px-4 py-3">{index + 1}</td>
+
               <td className="px-4 py-3">
                 <span
                   className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
@@ -124,10 +147,11 @@ const TicketsTable: React.FC = () => {
                   {ticket.status === "enabled"
                     ? "Habilitado"
                     : ticket.status === "joined"
-                      ? "Ingresado"
-                      : ticket.status}
+                    ? "Ingresado"
+                    : ticket.status}
                 </span>
               </td>
+
               <td className="px-4 py-3 font-medium text-gray-900">
                 {ticket.name}
               </td>
@@ -146,10 +170,12 @@ const TicketsTable: React.FC = () => {
                   ? ticket.checkedInAt instanceof Timestamp
                     ? ticket.checkedInAt.toDate().toLocaleString()
                     : ticket.checkedInAt instanceof Date
-                      ? ticket.checkedInAt.toLocaleString()
-                      : "—"
+                    ? ticket.checkedInAt.toLocaleString()
+                    : "—"
                   : "—"}
               </td>
+
+              {/* Acciones */}
               <td className="px-4 py-3 flex space-x-2">
                 <button
                   onClick={() => openEditModal(ticket)}
@@ -158,7 +184,7 @@ const TicketsTable: React.FC = () => {
                   ✏️
                 </button>
                 <button
-                  onClick={() => handleDelete(ticket.id)}
+                  onClick={() => openDeleteModal(ticket)}
                   className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs transition transform hover:scale-105"
                 >
                   🗑️
@@ -169,6 +195,7 @@ const TicketsTable: React.FC = () => {
         </tbody>
       </table>
 
+      {/* Paginación */}
       <div className="flex justify-between items-center p-4">
         <button
           onClick={prevPage}
@@ -191,27 +218,19 @@ const TicketsTable: React.FC = () => {
         </button>
       </div>
 
-      {selectedTicket && (
+      {/* Modal */}
+      {selectedTicket && modalMode && (
         <TicketModal
-          mode="edit"
-          isOpen={isEditModalOpen}
-          onClose={closeEditModal}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          mode={modalMode}
           ticket={selectedTicket}
+          /* props para delete */
+          onConfirmDelete={() => handleDelete(selectedTicket.id)}
+          loadingDelete={loadingDelete}
+          errorDelete={errorDelete}
         />
       )}
-
-      <style jsx>{`
-        @media (max-width: 640px) {
-          td.px-4.py-3.flex.space-x-2 {
-            flex-direction: column;
-            align-items: center;
-          }
-          button {
-            width: 100%;
-            margin-bottom: 4px;
-          }
-        }
-      `}</style>
     </div>
   );
 };
