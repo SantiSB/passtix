@@ -102,100 +102,106 @@ const TicketsTable: React.FC = () => {
   /* ────────────────────────────────────────────────────────────────────── */
   /* Render                                                                */
   /* ────────────────────────────────────────────────────────────────────── */
-  if (isLoading) return <p className="p-4 text-gray-500">Cargando tickets...</p>;
-  if (isError)   return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
+  if (isLoading)
+    return <p className="p-4 text-gray-500">Cargando tickets...</p>;
+  if (isError)
+    return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm bg-white">
-      {/* Tabla */}
-      <table className="min-w-full text-sm text-left text-gray-700">
-        <thead className="text-xs uppercase bg-black/90 text-white">
-          <tr>
-            {[
-              "#",
-              "Estado",
-              "Nombre",
-              "Cédula",
-              "Tipo",
-              "Precio",
-              "Fase",
-              "Localidad",
-              "Promotor",
-              "Correo",
-              "Celular",
-              "Ingreso",
-              "Acciones",
-            ].map((header) => (
-              <th key={header} className="px-4 py-3 font-semibold tracking-wide">
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody>
-          {tickets.map((ticket, index) => (
-            <tr key={ticket.id} className="even:bg-gray-50 hover:bg-gray-100">
-              <td className="px-4 py-3">{index + 1}</td>
-
-              <td className="px-4 py-3">
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
-                    ticket.status
-                  )}`}
+    <div className="rounded-xl border border-gray-200 shadow-sm bg-white">
+      {/* Scroll horizontal SOLO para la tabla */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left text-gray-700">
+          <thead className="text-xs uppercase bg-black/90 text-white">
+            <tr>
+              {[
+                "#",
+                "Estado",
+                "Nombre",
+                "Cédula",
+                "Tipo",
+                "Precio",
+                "Fase",
+                "Localidad",
+                "Promotor",
+                "Correo",
+                "Celular",
+                "Ingreso",
+                "Acciones",
+              ].map((header) => (
+                <th
+                  key={header}
+                  className="px-4 py-3 font-semibold tracking-wide whitespace-nowrap"
                 >
-                  {ticket.status === "enabled"
-                    ? "Habilitado"
-                    : ticket.status === "joined"
-                    ? "Ingresado"
-                    : ticket.status}
-                </span>
-              </td>
-
-              <td className="px-4 py-3 font-medium text-gray-900">
-                {ticket.name}
-              </td>
-              <td className="px-4 py-3">{ticket.identificationNumber}</td>
-              <td className="px-4 py-3">{ticket.ticketType}</td>
-              <td className="px-4 py-3">
-                {ticket.price ? `$${ticket.price}` : "—"}
-              </td>
-              <td className="px-4 py-3">{ticket.phaseName}</td>
-              <td className="px-4 py-3">{ticket.localityName}</td>
-              <td className="px-4 py-3">{ticket.promoterName ?? "—"}</td>
-              <td className="px-4 py-3">{ticket.email}</td>
-              <td className="px-4 py-3">{ticket.phoneNumber}</td>
-              <td className="px-4 py-3">
-                {ticket.checkedInAt
-                  ? ticket.checkedInAt instanceof Timestamp
-                    ? ticket.checkedInAt.toDate().toLocaleString()
-                    : ticket.checkedInAt instanceof Date
-                    ? ticket.checkedInAt.toLocaleString()
-                    : "—"
-                  : "—"}
-              </td>
-
-              {/* Acciones */}
-              <td className="px-4 py-3 flex space-x-2">
-                <button
-                  onClick={() => openEditModal(ticket)}
-                  className="px-2 py-1 bg-black/80 text-white rounded-lg text-xs transition transform hover:scale-105"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={() => openDeleteModal(ticket)}
-                  className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs transition transform hover:scale-105"
-                >
-                  🗑️
-                </button>
-              </td>
+                  {header}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
 
-      {/* Paginación */}
+          <tbody>
+            {tickets.map((ticket, index) => (
+              <tr key={ticket.id} className="even:bg-gray-50 hover:bg-gray-100">
+                <td className="px-4 py-3">{index + 1}</td>
+
+                <td className="px-4 py-3">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
+                      ticket.status
+                    )}`}
+                  >
+                    {ticket.status === "enabled"
+                      ? "Habilitado"
+                      : ticket.status === "joined"
+                        ? "Ingresado"
+                        : ticket.status}
+                  </span>
+                </td>
+
+                <td className="px-4 py-3 font-medium text-gray-900">
+                  {ticket.name}
+                </td>
+                <td className="px-4 py-3">{ticket.identificationNumber}</td>
+                <td className="px-4 py-3">{ticket.ticketType}</td>
+                <td className="px-4 py-3">
+                  {ticket.price ? `$${ticket.price}` : "—"}
+                </td>
+                <td className="px-4 py-3">{ticket.phaseName}</td>
+                <td className="px-4 py-3">{ticket.localityName}</td>
+                <td className="px-4 py-3">{ticket.promoterName ?? "—"}</td>
+                <td className="px-4 py-3">{ticket.email}</td>
+                <td className="px-4 py-3">{ticket.phoneNumber}</td>
+                <td className="px-4 py-3">
+                  {ticket.checkedInAt
+                    ? ticket.checkedInAt instanceof Timestamp
+                      ? ticket.checkedInAt.toDate().toLocaleString()
+                      : ticket.checkedInAt instanceof Date
+                        ? ticket.checkedInAt.toLocaleString()
+                        : "—"
+                    : "—"}
+                </td>
+
+                <td className="px-4 py-3 flex space-x-2">
+                  <button
+                    onClick={() => openEditModal(ticket)}
+                    className="px-2 py-1 bg-black/80 text-white rounded-lg text-xs transition transform hover:scale-105"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(ticket)}
+                    className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs transition transform hover:scale-105"
+                  >
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Paginación (afuera del scroll horizontal) */}
       <div className="flex justify-between items-center p-4">
         <button
           onClick={prevPage}
@@ -225,7 +231,6 @@ const TicketsTable: React.FC = () => {
           onClose={closeModal}
           mode={modalMode}
           ticket={selectedTicket}
-          /* props para delete */
           onConfirmDelete={() => handleDelete(selectedTicket.id)}
           loadingDelete={loadingDelete}
           errorDelete={errorDelete}
