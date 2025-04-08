@@ -10,6 +10,7 @@ import {
   limit,
   startAfter,
   DocumentSnapshot,
+  deleteDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import QRCode from "qrcode";
@@ -225,6 +226,18 @@ export async function updateTicket(params: {
     return { success: true, ticket: updatedTicket };
   } catch (error) {
     console.error("Error updating ticket:", error);
+    return { success: false };
+  }
+}
+
+// Elimina un ticket de la base de datos
+export async function deleteTicket(id: string): Promise<{ success: boolean }> {
+  try {
+    const ticketRef = doc(db, "ticket", id);
+    await deleteDoc(ticketRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting ticket:", error);
     return { success: false };
   }
 }

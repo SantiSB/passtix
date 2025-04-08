@@ -1,6 +1,6 @@
 import { Assistant } from "@/interfaces/Assistant";
 import { db } from "../firebase/firebase";
-import {  doc, getDoc, setDoc } from "firebase/firestore";
+import {  doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 import { IdentificationType } from "@/types/enums";
 
@@ -68,6 +68,18 @@ export async function updateAssistant(
     return { success: true };
   } catch (error) {
     console.error("Error updating assistant:", error);
+    return { success: false };
+  }
+}
+
+// Elimina un asistente de la base de datos
+export async function deleteAssistant(id: string): Promise<{ success: boolean }> {
+  try {
+    const assistantRef = doc(db, "assistant", id);
+    await deleteDoc(assistantRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting assistant:", error);
     return { success: false };
   }
 }
