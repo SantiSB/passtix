@@ -106,7 +106,8 @@ export async function getTicket(id: string): Promise<Ticket> {
 export async function fetchPaginatedTickets(
   pageSize = 10,
   lastDoc: DocumentSnapshot | null = null,
-  searchName: string = ""
+  searchName: string = "",
+  searchIdNumber: string = ""
 ): Promise<{
   tickets: EnrichedTicket[];
   lastDoc: DocumentSnapshot | null;
@@ -115,7 +116,7 @@ export async function fetchPaginatedTickets(
   const ticketCollection = collection(db, "ticket");
 
   let q;
-  let isFilteredSearch = Boolean(searchName?.trim());
+  let isFilteredSearch = Boolean(searchName?.trim() || searchIdNumber?.trim());
 
   if (isFilteredSearch) {
     // 🔍 No usamos paginación si hay filtro
@@ -167,12 +168,12 @@ export async function fetchPaginatedTickets(
     })
   );
 
-  // 🔍 Aplicar filtro si hay searchTerm
-  const filteredTickets = isFilteredSearch
-    ? enrichedTickets.filter((ticket) =>
-        ticket.name.toLowerCase().includes(searchName.toLowerCase())
-      )
-    : enrichedTickets;
+  // Apply both filters if present
+  const filteredTickets = enrichedTickets.filter((ticket) => {
+    const matchesName = ticket.name.toLowerCase().includes(searchName.toLowerCase());
+    const matchesIdNumber = ticket.identificationNumber.includes(searchIdNumber);
+    return matchesName && matchesIdNumber;
+  });
 
   return {
     tickets: filteredTickets,
