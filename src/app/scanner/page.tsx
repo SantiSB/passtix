@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQrScanner } from "@/hooks/useQrScanner";
-import { useAuth } from "@/context/AuthContext"; // 👈 NUEVO
-import { Img } from "@react-email/components";
+import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function ScannerPage() {
   const { user, loading, logout } = useAuth();
@@ -20,8 +21,8 @@ export default function ScannerPage() {
 
   const getStatusStyles = (status: string | null) => {
     if (!status) return "";
-    if (status.includes("✅")) return "text-emerald-800";
-    if (status.includes("❌")) return "text-red-500";
+    if (status.includes("✅")) return "text-emerald-400";
+    if (status.includes("❌")) return "text-red-400";
     if (status.includes("⚠️")) return "text-yellow-400";
     return "text-white";
   };
@@ -37,8 +38,8 @@ export default function ScannerPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen h-[100dvh] overflow-hidden bg-black flex flex-col items-center justify-center px-4 py-8 relative">
-      {/* Botón de logout arriba a la derecha */}
+    <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-4 py-8 relative text-white">
+      {/* Botón de logout */}
       <button
         onClick={logout}
         className="absolute top-4 right-4 text-sm text-white hover:text-red-400 transition font-medium z-50"
@@ -46,24 +47,41 @@ export default function ScannerPage() {
         Cerrar sesión
       </button>
 
-      <Img
-        src="https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2Flogo_piso12_negro.png?alt=media&token=19ecaf49-ddec-48e2-bdfa-824f4ea8ebb4"
-        alt="Logo Piso 12"
-        width="220"
-        style={{ margin: "0 auto 16px" }}
-      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        className="mb-8"
+      >
+        <Image
+          src="/branding/ImagotipoBlanco.png"
+          alt="Logo PassTix"
+          width={180}
+          height={180}
+        />
+      </motion.div>
 
-      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-slate-50 to-black shadow-2xl ring-2 ring-offset-slate-50">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-2 ring-black"
+      >
         <div
           id="qr-reader"
           ref={scannerRef}
           className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
         ></div>
-      </div>
+      </motion.div>
 
-      <div className="mt-6 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+        className="mt-6 text-center"
+      >
         {status ? (
-          <div className="space-y-2 transition-all duration-300">
+          <div className="space-y-2">
             {assistantName && (
               <p className="text-xl font-semibold text-white">
                 {assistantName}
@@ -78,7 +96,16 @@ export default function ScannerPage() {
             📷 Escaneando código QR...
           </p>
         )}
-      </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="absolute bottom-4 text-xs text-gray-500"
+      >
+        © 2025 PassTix. Todos los derechos reservados.
+      </motion.div>
     </div>
   );
 }
