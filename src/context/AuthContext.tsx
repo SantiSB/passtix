@@ -35,7 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 🔐 Asegurar persistencia en localStorage
     setPersistence(auth, browserLocalPersistence).then(() => {
       const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-        console.log("[Auth] Firebase user:", firebaseUser); // 🔍 Debug opcional
         setUser(firebaseUser ?? null);
         setLoading(false);
       });

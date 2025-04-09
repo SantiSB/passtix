@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchPaginatedTickets } from "@/lib/utils/ticket";
 import { DocumentSnapshot } from "firebase/firestore";
@@ -18,6 +18,11 @@ export default function usePaginatedTickets() {
   const [searchIdNumber, setSearchIdNumber] = useState("");
 
   /* ──────────────── React‑Query ──────────────── */
+  const queryFn = useMemo(() => {
+    return () =>
+      fetchPaginatedTickets(pageSize, lastDoc, searchName, searchIdNumber);
+  }, [pageSize, lastDoc, searchName, searchIdNumber]);
+
   const {
     data = { tickets: [], lastDoc: null, hasMore: false },
     isLoading,
@@ -25,11 +30,8 @@ export default function usePaginatedTickets() {
     isError,
     refetch,
   } = useQuery({
-    /* ⚠️ incluimos ambos filtros en la queryKey */
-    queryKey: ["tickets", pageCursor, searchName, searchIdNumber],
-    /* ⚠️ pasamos ambos filtros a la función */
-    queryFn: () =>
-      fetchPaginatedTickets(pageSize, lastDoc, searchName, searchIdNumber),
+    queryKey: ["tickets", pageCursor, lastDoc?.id, searchName, searchIdNumber],
+    queryFn,
     staleTime: 5000,
   });
 

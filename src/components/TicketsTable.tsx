@@ -38,6 +38,8 @@ const TicketsTable: React.FC = () => {
   } = usePaginatedTickets();
 
   /* ───────── local state para filtros ───────── */
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   const [nameInput, setNameInput] = useState(searchName);
   const [idInput, setIdInput] = useState(searchIdNumber);
 
@@ -46,14 +48,22 @@ const TicketsTable: React.FC = () => {
 
   const queryClient = useQueryClient();
 
-  useEffect(
-    () => updateSearchName(debouncedName),
-    [debouncedName, updateSearchName]
-  );
-  useEffect(
-    () => updateSearchIdNumber(debouncedId),
-    [debouncedId, updateSearchIdNumber]
-  );
+  useEffect(() => {
+    if (hasInitialized) {
+      updateSearchName(debouncedName);
+    }
+  }, [debouncedName]);
+
+  useEffect(() => {
+    if (hasInitialized) {
+      updateSearchIdNumber(debouncedId);
+    }
+  }, [debouncedId]);
+
+  // Marcar inicialización
+  useEffect(() => {
+    setHasInitialized(true);
+  }, []);
 
   /* ───────── filtrado local para la página mostrada ───────── */
   const filteredTickets = useMemo(() => {

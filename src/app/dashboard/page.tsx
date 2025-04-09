@@ -42,12 +42,15 @@ const DashboardPage = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Image
-              src="/branding/LogotipoBlanco.png"
-              alt="PassTix Logo"
-              width={120}
-              height={40}
-            />
+            <div className="relative w-[120px] h-[40px]">
+              <Image
+                src="/branding/LogotipoBlanco.png"
+                alt="PassTix Logo"
+                fill
+                sizes="(max-width: 768px) 100px, 120px"
+                style={{ objectFit: "contain" }}
+              />
+            </div>
           </motion.div>
 
           <motion.div
