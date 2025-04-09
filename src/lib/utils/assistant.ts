@@ -8,7 +8,7 @@ import { IdentificationType } from "@/types/enums";
 export async function createAssistant(
   name: string,
   email: string,
-  phoneNumber: string,
+  phoneNumber: string | null,
   identificationNumber: string,
   identificationType: IdentificationType
 ): Promise<Assistant> {

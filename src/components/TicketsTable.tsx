@@ -1,4 +1,4 @@
-import usePaginatedTickets from "@/hooks/usePaginatedTickets";
+import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 import { useState } from "react";
 import { Timestamp } from "firebase/firestore";
@@ -142,7 +142,7 @@ const TicketsTable: React.FC = () => {
           <tbody>
             {tickets.map((ticket, index) => (
               <tr key={ticket.id} className="even:bg-gray-50 hover:bg-gray-100">
-                <td className="px-4 py-3">{index + 1}</td>
+                <td className="px-4 py-3">{(pageIndex - 1) * PAGE_SIZE + index + 1}</td>
 
                 <td className="px-4 py-3">
                   <span
@@ -162,7 +162,13 @@ const TicketsTable: React.FC = () => {
                   {ticket.name}
                 </td>
                 <td className="px-4 py-3">{ticket.identificationNumber}</td>
-                <td className="px-4 py-3">{ticket.ticketType}</td>
+                <td className="px-4 py-3">
+                  {ticket.ticketType === "courtesy"
+                    ? "Cortesia"
+                    : ticket.ticketType === "ticket"
+                    ? "Boleta"
+                    : ticket.ticketType}
+                </td>
                 <td className="px-4 py-3">
                   {ticket.price ? `$${ticket.price}` : "—"}
                 </td>

@@ -111,28 +111,21 @@ export async function fetchPaginatedTickets(
   lastDoc: DocumentSnapshot | null;
   hasMore: boolean;
 }> {
-  let q = query(
-    collection(db, "ticket"),
-    orderBy("createdAt", "desc"),
-    limit(pageSize)
-  );
+  const ticketCollection = collection(db, "ticket");
 
-  if (lastDoc) {
-    q = query(
-      collection(db, "ticket"),
-      orderBy("createdAt", "desc"),
-      startAfter(lastDoc),
-      limit(pageSize)
-    );
-  }
+  const queryConstraints = [
+    orderBy("createdAt", "asc"),
+    ...(lastDoc ? [startAfter(lastDoc)] : []),
+    limit(pageSize),
+  ];
 
+  const q = query(ticketCollection, ...queryConstraints);
   const snapshot = await getDocs(q);
 
   const enrichedTickets: EnrichedTicket[] = await Promise.all(
     snapshot.docs.map(async (docSnap) => {
       const ticket = docSnap.data() as Ticket;
 
-      // Obtener datos relacionados
       const assistantSnap = await getDoc(
         doc(db, "assistant", ticket.assistantId)
       );
@@ -148,7 +141,6 @@ export async function fetchPaginatedTickets(
         ? await getDoc(doc(db, "promoter", ticket.promoterId))
         : null;
       const promoter = promoterSnap?.data();
-
 
       return {
         ...ticket,
