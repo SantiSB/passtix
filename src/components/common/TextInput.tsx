@@ -18,7 +18,7 @@ const TextInput: React.FC<TextInputProps> = ({
   onChange,
 }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
+    <label className="block text-sm font-medium text-black mb-1">
       {label}
     </label>
     <input
@@ -27,7 +27,7 @@ const TextInput: React.FC<TextInputProps> = ({
       required={required}
       value={value}
       onChange={onChange}
-      className="w-full border border-gray-300 p-3 rounded-md"
+      className="w-full border border-gray-300 p-3 rounded-md text-black"
     />
   </div>
 );
