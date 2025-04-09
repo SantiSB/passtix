@@ -6,19 +6,18 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 export function useQrScanner() {
   const [status, setStatus] = useState<string | null>(null);
   const [assistantName, setAssistantName] = useState<string | null>(null);
-  const [scanning, setScanning] = useState(false);
   const scannerRef = useRef<HTMLDivElement | null>(null);
   const hasScannedRef = useRef(false);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
+  const startedRef = useRef(false); // 🆕 para evitar doble start
 
   useEffect(() => {
+    if (!scannerRef.current || startedRef.current) return;
+
     const startScanner = async () => {
-      if (!scannerRef.current || scanning) return;
-
-      setScanning(true);
-
       const qrCodeRegionId = "qr-reader";
       html5QrCodeRef.current = new Html5Qrcode(qrCodeRegionId);
+      startedRef.current = true;
 
       try {
         await html5QrCodeRef.current.start(
@@ -83,13 +82,11 @@ export function useQrScanner() {
     startScanner();
 
     return () => {
-      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-        html5QrCodeRef.current.stop().then(() => {
-          html5QrCodeRef.current?.clear();
-        });
-      }
+      html5QrCodeRef.current?.stop().then(() => {
+        html5QrCodeRef.current?.clear();
+      });
     };
-  }, [scanning]);
+  }, []);
 
   return { status, assistantName, scannerRef };
 }
