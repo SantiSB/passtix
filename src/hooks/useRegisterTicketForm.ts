@@ -29,13 +29,17 @@ const useRegisterTicketForm = () => {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cambia el precio del ticket según la fase seleccionada
+  // Cambia el precio del ticket según la fase seleccionada o si es de cortesía
   useEffect(() => {
-    const selectedPhase = phases.find((p: Phase) => p.id === form.phaseId);
-    if (selectedPhase?.price !== undefined) {
-      setForm((prev) => ({ ...prev, price: selectedPhase.price }));
+    if (form.ticketType === 'courtesy') {
+      setForm((prev) => ({ ...prev, price: 0 }));
+    } else {
+      const selectedPhase = phases.find((p: Phase) => p.id === form.phaseId);
+      if (selectedPhase?.price !== undefined) {
+        setForm((prev) => ({ ...prev, price: selectedPhase.price }));
+      }
     }
-  }, [form.phaseId, phases]);
+  }, [form.phaseId, form.ticketType, phases]);
 
   // Cambia el valor de un input
   const handleChange = (

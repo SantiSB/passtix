@@ -121,7 +121,6 @@ const TicketModal = ({
                 required: true,
                 type: "email",
               },
-              { label: "Celular", name: "phoneNumber" },
               {
                 label: "Número de documento",
                 name: "identificationNumber",
@@ -152,6 +151,14 @@ const TicketModal = ({
                 { id: "otro", name: "Otro" },
               ]}
               required
+            />
+
+            <TextInput
+              label="Celular"
+              name="phoneNumber"
+              type="tel"
+              value={form.phoneNumber as string}
+              onChange={handleChange}
             />
 
             <SelectInput
