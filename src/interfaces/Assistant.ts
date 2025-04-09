@@ -6,7 +6,7 @@ export interface Assistant {
   email: string;
   identificationNumber: string;
   identificationType: IdentificationType;
-  phoneNumber?: string;
+  phoneNumber?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
