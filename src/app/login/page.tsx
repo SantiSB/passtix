@@ -1,68 +1,78 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import useAuth from "@/hooks/useAuth";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
-export default function LoginPage() {
-  const { user, login, loading } = useAuth();
+const LoginPage: React.FC = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (user) router.push("/dashboard");
-  }, [user, router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    try {
-      await login(email, password);
-    } catch {
-      setError("Correo o contraseña incorrectos.");
-    }
-  };
-
-  if (loading) return <p className="p-4">Cargando...</p>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-white">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6 text-black"
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white flex flex-col items-center justify-center px-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-sm text-center"
       >
-        <h1 className="text-2xl font-bold text-center text-gray-900">
-          Iniciar sesión
-        </h1>
-
-        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
-
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full p-3 border border-gray-300 rounded-md text-black"
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full p-3 border border-gray-300 rounded-md text-black"
-        />
-
+        <div className="flex justify-center mb-12">
+          <Image
+            src="/branding/IsotipoClaro.png"
+            alt="PassTix Logo"
+            width={250}
+            height={250}
+          />
+        </div>
+        <h2 className="text-2xl font-bold mb-6">Inicia sesión en tu cuenta</h2>
+        <form className="space-y-4 text-left">
+          <div>
+            <label htmlFor="email" className="block text-sm mb-1 text-gray-300">
+              Correo electrónico
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              placeholder="tucorreo@email.com"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm mb-1 text-gray-300">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              placeholder="••••••••"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full px-4 py-2 text-lg font-semibold rounded-2xl shadow-xl bg-amber-400 text-black hover:scale-105 transition-transform"
+          >
+            Entrar
+          </button>
+        </form>
         <button
-          type="submit"
-          className="w-full bg-black text-white py-3 rounded-md hover:bg-gray-800"
+          onClick={() => router.push("/")}
+          className="mt-6 text-sm text-gray-400 hover:text-white hover:underline"
         >
-          Ingresar
+          ← Volver al inicio
         </button>
-      </form>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="absolute bottom-6 text-xs text-gray-500"
+      >
+        © 2025 PassTix. Todos los derechos reservados.
+      </motion.div>
     </div>
   );
-}
+};
+
+export default LoginPage;
