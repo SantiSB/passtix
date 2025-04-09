@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-white">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6"
+        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-6 text-black"
       >
         <h1 className="text-2xl font-bold text-center text-gray-900">
           Iniciar sesión
@@ -45,7 +45,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md"
+          className="w-full p-3 border border-gray-300 rounded-md text-black"
         />
         <input
           type="password"
@@ -53,7 +53,7 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md"
+          className="w-full p-3 border border-gray-300 rounded-md text-black"
         />
 
         <button

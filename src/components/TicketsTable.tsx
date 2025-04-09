@@ -125,18 +125,18 @@ const TicketsTable: React.FC = () => {
   return (
     <div className="rounded-xl border border-gray-200 shadow-sm bg-white">
       {/* filtros */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-end px-4 py-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-end px-4 py-3 text-black">
         <input
           type="text"
           placeholder="Buscar por nombre…"
-          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-xs"
+          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full text-black"
           value={nameInput}
           onChange={(e) => setNameInput(e.target.value)}
         />
         <input
           type="text"
           placeholder="Buscar por cédula…"
-          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-xs"
+          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full text-black"
           value={idInput}
           onChange={(e) => setIdInput(e.target.value)}
         />
