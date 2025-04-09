@@ -116,7 +116,9 @@ export async function fetchPaginatedTickets(
   const ticketCollection = collection(db, "ticket");
 
   let q;
-  let isFilteredSearch = Boolean(searchName?.trim() || searchIdNumber?.trim());
+  const isFilteredSearch = Boolean(
+    searchName?.trim() || searchIdNumber?.trim()
+  );
 
   if (isFilteredSearch) {
     // 🔍 No usamos paginación si hay filtro
@@ -170,8 +172,11 @@ export async function fetchPaginatedTickets(
 
   // Apply both filters if present
   const filteredTickets = enrichedTickets.filter((ticket) => {
-    const matchesName = ticket.name.toLowerCase().includes(searchName.toLowerCase());
-    const matchesIdNumber = ticket.identificationNumber.includes(searchIdNumber);
+    const matchesName = ticket.name
+      .toLowerCase()
+      .includes(searchName.toLowerCase());
+    const matchesIdNumber =
+      ticket.identificationNumber.includes(searchIdNumber);
     return matchesName && matchesIdNumber;
   });
 
@@ -179,11 +184,10 @@ export async function fetchPaginatedTickets(
     tickets: filteredTickets,
     lastDoc: isFilteredSearch
       ? null // No hay paginación cuando se filtra
-      : snapshot.docs[snapshot.docs.length - 1] ?? null,
+      : (snapshot.docs[snapshot.docs.length - 1] ?? null),
     hasMore: !isFilteredSearch && snapshot.docs.length === pageSize,
   };
 }
-
 
 // Actualiza un ticket en la base de datos
 export async function updateTicket(params: {

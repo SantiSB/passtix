@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -21,7 +20,7 @@ export default function LoginPage() {
     setError("");
     try {
       await login(email, password);
-    } catch (err: any) {
+    } catch {
       setError("Correo o contraseña incorrectos.");
     }
   };

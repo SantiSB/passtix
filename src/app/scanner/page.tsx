@@ -14,7 +14,7 @@ export default function ScannerPage() {
     if (!loading && !user) {
       router.push("/login");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const { status, assistantName, scannerRef } = useQrScanner();
 
