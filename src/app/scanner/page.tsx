@@ -61,20 +61,13 @@ export default function ScannerPage() {
         />
       </motion.div>
 
-      {/* <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-2 ring-black"
-      > */}
-      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-slate-50 to-black shadow-2xl ring-2 ring-offset-slate-50">
+      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-slate-50">
         <div
           id="qr-reader"
           ref={scannerRef}
           className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
         ></div>
       </div>
-      {/* </motion.div> */}
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
