@@ -41,8 +41,8 @@ const TicketsTable: React.FC = () => {
   const [nameInput, setNameInput] = useState(searchName);
   const [idInput,   setIdInput]   = useState(searchIdNumber);
 
-  const [debouncedName] = useDebounce(nameInput, 400);
-  const [debouncedId]   = useDebounce(idInput, 400);
+  const [debouncedName] = useDebounce(nameInput, 600);
+  const [debouncedId]   = useDebounce(idInput, 600);
 
   useEffect(() => updateSearchName(debouncedName), [debouncedName]);
   useEffect(() => updateSearchIdNumber(debouncedId), [debouncedId]);
@@ -129,7 +129,7 @@ const TicketsTable: React.FC = () => {
       </div>
 
       {isFetching && hasFilters && (
-        <p className="px-4 text-sm text-gray-500 animate-pulse">🔎 Buscando resultados…</p>
+        <p className="px-4 text-sm text-gray-500 animate-pulse">🔎 Buscando resultados…</p>
       )}
 
       {/* tabla */}
@@ -191,19 +191,19 @@ const TicketsTable: React.FC = () => {
           <button
             onClick={prevPage}
             disabled={!canGoBack || isFetching}
-            className="px-3 py-2 bg-gray-300 rounded disabled:opacity-50"
+            className="px-3 py-2 bg-amber-400 text-black rounded-lg shadow-md hover:scale-105 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-50"
           >
-            ← Anterior
+            ← Anterior
           </button>
           <span className="text-sm text-gray-600">
-            Página <strong>{pageIndex}</strong>
+            Página <strong>{pageIndex}</strong>
           </span>
           <button
             onClick={nextPage}
             disabled={!hasMore || isFetching}
-            className="px-3 py-2 bg-gray-300 rounded disabled:opacity-50"
+            className="px-3 py-2 bg-amber-400 text-black rounded-lg shadow-md hover:scale-105 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-50"
           >
-            Siguiente →
+            Siguiente →
           </button>
         </div>
       )}
