@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPaginatedTickets } from "@/lib/utils/ticket";
 import { DocumentSnapshot } from "firebase/firestore";
 
-export const PAGE_SIZE = 5;
+export const PAGE_SIZE = 100;
 
 export default function usePaginatedTickets() {
   /* ──────────────── estado de paginación ──────────────── */

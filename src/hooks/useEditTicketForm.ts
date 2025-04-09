@@ -5,11 +5,14 @@ import { Phase } from "@/interfaces/Phase";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 import useEventOptions from "@/hooks/useEventOptions";
 import usePromoterOptions from "@/hooks/usePromoterOptions";
+import { useQueryClient } from "@tanstack/react-query";
 
 const useEditTicketForm = (initialTicket: EnrichedTicket) => {
   // Hooks para obtener las opciones de los inputs de eventos y promotores
   const { phases, localities, loading: loadingOptions } = useEventOptions();
   const { promoters, loading: loadingPromoters } = usePromoterOptions();
+
+  const queryClient = useQueryClient();
 
   // Estado del formulario
   const [form, setForm] = useState(initialTicket);
@@ -61,6 +64,8 @@ const useEditTicketForm = (initialTicket: EnrichedTicket) => {
 
       // Si la respuesta es exitosa, indicar éxito
       setSuccess(true);
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+
     } catch (err) {
       // Si hay un error, mostrarlo
       const error = err instanceof Error ? err.message : "Error desconocido";

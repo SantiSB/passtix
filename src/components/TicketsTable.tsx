@@ -5,6 +5,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Timestamp } from "firebase/firestore";
 import TicketModal from "./TicketModal";
 import { useDebounce } from "use-debounce";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 /* ───────────────────────── helpers ───────────────────────── */
 const getStatusBadgeClass = (status: string) => {
@@ -43,6 +45,8 @@ const TicketsTable: React.FC = () => {
 
   const [debouncedName] = useDebounce(nameInput, 600);
   const [debouncedId]   = useDebounce(idInput, 600);
+
+  const queryClient = useQueryClient();
 
   useEffect(() => updateSearchName(debouncedName), [debouncedName]);
   useEffect(() => updateSearchIdNumber(debouncedId), [debouncedId]);
@@ -94,7 +98,8 @@ const TicketsTable: React.FC = () => {
       });
       const json = await res.json();
       if (!res.ok || !json.success) throw new Error(json.error || "Error eliminando ticket");
-      await refetch?.();
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+
       closeModal();
     } catch (err: any) {
       setErrorDelete(err.message ?? "Error desconocido");

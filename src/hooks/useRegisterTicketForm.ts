@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import { Phase } from "@/interfaces/Phase";
 import useEventOptions from "@/hooks/useEventOptions";
 import usePromoterOptions from "@/hooks/usePromoterOptions";
+import { useQueryClient } from "@tanstack/react-query";
 
 const useRegisterTicketForm = () => {
   // Hooks para obtener las opciones de los inputs de eventos y promotores
   const { phases, localities, loading: loadingOptions } = useEventOptions();
   const { promoters, loading: loadingPromoters } = usePromoterOptions();
+
+  const queryClient = useQueryClient();
+
 
   // Estado del formulario
   const [form, setForm] = useState({
@@ -75,6 +79,7 @@ const useRegisterTicketForm = () => {
 
       // Si la respuesta es exitosa, limpiar el formulario
       setSuccess(true);
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
       setForm({
         name: "",
         email: "",
