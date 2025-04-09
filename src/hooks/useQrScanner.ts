@@ -6,28 +6,35 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 export function useQrScanner() {
   const [status, setStatus] = useState<string | null>(null);
   const [assistantName, setAssistantName] = useState<string | null>(null);
-  const [scanning, setScanning] = useState(false);
-  const scannerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
   const hasScannedRef = useRef(false);
-  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    const startScanner = async () => {
-      if (!scannerRef.current || scanning) return;
+    const tryStart = async () => {
+      // 🔁 Esperamos a que el contenedor exista en el DOM
+      if (!containerRef.current) {
+        console.warn("⏳ containerRef aún no montado, reintentando...");
+        setTimeout(tryStart, 200); // Reintenta en 200ms
+        return;
+      }
 
-      setScanning(true);
+      const regionId = `qr-reader-${Date.now()}`;
+      const scannerDiv = document.createElement("div");
+      scannerDiv.id = regionId;
+      containerRef.current.innerHTML = "";
+      containerRef.current.appendChild(scannerDiv);
 
-      const qrCodeRegionId = "qr-reader";
-      html5QrCodeRef.current = new Html5Qrcode(qrCodeRegionId);
+      console.log("🟢 Inicializando escáner en:", regionId);
+      const html5QrCode = new Html5Qrcode(regionId);
+      scannerRef.current = html5QrCode;
 
       try {
-        await html5QrCodeRef.current.start(
+        await html5QrCode.start(
           { facingMode: "environment" },
-          {
-            fps: 10,
-            qrbox: 250,
-          },
+          { fps: 10, qrbox: 250 },
           async (qrText) => {
+            console.log("✅ QR detectado:", qrText);
             if (hasScannedRef.current) return;
             hasScannedRef.current = true;
             setStatus("Verificando...");
@@ -40,8 +47,7 @@ export function useQrScanner() {
                 setStatus("❌ QR no válido");
               } else {
                 const ticket = ticketSnap.data();
-                const assistantId = ticket.assistantId;
-                const assistantRef = doc(db, "assistant", assistantId);
+                const assistantRef = doc(db, "assistant", ticket.assistantId);
                 const assistantSnap = await getDoc(assistantRef);
                 const assistant = assistantSnap.exists()
                   ? assistantSnap.data()
@@ -60,7 +66,7 @@ export function useQrScanner() {
                 setAssistantName(assistant?.name || "Asistente");
               }
             } catch (err) {
-              console.error(err);
+              console.error("❌ Error escaneando QR:", err);
               setStatus("❌ Error al procesar el QR");
             }
 
@@ -70,26 +76,25 @@ export function useQrScanner() {
               setAssistantName(null);
             }, 3000);
           },
-          (errorMessage) => {
-            console.warn("QR Scan error:", errorMessage);
+          (err) => {
+            console.warn("⚠️ Error al escanear:", err);
           }
         );
-      } catch (error) {
-        console.error("Error al iniciar el escáner:", error);
+      } catch (err) {
+        console.error("❌ No se pudo iniciar la cámara:", err);
         setStatus("❌ No se pudo acceder a la cámara");
       }
     };
 
-    startScanner();
+    tryStart();
 
     return () => {
-      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-        html5QrCodeRef.current.stop().then(() => {
-          html5QrCodeRef.current?.clear();
-        });
-      }
+      scannerRef.current?.stop().then(() => {
+        scannerRef.current?.clear();
+        console.log("🛑 Scanner detenido");
+      });
     };
-  }, [scanning]);
+  }, []);
 
-  return { status, assistantName, scannerRef };
+  return { status, assistantName, scannerRef: containerRef };
 }

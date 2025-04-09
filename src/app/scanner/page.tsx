@@ -62,11 +62,11 @@ export default function ScannerPage() {
       </motion.div>
 
       <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-slate-50">
-        <div
-          id="qr-reader"
-          ref={scannerRef}
-          className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
-        ></div>
+      <div
+  ref={scannerRef}
+  className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
+></div>
+
       </div>
 
       <motion.div
