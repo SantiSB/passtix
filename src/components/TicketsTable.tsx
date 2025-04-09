@@ -1,12 +1,11 @@
 import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Timestamp } from "firebase/firestore";
 import TicketModal from "./TicketModal";
+import { useDebounce } from "use-debounce";
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Helpers                                                                   */
-/* ────────────────────────────────────────────────────────────────────────── */
+/* Helpers */
 const getStatusBadgeClass = (status: string) => {
   switch (status.toLowerCase()) {
     case "enabled":
@@ -18,11 +17,7 @@ const getStatusBadgeClass = (status: string) => {
   }
 };
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Component                                                                 */
-/* ────────────────────────────────────────────────────────────────────────── */
 const TicketsTable: React.FC = () => {
-  /* 🔸 Traemos los tickets paginados */
   const {
     tickets,
     isLoading,
@@ -34,22 +29,26 @@ const TicketsTable: React.FC = () => {
     canGoBack,
     pageIndex,
     refetch,
+    searchTerm,
+    updateSearchTerm,
   } = usePaginatedTickets();
 
-  /* 🔸 Estado del modal */
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"edit" | "delete" | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
     null
   );
 
-  /* 🔸 Estado para eliminación */
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [errorDelete, setErrorDelete] = useState<string | null>(null);
 
-  /* ────────────────────────────────────────────────────────────────────── */
-  /* Abrir / cerrar modal                                                  */
-  /* ────────────────────────────────────────────────────────────────────── */
+  const [inputValue, setInputValue] = useState(searchTerm);
+  const [debouncedValue] = useDebounce(inputValue, 400); // 400ms
+
+  useEffect(() => {
+    updateSearchTerm(debouncedValue);
+  }, [debouncedValue]);
+
   const openEditModal = (ticket: EnrichedTicket) => {
     setSelectedTicket(ticket);
     setModalMode("edit");
@@ -69,9 +68,6 @@ const TicketsTable: React.FC = () => {
     setErrorDelete(null);
   };
 
-  /* ────────────────────────────────────────────────────────────────────── */
-  /* DELETE handler                                                        */
-  /* ────────────────────────────────────────────────────────────────────── */
   const handleDelete = async (ticketId: string) => {
     setLoadingDelete(true);
     setErrorDelete(null);
@@ -88,7 +84,6 @@ const TicketsTable: React.FC = () => {
         throw new Error(json.error || "Error eliminando ticket");
       }
 
-      /* Actualizar la lista */
       await refetch?.();
       closeModal();
     } catch (err) {
@@ -99,9 +94,6 @@ const TicketsTable: React.FC = () => {
     }
   };
 
-  /* ────────────────────────────────────────────────────────────────────── */
-  /* Render                                                                */
-  /* ────────────────────────────────────────────────────────────────────── */
   if (isLoading)
     return <p className="p-4 text-gray-500">Cargando tickets...</p>;
   if (isError)
@@ -109,7 +101,24 @@ const TicketsTable: React.FC = () => {
 
   return (
     <div className="rounded-xl border border-gray-200 shadow-sm bg-white">
-      {/* Scroll horizontal SOLO para la tabla */}
+      {/* 🔍 Filtro por nombre */}
+      <div className="flex justify-end px-4 py-3">
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full max-w-xs"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+      </div>
+
+      {isFetching && searchTerm && (
+        <p className="px-4 text-sm text-gray-500 animate-pulse">
+          🔎 Buscando resultados...
+        </p>
+      )}
+
+      {/* Tabla */}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-left text-gray-700">
           <thead className="text-xs uppercase bg-black/90 text-white">
@@ -140,9 +149,13 @@ const TicketsTable: React.FC = () => {
           </thead>
 
           <tbody>
-            {tickets.map((ticket, index) => (
+            {tickets.map((ticket: EnrichedTicket, index: number) => (
               <tr key={ticket.id} className="even:bg-gray-50 hover:bg-gray-100">
-                <td className="px-4 py-3">{(pageIndex - 1) * PAGE_SIZE + index + 1}</td>
+                <td className="px-4 py-3">
+                  {searchTerm
+                    ? index + 1
+                    : (pageIndex - 1) * PAGE_SIZE + index + 1}
+                </td>
 
                 <td className="px-4 py-3">
                   <span
@@ -157,7 +170,6 @@ const TicketsTable: React.FC = () => {
                         : ticket.status}
                   </span>
                 </td>
-
                 <td className="px-4 py-3 font-medium text-gray-900">
                   {ticket.name}
                 </td>
@@ -166,8 +178,8 @@ const TicketsTable: React.FC = () => {
                   {ticket.ticketType === "courtesy"
                     ? "Cortesia"
                     : ticket.ticketType === "ticket"
-                    ? "Boleta"
-                    : ticket.ticketType}
+                      ? "Boleta"
+                      : ticket.ticketType}
                 </td>
                 <td className="px-4 py-3">
                   {ticket.price ? `$${ticket.price}` : "—"}
@@ -186,7 +198,6 @@ const TicketsTable: React.FC = () => {
                         : "—"
                     : "—"}
                 </td>
-
                 <td className="px-4 py-3 flex space-x-2">
                   <button
                     onClick={() => openEditModal(ticket)}
@@ -207,28 +218,28 @@ const TicketsTable: React.FC = () => {
         </table>
       </div>
 
-      {/* Paginación (afuera del scroll horizontal) */}
-      <div className="flex justify-between items-center p-4">
-        <button
-          onClick={prevPage}
-          disabled={!canGoBack || isFetching}
-          className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          ← Anterior
-        </button>
-
-        <span className="text-sm text-gray-600">
-          Página <strong>{pageIndex}</strong>
-        </span>
-
-        <button
-          onClick={nextPage}
-          disabled={!hasMore || isFetching}
-          className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Siguiente →
-        </button>
-      </div>
+      {/* Paginación solo si NO estamos buscando */}
+      {!searchTerm && (
+        <div className="flex justify-between items-center p-4">
+          <button
+            onClick={prevPage}
+            disabled={!canGoBack || isFetching}
+            className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ← Anterior
+          </button>
+          <span className="text-sm text-gray-600">
+            Página <strong>{pageIndex}</strong>
+          </span>
+          <button
+            onClick={nextPage}
+            disabled={!hasMore || isFetching}
+            className="px-3 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Siguiente →
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
       {selectedTicket && modalMode && (

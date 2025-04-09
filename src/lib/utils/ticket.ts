@@ -105,7 +105,8 @@ export async function getTicket(id: string): Promise<Ticket> {
 // Consulta tickets paginados para React Query
 export async function fetchPaginatedTickets(
   pageSize = 10,
-  lastDoc: DocumentSnapshot | null = null
+  lastDoc: DocumentSnapshot | null = null,
+  searchName: string = ""
 ): Promise<{
   tickets: EnrichedTicket[];
   lastDoc: DocumentSnapshot | null;
@@ -113,13 +114,22 @@ export async function fetchPaginatedTickets(
 }> {
   const ticketCollection = collection(db, "ticket");
 
-  const queryConstraints = [
-    orderBy("createdAt", "asc"),
-    ...(lastDoc ? [startAfter(lastDoc)] : []),
-    limit(pageSize),
-  ];
+  let q;
+  let isFilteredSearch = Boolean(searchName?.trim());
 
-  const q = query(ticketCollection, ...queryConstraints);
+  if (isFilteredSearch) {
+    // 🔍 No usamos paginación si hay filtro
+    q = query(ticketCollection, orderBy("createdAt", "asc"));
+  } else {
+    // 🔄 Usamos paginación normal
+    const queryConstraints = [
+      orderBy("createdAt", "asc"),
+      ...(lastDoc ? [startAfter(lastDoc)] : []),
+      limit(pageSize),
+    ];
+    q = query(ticketCollection, ...queryConstraints);
+  }
+
   const snapshot = await getDocs(q);
 
   const enrichedTickets: EnrichedTicket[] = await Promise.all(
@@ -157,12 +167,22 @@ export async function fetchPaginatedTickets(
     })
   );
 
+  // 🔍 Aplicar filtro si hay searchTerm
+  const filteredTickets = isFilteredSearch
+    ? enrichedTickets.filter((ticket) =>
+        ticket.name.toLowerCase().includes(searchName.toLowerCase())
+      )
+    : enrichedTickets;
+
   return {
-    tickets: enrichedTickets,
-    lastDoc: snapshot.docs[snapshot.docs.length - 1] ?? null,
-    hasMore: snapshot.docs.length === pageSize,
+    tickets: filteredTickets,
+    lastDoc: isFilteredSearch
+      ? null // No hay paginación cuando se filtra
+      : snapshot.docs[snapshot.docs.length - 1] ?? null,
+    hasMore: !isFilteredSearch && snapshot.docs.length === pageSize,
   };
 }
+
 
 // Actualiza un ticket en la base de datos
 export async function updateTicket(params: {
