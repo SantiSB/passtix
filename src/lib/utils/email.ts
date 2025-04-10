@@ -20,7 +20,7 @@ export async function sendTicketEmail({
     const { error } = await resend.emails.send({
       from: "Piso 12 - PassTix <notificaciones@piso12.com>",
       to,
-      subject: `🎟️ Confirmación de compra - BICHIYAL`,
+      subject: `🎟️ Entrada Piso 12 - BICHIYAL`,
       react: await TicketEmail({
         name,
         qrCodeUrl,

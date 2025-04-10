@@ -48,7 +48,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               style={{ margin: "0 auto 16px" }}
             />
             <Heading as="h1" style={{ fontSize: "24px", marginBottom: "8px" }}>
-              ¡Gracias por comprar tu ticket!
+              ¡ Ya eres parte de la mejor fiesta de perreo !
             </Heading>
             <Text style={{ fontSize: "14px", color: "#333" }}>{ticketId}</Text>
             <Heading as="h2" style={{ fontSize: "20px", marginBottom: "8px" }}>
