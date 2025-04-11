@@ -1,5 +1,6 @@
-/* eslint‑disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps */
 import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
+import useLiveTickets from "@/hooks/useLiveTickets";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 import { useState, useEffect, useMemo } from "react";
 import { Timestamp } from "firebase/firestore";
@@ -37,7 +38,8 @@ const TicketsTable: React.FC = () => {
     updateSearchIdNumber,
   } = usePaginatedTickets();
 
-  /* ───────── local state para filtros ───────── */
+  const live = useLiveTickets();
+
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const [nameInput, setNameInput] = useState(searchName);
@@ -60,25 +62,24 @@ const TicketsTable: React.FC = () => {
     }
   }, [debouncedId]);
 
-  // Marcar inicialización
   useEffect(() => {
     setHasInitialized(true);
   }, []);
 
-  /* ───────── filtrado local para la página mostrada ───────── */
+  const hasFilters = Boolean(debouncedName.trim() || debouncedId.trim());
+
+  const rawTickets = hasFilters ? tickets : live.tickets;
+
   const filteredTickets = useMemo(() => {
     const n = debouncedName.trim().toLowerCase();
     const id = debouncedId.trim();
-    return tickets.filter((t) => {
+    return rawTickets.filter((t) => {
       const matchName = n ? t.name.toLowerCase().includes(n) : true;
       const matchId = id ? t.identificationNumber.includes(id) : true;
       return matchName && matchId;
     });
-  }, [tickets, debouncedName, debouncedId]);
+  }, [rawTickets, debouncedName, debouncedId]);
 
-  const hasFilters = Boolean(debouncedName.trim() || debouncedId.trim());
-
-  /* ───────── modal / delete ───────── */
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"edit" | "delete" | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
@@ -126,12 +127,12 @@ const TicketsTable: React.FC = () => {
     }
   };
 
-  /* ───────── loading / error ───────── */
-  if (isLoading) return <p className="p-4 text-gray-500">Cargando tickets…</p>;
+  if ((isLoading && hasFilters) || (live.loading && !hasFilters))
+    return <p className="p-4 text-gray-500">Cargando tickets…</p>;
+
   if (isError)
     return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
 
-  /* ───────────────────────── UI ───────────────────────── */
   return (
     <div className="rounded-xl border border-gray-200 shadow-sm bg-white">
       {/* filtros */}
@@ -245,7 +246,6 @@ const TicketsTable: React.FC = () => {
         </table>
       </div>
 
-      {/* paginación (solo si no hay filtros activos) */}
       {!hasFilters && (
         <div className="flex justify-between items-center p-4">
           <button
@@ -268,7 +268,6 @@ const TicketsTable: React.FC = () => {
         </div>
       )}
 
-      {/* modal */}
       {selectedTicket && modalMode && (
         <TicketModal
           isOpen={isModalOpen}
