@@ -41,7 +41,6 @@ const TicketsTable: React.FC = () => {
   const live = useLiveTickets();
 
   const [hasInitialized, setHasInitialized] = useState(false);
-
   const [nameInput, setNameInput] = useState(searchName);
   const [idInput, setIdInput] = useState(searchIdNumber);
 
@@ -67,8 +66,8 @@ const TicketsTable: React.FC = () => {
   }, []);
 
   const hasFilters = Boolean(debouncedName.trim() || debouncedId.trim());
-
-  const rawTickets = hasFilters ? tickets : live.tickets;
+  const usingPagination = !hasFilters;
+  const rawTickets = usingPagination ? tickets : live.tickets;
 
   const filteredTickets = useMemo(() => {
     const n = debouncedName.trim().toLowerCase();
@@ -82,9 +81,7 @@ const TicketsTable: React.FC = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"edit" | "delete" | null>(null);
-  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
-    null
-  );
+  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [errorDelete, setErrorDelete] = useState<string | null>(null);
 
@@ -93,11 +90,13 @@ const TicketsTable: React.FC = () => {
     setModalMode("edit");
     setModalOpen(true);
   };
+
   const openDeleteModal = (t: EnrichedTicket) => {
     setSelectedTicket(t);
     setModalMode("delete");
     setModalOpen(true);
   };
+
   const closeModal = () => {
     setModalOpen(false);
     setSelectedTicket(null);
@@ -117,7 +116,6 @@ const TicketsTable: React.FC = () => {
       if (!res.ok || !json.success)
         throw new Error(json.error || "Error eliminando ticket");
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
-
       closeModal();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error desconocido";
@@ -127,11 +125,13 @@ const TicketsTable: React.FC = () => {
     }
   };
 
-  if ((isLoading && hasFilters) || (live.loading && !hasFilters))
+  if ((isLoading && usingPagination) || (live.loading && !usingPagination)) {
     return <p className="p-4 text-gray-500">Cargando tickets…</p>;
+  }
 
-  if (isError)
+  if (isError) {
     return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
+  }
 
   return (
     <div className="rounded-xl border border-gray-200 shadow-sm bg-white">
@@ -179,10 +179,7 @@ const TicketsTable: React.FC = () => {
                 "Ingreso",
                 "Acciones",
               ].map((h) => (
-                <th
-                  key={h}
-                  className="px-4 py-3 font-semibold whitespace-nowrap"
-                >
+                <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">
                   {h}
                 </th>
               ))}
@@ -193,24 +190,20 @@ const TicketsTable: React.FC = () => {
             {filteredTickets.map((t, i) => (
               <tr key={t.id} className="even:bg-gray-50 hover:bg-gray-100">
                 <td className="px-4 py-3">
-                  {hasFilters ? i + 1 : (pageIndex - 1) * PAGE_SIZE + i + 1}
+                  {usingPagination ? (pageIndex - 1) * PAGE_SIZE + i + 1 : i + 1}
                 </td>
                 <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}
-                  >
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}>
                     {t.status === "enabled"
                       ? "Habilitado"
                       : t.status === "joined"
-                        ? "Ingresado"
-                        : t.status}
+                      ? "Ingresado"
+                      : t.status}
                   </span>
                 </td>
                 <td className="px-4 py-3 font-medium">{t.name}</td>
                 <td className="px-4 py-3">{t.identificationNumber}</td>
-                <td className="px-4 py-3">
-                  {t.ticketType === "courtesy" ? "Cortesía" : "Boleta"}
-                </td>
+                <td className="px-4 py-3">{t.ticketType === "courtesy" ? "Cortesía" : "Boleta"}</td>
                 <td className="px-4 py-3">{t.price ? `$${t.price}` : "—"}</td>
                 <td className="px-4 py-3">{t.phaseName}</td>
                 <td className="px-4 py-3">{t.localityName}</td>
@@ -222,8 +215,8 @@ const TicketsTable: React.FC = () => {
                     ? t.checkedInAt instanceof Timestamp
                       ? t.checkedInAt.toDate().toLocaleString()
                       : t.checkedInAt instanceof Date
-                        ? t.checkedInAt.toLocaleString()
-                        : "—"
+                      ? t.checkedInAt.toLocaleString()
+                      : "—"
                     : "—"}
                 </td>
                 <td className="px-4 py-3 flex space-x-2">
@@ -246,7 +239,8 @@ const TicketsTable: React.FC = () => {
         </table>
       </div>
 
-      {!hasFilters && (
+      {/* paginación */}
+      {usingPagination && (
         <div className="flex justify-between items-center p-4">
           <button
             onClick={prevPage}
@@ -268,6 +262,7 @@ const TicketsTable: React.FC = () => {
         </div>
       )}
 
+      {/* modal */}
       {selectedTicket && modalMode && (
         <TicketModal
           isOpen={isModalOpen}
