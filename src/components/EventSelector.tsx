@@ -24,13 +24,13 @@ export default function EventSelector({ selectedEventId, onSelect }: Props) {
       <select
         value={selectedEventId || ""}
         onChange={(e) => onSelect(e.target.value)}
-        className="w-full bg-gray-800 text-white border border-gray-700 p-3 rounded-lg"
+        className="w-full bg-gray-800 text-white border border-gray-700 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-700 transition-colors"
       >
         <option value="" disabled>
           -- Selecciona un evento --
         </option>
         {events.map((event) => (
-          <option key={event.id} value={event.id}>
+          <option key={event.id} value={event.id} className="text-black">
             {event.name} - {new Date(event.date.seconds * 1000).toLocaleDateString()}
           </option>
         ))}

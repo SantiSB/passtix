@@ -63,14 +63,14 @@ const DashboardPage = () => {
           >
             <button
               onClick={() => setIsEventModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition transform hover:scale-105"
+              className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition transform hover:scale-105 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             >
               Crear evento
             </button>
 
             <button
               onClick={() => setIsTicketModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black shadow-lg transition transform hover:scale-105"
+              className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-semibold text-black shadow-lg transition transform hover:scale-105 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ const DashboardPage = () => {
 
             <button
               onClick={logout}
-              className="text-sm text-white hover:text-red-400 transition font-medium"
+              className="text-sm text-white hover:text-red-400 transition font-medium focus:outline-none focus:ring-2 focus:ring-red-300"
             >
               Cerrar sesión
             </button>
@@ -106,7 +106,7 @@ const DashboardPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl"
+            className="rounded-2xl bg-gray-800 p-6"
           >
             <h2 className="text-xl font-bold text-white mb-4">Tus eventos</h2>
             <EventSelector
@@ -119,7 +119,7 @@ const DashboardPage = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="mt-12"
+            className="mt-12 bg-gray-800 p-6 rounded-2xl"
           >
             <h2 className="text-xl font-bold text-white mb-4">Boletas</h2>
             {selectedEventId ? (
