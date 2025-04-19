@@ -5,18 +5,28 @@ import {
   onSnapshot,
   getDoc,
   query,
+  where,
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebase";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 import { Ticket } from "@/interfaces/Ticket";
 
-export default function useLiveTickets() {
+export default function useLiveTickets(eventId: string) {
   const [tickets, setTickets] = useState<EnrichedTicket[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "ticket"), orderBy("createdAt", "asc"));
+    if (!eventId) {
+      setLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, "ticket"),
+      where("eventId", "==", eventId),
+      orderBy("createdAt", "asc")
+    );
 
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const enriched: EnrichedTicket[] = await Promise.all(
@@ -61,7 +71,7 @@ export default function useLiveTickets() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [eventId]);
 
   return { tickets, loading };
 }

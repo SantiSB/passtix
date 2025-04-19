@@ -16,6 +16,7 @@ interface TicketModalProps {
   onClose: () => void;
   mode: "create" | "edit" | "delete";
   ticket?: EnrichedTicket;
+  eventId: string;
   /* Props para modo delete */
   onConfirmDelete?: () => void;
   loadingDelete?: boolean;
@@ -33,10 +34,11 @@ const TicketModal = ({
   onConfirmDelete,
   loadingDelete,
   errorDelete,
+  eventId
 }: TicketModalProps) => {
   /* Hooks de formulario */
-  const editFormHook = useEditTicketForm(ticket || ({} as EnrichedTicket));
-  const registerFormHook = useRegisterTicketForm();
+  const editFormHook = useEditTicketForm(ticket || ({} as EnrichedTicket), eventId);
+  const registerFormHook = useRegisterTicketForm(eventId);
   const formHook = mode === "edit" && ticket ? editFormHook : registerFormHook;
 
   const {

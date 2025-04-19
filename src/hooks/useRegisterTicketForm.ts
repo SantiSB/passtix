@@ -6,7 +6,7 @@ import useEventOptions from "@/hooks/useEventOptions";
 import usePromoterOptions from "@/hooks/usePromoterOptions";
 import { useQueryClient } from "@tanstack/react-query";
 
-const useRegisterTicketForm = () => {
+const useRegisterTicketForm = (eventId: string ) => {
   // Hooks para obtener las opciones de los inputs de eventos y promotores
   const { phases, localities, loading: loadingOptions } = useEventOptions();
   const { promoters, loading: loadingPromoters } = usePromoterOptions();
@@ -68,7 +68,7 @@ const useRegisterTicketForm = () => {
       const res = await fetch("/api/register-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form }),
+        body: JSON.stringify({ ...form, eventId }),
       });
 
       // Obtener la respuesta

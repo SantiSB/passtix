@@ -2,16 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import TicketsTable from "@/components/TicketsTable";
+import EventModal from "@/components/EventModal";
 import TicketModal from "@/components/TicketModal";
+import EventSelector from "@/components/EventSelector";
+import TicketsTable from "@/components/TicketsTable";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import useAuth from "@/hooks/useAuth";
 
 const DashboardPage = () => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -19,12 +24,9 @@ const DashboardPage = () => {
     }
   }, [user, loading]);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center text-white">
         Cargando sesión...
       </div>
     );
@@ -57,11 +59,18 @@ const DashboardPage = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            className="flex items-center gap-4"
+            className="flex flex-wrap gap-4 items-center"
           >
             <button
-              onClick={openModal}
-              className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black shadow-lg transition transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              onClick={() => setIsEventModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg transition transform hover:scale-105"
+            >
+              Crear evento
+            </button>
+
+            <button
+              onClick={() => setIsTicketModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-4 py-2 text-sm font-semibold text-black shadow-lg transition transform hover:scale-105"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -70,7 +79,6 @@ const DashboardPage = () => {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={2}
-                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -100,14 +108,41 @@ const DashboardPage = () => {
             transition={{ duration: 0.5 }}
             className="rounded-2xl"
           >
-            <div className="overflow-x-auto w-full">
-              <TicketsTable />
-            </div>
+            <h2 className="text-xl font-bold text-white mb-4">Tus eventos</h2>
+            <EventSelector
+              selectedEventId={selectedEventId}
+              onSelect={setSelectedEventId}
+            />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="mt-12"
+          >
+            <h2 className="text-xl font-bold text-white mb-4">Boletas</h2>
+            {selectedEventId ? (
+              <TicketsTable eventId={selectedEventId} />
+            ) : (
+              <p className="text-white">
+                Selecciona un evento para ver sus boletas.
+              </p>
+            )}
           </motion.div>
         </div>
       </main>
 
-      <TicketModal mode="create" isOpen={isModalOpen} onClose={closeModal} />
+      <TicketModal
+        mode="create"
+        isOpen={isTicketModalOpen}
+        onClose={() => setIsTicketModalOpen(false)}
+        eventId={selectedEventId || ""}
+      />
+      <EventModal
+        isOpen={isEventModalOpen}
+        onClose={() => setIsEventModalOpen(false)}
+      />
     </section>
   );
 };

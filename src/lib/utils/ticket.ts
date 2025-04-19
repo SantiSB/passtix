@@ -11,6 +11,7 @@ import {
   startAfter,
   DocumentSnapshot,
   deleteDoc,
+  where,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import QRCode from "qrcode";
@@ -20,10 +21,11 @@ import { TicketType, TicketStatus } from "@/types/enums";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
 // ID del evento BICHIYAL
-const BICHIYAL_EVENT_ID = "kZEZ4x42RtwELpkO3dEf";
+// const BICHIYAL_EVENT_ID = "kZEZ4x42RtwELpkO3dEf";
 
 // Crea un ticket con QR
 export async function createTicket(params: {
+  eventId: string; // 👈 Nuevo parámetro dinámico
   assistantId: string;
   phaseId: string;
   ticketType: TicketType;
@@ -33,6 +35,7 @@ export async function createTicket(params: {
   status: TicketStatus;
 }): Promise<Ticket> {
   const {
+    eventId,
     assistantId,
     phaseId,
     ticketType,
@@ -42,28 +45,18 @@ export async function createTicket(params: {
     status,
   } = params;
 
-  // Generar ID del ticket
   const ticketId = uuid();
-
-  // Generar QR con el ID del ticket
   const qrBuffer = await QRCode.toBuffer(ticketId, { type: "png" });
 
-  // Guardar QR en Firebase Storage
   const qrRef = ref(storage, `qrcodes/${ticketId}.png`);
-
-  // Subir QR a Firebase Storage
   await uploadBytes(qrRef, qrBuffer, { contentType: "image/png" });
-
-  // Obtener URL del QR
   const qrCodeUrl = await getDownloadURL(qrRef);
 
-  // Generar fecha y hora actual
   const now = new Date();
 
-  // Crear ticket
   const ticket: Ticket = {
     id: ticketId,
-    eventId: BICHIYAL_EVENT_ID,
+    eventId, // 👈 Usamos el que se pasó como parámetro
     assistantId,
     phaseId,
     promoterId,
@@ -77,7 +70,6 @@ export async function createTicket(params: {
     checkedInAt: null,
   };
 
-  // Devolver ticket creado
   return ticket;
 }
 
@@ -107,7 +99,8 @@ export async function fetchPaginatedTickets(
   pageSize = 10,
   lastDoc: DocumentSnapshot | null = null,
   searchName: string = "",
-  searchIdNumber: string = ""
+  searchIdNumber: string = "",
+  eventId: string // ✅ Nuevo parámetro requerido
 ): Promise<{
   tickets: EnrichedTicket[];
   lastDoc: DocumentSnapshot | null;
@@ -115,17 +108,23 @@ export async function fetchPaginatedTickets(
 }> {
   const ticketCollection = collection(db, "ticket");
 
-  let q;
   const isFilteredSearch = Boolean(
     searchName?.trim() || searchIdNumber?.trim()
   );
 
+  let q;
+
   if (isFilteredSearch) {
-    // 🔍 No usamos paginación si hay filtro
-    q = query(ticketCollection, orderBy("createdAt", "asc"));
+    // 🔍 No usamos paginación cuando hay filtros, pero sí filtramos por evento
+    q = query(
+      ticketCollection,
+      orderBy("createdAt", "asc"),
+      where("eventId", "==", eventId)
+    );
   } else {
-    // 🔄 Usamos paginación normal
+    // 🔄 Usamos paginación + filtro por evento
     const queryConstraints = [
+      where("eventId", "==", eventId),
       orderBy("createdAt", "asc"),
       ...(lastDoc ? [startAfter(lastDoc)] : []),
       limit(pageSize),
@@ -170,7 +169,7 @@ export async function fetchPaginatedTickets(
     })
   );
 
-  // Apply both filters if present
+  // 🔎 Aplicar filtros en frontend si están presentes
   const filteredTickets = enrichedTickets.filter((ticket) => {
     const matchesName = ticket.name
       .toLowerCase()
@@ -183,7 +182,7 @@ export async function fetchPaginatedTickets(
   return {
     tickets: filteredTickets,
     lastDoc: isFilteredSearch
-      ? null // No hay paginación cuando se filtra
+      ? null // no usamos paginación cuando se filtra
       : (snapshot.docs[snapshot.docs.length - 1] ?? null),
     hasMore: !isFilteredSearch && snapshot.docs.length === pageSize,
   };

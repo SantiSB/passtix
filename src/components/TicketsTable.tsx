@@ -1,4 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+"use client";
+
 import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
 import useLiveTickets from "@/hooks/useLiveTickets";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
@@ -7,6 +9,11 @@ import { Timestamp } from "firebase/firestore";
 import TicketModal from "./TicketModal";
 import { useDebounce } from "use-debounce";
 import { useQueryClient } from "@tanstack/react-query";
+
+/* ───────────────────────── types ───────────────────────── */
+interface TicketsTableProps {
+  eventId: string;
+}
 
 /* ───────────────────────── helpers ───────────────────────── */
 const getStatusBadgeClass = (status: string) => {
@@ -21,7 +28,7 @@ const getStatusBadgeClass = (status: string) => {
 };
 
 /* ───────────────────────── component ───────────────────────── */
-const TicketsTable: React.FC = () => {
+const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
   const {
     tickets,
     isLoading,
@@ -36,29 +43,23 @@ const TicketsTable: React.FC = () => {
     searchIdNumber,
     updateSearchName,
     updateSearchIdNumber,
-  } = usePaginatedTickets();
+  } = usePaginatedTickets(eventId); // ✅ pasamos el eventId
 
-  const live = useLiveTickets();
+  const live = useLiveTickets(eventId); // ✅ también lo usamos en modo "live"
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [nameInput, setNameInput] = useState(searchName);
   const [idInput, setIdInput] = useState(searchIdNumber);
-
   const [debouncedName] = useDebounce(nameInput, 600);
   const [debouncedId] = useDebounce(idInput, 600);
-
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (hasInitialized) {
-      updateSearchName(debouncedName);
-    }
+    if (hasInitialized) updateSearchName(debouncedName);
   }, [debouncedName]);
 
   useEffect(() => {
-    if (hasInitialized) {
-      updateSearchIdNumber(debouncedId);
-    }
+    if (hasInitialized) updateSearchIdNumber(debouncedId);
   }, [debouncedId]);
 
   useEffect(() => {
@@ -81,7 +82,9 @@ const TicketsTable: React.FC = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"edit" | "delete" | null>(null);
-  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
+    null
+  );
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [errorDelete, setErrorDelete] = useState<string | null>(null);
 
@@ -179,31 +182,39 @@ const TicketsTable: React.FC = () => {
                 "Ingreso",
                 "Acciones",
               ].map((h) => (
-                <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">
+                <th
+                  key={h}
+                  className="px-4 py-3 font-semibold whitespace-nowrap"
+                >
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-
           <tbody>
             {filteredTickets.map((t, i) => (
               <tr key={t.id} className="even:bg-gray-50 hover:bg-gray-100">
                 <td className="px-4 py-3">
-                  {usingPagination ? (pageIndex - 1) * PAGE_SIZE + i + 1 : i + 1}
+                  {usingPagination
+                    ? (pageIndex - 1) * PAGE_SIZE + i + 1
+                    : i + 1}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}
+                  >
                     {t.status === "enabled"
                       ? "Habilitado"
                       : t.status === "joined"
-                      ? "Ingresado"
-                      : t.status}
+                        ? "Ingresado"
+                        : t.status}
                   </span>
                 </td>
                 <td className="px-4 py-3 font-medium">{t.name}</td>
                 <td className="px-4 py-3">{t.identificationNumber}</td>
-                <td className="px-4 py-3">{t.ticketType === "courtesy" ? "Cortesía" : "Boleta"}</td>
+                <td className="px-4 py-3">
+                  {t.ticketType === "courtesy" ? "Cortesía" : "Boleta"}
+                </td>
                 <td className="px-4 py-3">{t.price ? `$${t.price}` : "—"}</td>
                 <td className="px-4 py-3">{t.phaseName}</td>
                 <td className="px-4 py-3">{t.localityName}</td>
@@ -215,8 +226,8 @@ const TicketsTable: React.FC = () => {
                     ? t.checkedInAt instanceof Timestamp
                       ? t.checkedInAt.toDate().toLocaleString()
                       : t.checkedInAt instanceof Date
-                      ? t.checkedInAt.toLocaleString()
-                      : "—"
+                        ? t.checkedInAt.toLocaleString()
+                        : "—"
                     : "—"}
                 </td>
                 <td className="px-4 py-3 flex space-x-2">
@@ -269,6 +280,7 @@ const TicketsTable: React.FC = () => {
           onClose={closeModal}
           mode={modalMode}
           ticket={selectedTicket}
+          eventId={eventId}
           onConfirmDelete={() => handleDelete(selectedTicket.id)}
           loadingDelete={loadingDelete}
           errorDelete={errorDelete}

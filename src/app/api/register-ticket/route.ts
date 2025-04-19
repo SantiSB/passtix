@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
       phaseId,
       promoterId,
       price,
+      eventId,
     } = body;
 
     // 🔐 Validación de campos obligatorios
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Crear ticket (con QR, sin guardar aún)
     const ticket = await createTicket({
+      eventId,
       assistantId: assistant.id,
       phaseId,
       ticketType,

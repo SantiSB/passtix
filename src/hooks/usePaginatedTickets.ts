@@ -5,23 +5,26 @@ import { DocumentSnapshot } from "firebase/firestore";
 
 export const PAGE_SIZE = 100;
 
-export default function usePaginatedTickets() {
-  /* ──────────────── estado de paginación ──────────────── */
+export default function usePaginatedTickets(eventId: string) {
   const [pageSize] = useState(PAGE_SIZE);
   const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
   const [pageCursor, setPageCursor] = useState<string | null>(null);
   const [historyStack, setHistoryStack] = useState<DocumentSnapshot[]>([]);
   const [pageIndex, setPageIndex] = useState(1);
 
-  /* ──────────────── estado de filtros ──────────────── */
   const [searchName, setSearchName] = useState("");
   const [searchIdNumber, setSearchIdNumber] = useState("");
 
-  /* ──────────────── React‑Query ──────────────── */
   const queryFn = useMemo(() => {
     return () =>
-      fetchPaginatedTickets(pageSize, lastDoc, searchName, searchIdNumber);
-  }, [pageSize, lastDoc, searchName, searchIdNumber]);
+      fetchPaginatedTickets(
+        pageSize,
+        lastDoc,
+        searchName,
+        searchIdNumber,
+        eventId
+      );
+  }, [pageSize, lastDoc, searchName, searchIdNumber, eventId]);
 
   const {
     data = { tickets: [], lastDoc: null, hasMore: false },
@@ -30,12 +33,18 @@ export default function usePaginatedTickets() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["tickets", pageCursor, lastDoc?.id, searchName, searchIdNumber],
+    queryKey: [
+      "tickets",
+      pageCursor,
+      lastDoc?.id,
+      searchName,
+      searchIdNumber,
+      eventId,
+    ],
     queryFn,
     staleTime: 5000,
   });
 
-  /* ──────────────── helpers de paginación ──────────────── */
   const nextPage = () => {
     if (data.hasMore && data.lastDoc) {
       setHistoryStack((prev) => [...prev, lastDoc!]);
@@ -54,7 +63,6 @@ export default function usePaginatedTickets() {
     setPageIndex((prev) => Math.max(prev - 1, 1));
   };
 
-  /* ──────────────── helpers de búsqueda ──────────────── */
   const updateSearchName = (name: string) => {
     setSearchName(name);
     resetPagination();
@@ -72,7 +80,6 @@ export default function usePaginatedTickets() {
     setPageIndex(1);
   };
 
-  /* ──────────────── retorno ──────────────── */
   return {
     tickets: data.tickets,
     isLoading,
@@ -85,7 +92,6 @@ export default function usePaginatedTickets() {
     pageIndex,
     refetch,
     pageSize,
-    /* filtros y setters */
     searchName,
     searchIdNumber,
     updateSearchName,
