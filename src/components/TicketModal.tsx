@@ -34,10 +34,13 @@ const TicketModal = ({
   onConfirmDelete,
   loadingDelete,
   errorDelete,
-  eventId
+  eventId,
 }: TicketModalProps) => {
   /* Hooks de formulario */
-  const editFormHook = useEditTicketForm(ticket || ({} as EnrichedTicket), eventId);
+  const editFormHook = useEditTicketForm(
+    ticket || ({} as EnrichedTicket),
+    eventId
+  );
   const registerFormHook = useRegisterTicketForm(eventId);
   const formHook = mode === "edit" && ticket ? editFormHook : registerFormHook;
 
@@ -171,8 +174,8 @@ const TicketModal = ({
               options={[
                 { id: "ticket", name: "Boleta" },
                 { id: "courtesy", name: "Cortesía" },
+                { id: "brunch", name: "Brunch" },
               ]}
-              required
             />
 
             <SelectInput
@@ -181,7 +184,6 @@ const TicketModal = ({
               value={form.localityId}
               onChange={handleChange}
               options={localities}
-              required
             />
 
             <SelectInput
@@ -190,7 +192,6 @@ const TicketModal = ({
               value={form.phaseId}
               onChange={handleChange}
               options={phases}
-              required
             />
 
             <SelectInput

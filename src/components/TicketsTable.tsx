@@ -213,7 +213,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                 <td className="px-4 py-3 font-medium">{t.name}</td>
                 <td className="px-4 py-3">{t.identificationNumber}</td>
                 <td className="px-4 py-3">
-                  {t.ticketType === "courtesy" ? "Cortesía" : "Boleta"}
+                  {t.ticketType === "courtesy" ? "Cortesía" : t.ticketType === "brunch" ? "Brunch" : "Boleta"}
                 </td>
                 <td className="px-4 py-3">{t.price ? `$${t.price}` : "—"}</td>
                 <td className="px-4 py-3">{t.phaseName}</td>

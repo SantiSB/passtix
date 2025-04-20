@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   collection,
@@ -7,6 +9,7 @@ import {
   query,
   where,
   orderBy,
+  DocumentReference,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebase";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
@@ -15,6 +18,12 @@ import { Ticket } from "@/interfaces/Ticket";
 export default function useLiveTickets(eventId: string) {
   const [tickets, setTickets] = useState<EnrichedTicket[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getSafeDoc = (collectionName: string, id?: string | null) => {
+    return id && typeof id === "string" && !id.includes("/")
+      ? doc(db, collectionName, id)
+      : null;
+  };
 
   useEffect(() => {
     if (!eventId) {
@@ -33,36 +42,52 @@ export default function useLiveTickets(eventId: string) {
         snapshot.docs.map(async (docSnap) => {
           const ticket = docSnap.data() as Ticket;
 
-          const assistantSnap = await getDoc(
-            doc(db, "assistant", ticket.assistantId)
-          );
-          const assistant = assistantSnap.data();
+          try {
+            const assistantRef = getSafeDoc("assistant", ticket.assistantId);
+            const phaseRef = getSafeDoc("phase", ticket.phaseId);
+            const localityRef = getSafeDoc("locality", ticket.localityId);
+            const promoterRef = getSafeDoc("promoter", ticket.promoterId ?? "");
 
-          const phaseSnap = await getDoc(doc(db, "phase", ticket.phaseId));
-          const phase = phaseSnap.data();
+            const [assistantSnap, phaseSnap, localitySnap, promoterSnap] =
+              await Promise.all([
+                assistantRef ? getDoc(assistantRef) : Promise.resolve(null),
+                phaseRef ? getDoc(phaseRef) : Promise.resolve(null),
+                localityRef ? getDoc(localityRef) : Promise.resolve(null),
+                promoterRef ? getDoc(promoterRef) : Promise.resolve(null),
+              ]);
 
-          const localitySnap = await getDoc(
-            doc(db, "locality", ticket.localityId)
-          );
-          const locality = localitySnap.data();
+            const assistant = assistantSnap?.data();
+            const phase = phaseSnap?.data();
+            const locality = localitySnap?.data();
+            const promoter = promoterSnap?.data();
 
-          const promoterSnap = ticket.promoterId
-            ? await getDoc(doc(db, "promoter", ticket.promoterId))
-            : null;
-          const promoter = promoterSnap?.data();
-
-          return {
-            ...ticket,
-            id: docSnap.id,
-            name: assistant?.name ?? "—",
-            email: assistant?.email ?? "—",
-            phoneNumber: assistant?.phoneNumber ?? "—",
-            identificationNumber: assistant?.identificationNumber ?? "—",
-            identificationType: assistant?.identificationType ?? "—",
-            phaseName: phase?.name ?? "—",
-            localityName: locality?.name ?? "—",
-            promoterName: promoter?.name ?? "—",
-          };
+            return {
+              ...ticket,
+              id: docSnap.id,
+              name: assistant?.name ?? "—",
+              email: assistant?.email ?? "—",
+              phoneNumber: assistant?.phoneNumber ?? "—",
+              identificationNumber: assistant?.identificationNumber ?? "—",
+              identificationType: assistant?.identificationType ?? "—",
+              phaseName: phase?.name ?? "—",
+              localityName: locality?.name ?? "—",
+              promoterName: promoter?.name ?? "—",
+            };
+          } catch (error) {
+            console.warn(`❌ Error enriqueciendo ticket ${docSnap.id}:`, error);
+            return {
+              ...ticket,
+              id: docSnap.id,
+              name: "—",
+              email: "—",
+              phoneNumber: "—",
+              identificationNumber: "—",
+              identificationType: "—",
+              phaseName: "—",
+              localityName: "—",
+              promoterName: "—",
+            };
+          }
         })
       );
 

@@ -100,92 +100,111 @@ export async function fetchPaginatedTickets(
   lastDoc: DocumentSnapshot | null = null,
   searchName: string = "",
   searchIdNumber: string = "",
-  eventId: string // ✅ Nuevo parámetro requerido
+  eventId: string
 ): Promise<{
   tickets: EnrichedTicket[];
   lastDoc: DocumentSnapshot | null;
   hasMore: boolean;
 }> {
-  const ticketCollection = collection(db, "ticket");
-
-  const isFilteredSearch = Boolean(
-    searchName?.trim() || searchIdNumber?.trim()
-  );
-
-  let q;
-
-  if (isFilteredSearch) {
-    // 🔍 No usamos paginación cuando hay filtros, pero sí filtramos por evento
-    q = query(
-      ticketCollection,
-      orderBy("createdAt", "asc"),
-      where("eventId", "==", eventId)
+  try {
+    const ticketCollection = collection(db, "ticket");
+    const isFilteredSearch = Boolean(
+      searchName?.trim() || searchIdNumber?.trim()
     );
-  } else {
-    // 🔄 Usamos paginación + filtro por evento
-    const queryConstraints = [
-      where("eventId", "==", eventId),
-      orderBy("createdAt", "asc"),
-      ...(lastDoc ? [startAfter(lastDoc)] : []),
-      limit(pageSize),
-    ];
-    q = query(ticketCollection, ...queryConstraints);
-  }
 
-  const snapshot = await getDocs(q);
+    let q;
 
-  const enrichedTickets: EnrichedTicket[] = await Promise.all(
-    snapshot.docs.map(async (docSnap) => {
-      const ticket = docSnap.data() as Ticket;
-
-      const assistantSnap = await getDoc(
-        doc(db, "assistant", ticket.assistantId)
+    if (isFilteredSearch) {
+      q = query(
+        ticketCollection,
+        orderBy("createdAt", "asc"),
+        where("eventId", "==", eventId)
       );
-      const assistant = assistantSnap.data();
+    } else {
+      const queryConstraints = [
+        where("eventId", "==", eventId),
+        orderBy("createdAt", "asc"),
+        ...(lastDoc ? [startAfter(lastDoc)] : []),
+        limit(pageSize),
+      ];
+      q = query(ticketCollection, ...queryConstraints);
+    }
 
-      const phaseSnap = await getDoc(doc(db, "phase", ticket.phaseId));
-      const phase = phaseSnap.data();
+    const snapshot = await getDocs(q);
 
-      const localitySnap = await getDoc(doc(db, "locality", ticket.localityId));
-      const locality = localitySnap.data();
+    const enrichedTickets: EnrichedTicket[] = await Promise.all(
+      snapshot.docs.map(async (docSnap) => {
+        const ticket = docSnap.data() as Ticket;
 
-      const promoterSnap = ticket.promoterId
-        ? await getDoc(doc(db, "promoter", ticket.promoterId))
-        : null;
-      const promoter = promoterSnap?.data();
+        try {
+          const assistantSnap = ticket.assistantId
+            ? await getDoc(doc(db, "assistant", ticket.assistantId))
+            : null;
+          const phaseSnap = ticket.phaseId
+            ? await getDoc(doc(db, "phase", ticket.phaseId))
+            : null;
+          const localitySnap = ticket.localityId
+            ? await getDoc(doc(db, "locality", ticket.localityId))
+            : null;
+          const promoterSnap = ticket.promoterId
+            ? await getDoc(doc(db, "promoter", ticket.promoterId))
+            : null;
 
-      return {
-        ...ticket,
-        id: docSnap.id,
-        name: assistant?.name ?? "—",
-        email: assistant?.email ?? "—",
-        phoneNumber: assistant?.phoneNumber ?? "—",
-        identificationNumber: assistant?.identificationNumber ?? "—",
-        identificationType: assistant?.identificationType ?? "—",
-        phaseName: phase?.name ?? "—",
-        localityName: locality?.name ?? "—",
-        promoterName: promoter?.name ?? "—",
-      };
-    })
-  );
+          const assistant = assistantSnap?.data();
+          const phase = phaseSnap?.data();
+          const locality = localitySnap?.data();
+          const promoter = promoterSnap?.data();
 
-  // 🔎 Aplicar filtros en frontend si están presentes
-  const filteredTickets = enrichedTickets.filter((ticket) => {
-    const matchesName = ticket.name
-      .toLowerCase()
-      .includes(searchName.toLowerCase());
-    const matchesIdNumber =
-      ticket.identificationNumber.includes(searchIdNumber);
-    return matchesName && matchesIdNumber;
-  });
+          return {
+            ...ticket,
+            id: docSnap.id,
+            name: assistant?.name ?? "—",
+            email: assistant?.email ?? "—",
+            phoneNumber: assistant?.phoneNumber ?? "—",
+            identificationNumber: assistant?.identificationNumber ?? "—",
+            identificationType: assistant?.identificationType ?? "—",
+            phaseName: phase?.name ?? "—",
+            localityName: locality?.name ?? "—",
+            promoterName: promoter?.name ?? "—",
+          };
+        } catch (error) {
+          console.warn(`⚠️ Error enriqueciendo ticket ${docSnap.id}:`, error);
+          return {
+            ...ticket,
+            id: docSnap.id,
+            name: "—",
+            email: "—",
+            phoneNumber: "—",
+            identificationNumber: "—",
+            identificationType: "—",
+            phaseName: "—",
+            localityName: "—",
+            promoterName: "—",
+          };
+        }
+      })
+    );
 
-  return {
-    tickets: filteredTickets,
-    lastDoc: isFilteredSearch
-      ? null // no usamos paginación cuando se filtra
-      : (snapshot.docs[snapshot.docs.length - 1] ?? null),
-    hasMore: !isFilteredSearch && snapshot.docs.length === pageSize,
-  };
+    const filteredTickets = enrichedTickets.filter((ticket) => {
+      const matchesName = ticket.name
+        .toLowerCase()
+        .includes(searchName.toLowerCase());
+      const matchesIdNumber =
+        ticket.identificationNumber.includes(searchIdNumber);
+      return matchesName && matchesIdNumber;
+    });
+
+    return {
+      tickets: filteredTickets,
+      lastDoc: isFilteredSearch
+        ? null
+        : (snapshot.docs[snapshot.docs.length - 1] ?? null),
+      hasMore: !isFilteredSearch && snapshot.docs.length === pageSize,
+    };
+  } catch (err) {
+    console.error("🔥 Error en fetchPaginatedTickets:", err);
+    throw err; // 🔁 para que React Query sepa que falló
+  }
 }
 
 // Actualiza un ticket en la base de datos

@@ -9,6 +9,7 @@ import TicketsTable from "@/components/TicketsTable";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import useAuth from "@/hooks/useAuth";
+import PhaseModal from "@/components/PhaseModal";
 
 const DashboardPage = () => {
   const { user, loading, logout } = useAuth();
@@ -16,6 +17,7 @@ const DashboardPage = () => {
 
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isPhaseModalOpen, setIsPhaseModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -66,6 +68,13 @@ const DashboardPage = () => {
               className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition transform hover:scale-105 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             >
               Crear evento
+            </button>
+
+            <button
+              onClick={() => setIsPhaseModalOpen(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+            >
+              Crear Fase
             </button>
 
             <button
@@ -142,6 +151,11 @@ const DashboardPage = () => {
       <EventModal
         isOpen={isEventModalOpen}
         onClose={() => setIsEventModalOpen(false)}
+      />
+      <PhaseModal
+        isOpen={isPhaseModalOpen}
+        onClose={() => setIsPhaseModalOpen(false)}
+        eventId={selectedEventId || ""}
       />
     </section>
   );

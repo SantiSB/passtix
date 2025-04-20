@@ -32,8 +32,6 @@ export async function PUT(req: NextRequest) {
       !identificationNumber ||
       !identificationType ||
       !ticketType ||
-      !localityId ||
-      !phaseId ||
       !price
     ) {
       return NextResponse.json(

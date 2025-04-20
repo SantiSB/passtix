@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const useRegisterTicketForm = (eventId: string ) => {
   // Hooks para obtener las opciones de los inputs de eventos y promotores
-  const { phases, localities, loading: loadingOptions } = useEventOptions();
+  const { phases, localities, loading: loadingOptions } = useEventOptions(eventId);
   const { promoters, loading: loadingPromoters } = usePromoterOptions();
 
   const queryClient = useQueryClient();
@@ -36,6 +36,8 @@ const useRegisterTicketForm = (eventId: string ) => {
   // Cambia el precio del ticket según la fase seleccionada o si es de cortesía
   useEffect(() => {
     if (form.ticketType === 'courtesy') {
+      setForm((prev) => ({ ...prev, price: 0 }));
+    } else if (form.ticketType === 'brunch') {
       setForm((prev) => ({ ...prev, price: 0 }));
     } else {
       const selectedPhase = phases.find((p: Phase) => p.id === form.phaseId);
