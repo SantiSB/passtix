@@ -25,7 +25,7 @@ export async function sendTicketEmail({
 }: SendTicketEmailParams): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await resend.emails.send({
-      from: `${eventName} - PassTix <notificaciones@piso12.com>`,
+      from: `${eventName} - PassTix <tickets@passtix.online>`,
       to,
       subject: `🎟️ Tu entrada para ${eventName}`,
       react: await TicketEmail({
