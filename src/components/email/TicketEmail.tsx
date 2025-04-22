@@ -14,13 +14,39 @@ interface TicketEmailProps {
   name: string;
   qrCodeUrl: string;
   ticketId: string;
+  eventName: string;
+  eventDate: string;
+  eventVenue: string;
+  eventAddress: string;
+  eventCity: string;
 }
+
+/* 🔗 Diccionario de logos por nombre de evento o productor */
+const IMG_URLS: Record<string, string> = {
+  sortech:
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/latribu%2Flogo.png?alt=media&token=7bbe940b-ae6e-4adf-8c41-5fd1dcd1dca5",
+  ssoe: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/arkhes%2Flogo.png?alt=media&token=35d7d18b-c030-4a3a-a285-bc0b64a54892",
+  knockout:
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/plazanorte%2Flogo.PNG?alt=media&token=ad0c3952-089f-4ebb-b848-f0d4fbbbe5f4",
+  bichiyal:
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2FpN8CiNC5oheHobFlxakX.png?alt=media&token=862f102e-0433-4bb1-8eba-414429ba6d36",
+  passtix:
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/passtix%2Flogo.png?alt=media&token=40c581ba-c63d-440f-99d0-4ae4e8290d3f",
+};
 
 const TicketEmail: React.FC<TicketEmailProps> = ({
   name,
   qrCodeUrl,
   ticketId,
+  eventName,
+  eventDate,
+  eventVenue,
+  eventAddress,
+  eventCity,
 }) => {
+  const normalizedKey = eventName.toLowerCase().replace(/\s/g, "");
+  const logoUrl = IMG_URLS[normalizedKey] || IMG_URLS["passtix"];
+
   return (
     <Html>
       <Head />
@@ -39,31 +65,30 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             borderRadius: "8px",
           }}
         >
-          {/* Encabezado y logo */}
+          {/* ---------- header ---------- */}
           <Section style={{ textAlign: "center", marginBottom: "24px" }}>
             <Img
-              src="https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2Flogo_piso12_negro.png?alt=media&token=19ecaf49-ddec-48e2-bdfa-824f4ea8ebb4"
-              alt="Logo Piso 12"
+              src={logoUrl}
+              alt={`${eventName} logo`}
               width="220"
               style={{ margin: "0 auto 16px" }}
             />
             <Heading as="h1" style={{ fontSize: "24px", marginBottom: "8px" }}>
-              ¡ Ya eres parte de la mejor fiesta de perreo !
+              ¡Tu entrada ya está confirmada!
             </Heading>
             <Text style={{ fontSize: "14px", color: "#333" }}>{ticketId}</Text>
             <Heading as="h2" style={{ fontSize: "20px", marginBottom: "8px" }}>
-              ¡ESTA ENTRADA YA ES TUYA! 
+              {eventName}
             </Heading>
             <Text style={{ fontSize: "14px", color: "#333" }}>
-              Hola {name} !
+              Hola {name}!
             </Text>
             <Text style={{ fontSize: "14px", color: "#333" }}>
-              LLEVA ESTE CÓDIGO QR A LA FIESTA, PUEDE SER IMPRESO O EN TU
-              CELULAR
+              Lleva este código QR al evento (impreso o en tu celular).
             </Text>
           </Section>
 
-          {/* Código QR */}
+          {/* ---------- QR ---------- */}
           <Section style={{ textAlign: "center", margin: "24px 0" }}>
             <Img
               src={qrCodeUrl}
@@ -77,43 +102,44 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               }}
             />
             <Text style={{ marginTop: "8px", fontSize: "12px", color: "#999" }}>
-              Presenta este código QR al ingresar al evento.
+              Presenta este código QR al ingresar.
             </Text>
           </Section>
 
-          {/* Detalles del evento */}
+          {/* ---------- detalles ---------- */}
           <Section style={{ marginTop: "20px", textAlign: "center" }}>
             <Heading as="h2" style={{ fontSize: "18px", marginBottom: "12px" }}>
-              Detalles de tu compra
+              Detalles del evento
             </Heading>
             <Text>
-              <strong>Evento:</strong> BICHIYAL - Piso 12
+              <strong>Evento:</strong> {eventName}
             </Text>
             <Text>
-              <strong>Fecha:</strong> 12 de abril de 2025
+              <strong>Fecha:</strong> {eventDate}
             </Text>
-            <Text>
-              <strong>Lugar:</strong> Hotel V1501
-            </Text>
-            <Text>
-              <strong>Dirección:</strong> Cl 20 #33-60
-            </Text>
-            <Text>
-              <strong>Ciudad:</strong> Pasto, Nariño
-            </Text>
+            {eventVenue && (
+              <Text>
+                <strong>Lugar:</strong> {eventVenue}
+              </Text>
+            )}
+            {eventAddress && (
+              <Text>
+                <strong>Dirección:</strong> {eventAddress}
+              </Text>
+            )}
+            {eventCity && (
+              <Text>
+                <strong>Ciudad:</strong> {eventCity}
+              </Text>
+            )}
           </Section>
 
-          {/* Footer */}
+          {/* ---------- footer ---------- */}
           <Section style={{ marginTop: "32px", textAlign: "center" }}>
-            <Text><strong>Disfruta el espectáculo!</strong></Text>
             <Text>
-              La fiesta no se vive, se siente… comparte la vibra con el mundo
-              #RitmoYExperiencia
+              <strong>¡Nos vemos pronto!</strong>
             </Text>
-            <Text>instagram: @piso12____</Text>
-            <Text>¡Gracias por su compra!</Text>
-            <Text>PassTix agradece su preferencia.</Text>
-            <Text>(+57)-305-206-59-63</Text>
+            <Text>Gracias por elegir PassTix.</Text>
             <Text
               style={{
                 marginTop: "12px",
@@ -122,12 +148,8 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
                 lineHeight: "1.4",
               }}
             >
-              AVISO DE CONFIDENCIALIDAD: La información, incluyendo cualquier
-              archivo adjunto, contenida en este mensaje es confidencial y
-              solamente dirigido a la(s) persona(s) mencionadas arriba. Si el
-              lector de este mensaje no es el interesado, favor de eliminarlo y
-              notificar al remitente, quedando estrictamente prohibido la
-              difusión, distribución o reproducción de este comunicado.
+              AVISO DE CONFIDENCIALIDAD: la información contenida en este
+              mensaje es confidencial y se dirige sólo al destinatario.
             </Text>
             <Text
               style={{
@@ -136,14 +158,8 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
                 lineHeight: "1.4",
               }}
             >
-              CONFIDENTIALITY NOTICE: The information contained in this
-              electronic message including any attachments is privileged and
-              confidential, and is intended for the use of the individual(s)
-              named above and others who have been specifically authorized to
-              receive it. If you are not the intended recipient, you are hereby
-              notified that any dissemination, distribution or copying of this
-              message is strictly prohibited. If you have received this message
-              by mistake, please destroy it immediately, and notify the sender.
+              CONFIDENTIALITY NOTICE: This e‑mail and any attachments are
+              confidential and intended only for the named recipient.
             </Text>
           </Section>
         </Container>

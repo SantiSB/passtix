@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { createTicket, saveTicket } from "@/lib/utils/ticket";
 import { sendTicketEmail } from "@/lib/utils/email";
 import { createAssistant, saveAssistant } from "@/lib/utils/assistant";
+import { db } from "@/lib/firebase/firebase";
+import { doc, getDoc, Timestamp } from "firebase/firestore";
 
-// Endpoint para registrar un ticket
+// POST /api/register-ticket
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    /* ------------------------------------------------------------------ */
+    /* 1. Datos recibidos del front                                        */
+    /* ------------------------------------------------------------------ */
     const {
+      eventId, // <- obligatorio: id del evento
       name,
       email,
       phoneNumber,
@@ -21,8 +27,9 @@ export async function POST(req: NextRequest) {
       price,
     } = body;
 
-    // 🔐 Validación de campos obligatorios
+    // Validación de campos básicos
     if (
+      !eventId ||
       !name ||
       !email ||
       !identificationNumber ||
@@ -35,48 +42,85 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 🧠 Campos opcionales con valores por defecto
-    const optionalPhone = phoneNumber || null;
-    const optionalPromoter = promoterId || null;
-    const optionalPrice = price ?? null;
+    /* ------------------------------------------------------------------ */
+    /* 2. Traer datos del evento                                           */
+    /* ------------------------------------------------------------------ */
+    const eventSnap = await getDoc(doc(db, "event", eventId));
+    if (!eventSnap.exists()) {
+      return NextResponse.json(
+        { success: false, error: "Evento no encontrado." },
+        { status: 404 }
+      );
+    }
 
-    // 1. Crear asistente
+    const eventData = eventSnap.data() as Record<string, any>;
+    const eventName = eventData.name ?? "Evento";
+    const eventVenue = eventData.venue ?? "";
+    const eventAddress = eventData.address ?? "";
+    const eventCity = eventData.city ?? "";
+
+    // Formatear fecha a texto legible en español
+    let eventDate = "";
+    if (eventData.date) {
+      const dateObj =
+        eventData.date instanceof Timestamp
+          ? eventData.date.toDate()
+          : new Date(eventData.date);
+      eventDate = dateObj.toLocaleDateString("es-CO", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* 3. Crear asistente y ticket                                         */
+    /* ------------------------------------------------------------------ */
     const assistant = await createAssistant(
       name,
       email,
-      optionalPhone,
+      phoneNumber || null,
       identificationNumber,
       identificationType
     );
 
-    // 2. Crear ticket (con QR, sin guardar aún)
     const ticket = await createTicket({
-      eventId: body.eventId,
+      eventId,
       assistantId: assistant.id,
       phaseId,
       ticketType,
       localityId,
-      price: optionalPrice,
-      promoterId: optionalPromoter,
+      price: price ?? null,
+      promoterId: promoterId || null,
       status: "enabled",
     });
 
-    // 3. Enviar correo con QR
+    /* ------------------------------------------------------------------ */
+    /* 4. Enviar correo                                                    */
+    /* ------------------------------------------------------------------ */
     const emailResult = await sendTicketEmail({
       to: email,
       name,
       qrCodeUrl: ticket.qrCode,
       ticketId: ticket.id,
+      eventName,
+      eventDate,
+      eventVenue,
+      eventAddress,
+      eventCity,
     });
 
     if (!emailResult.success) {
+      console.error("Error al enviar el correo:", emailResult.error);
       return NextResponse.json(
         { success: false, error: "No se pudo enviar el correo con el QR." },
         { status: 500 }
       );
     }
 
-    // 4. Guardar ticket y asistente en Firestore
+    /* ------------------------------------------------------------------ */
+    /* 5. Guardar en Firestore                                             */
+    /* ------------------------------------------------------------------ */
     await saveTicket(ticket);
     await saveAssistant(assistant);
 

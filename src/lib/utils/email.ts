@@ -1,30 +1,46 @@
 import { Resend } from "resend";
 import TicketEmail from "@/components/email/TicketEmail";
 
-// Inicializar Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Enviar email de ticket
+interface SendTicketEmailParams {
+  to: string;
+  name: string;
+  qrCodeUrl: string;
+  ticketId: string;
+  eventName: string;
+  eventDate: string;
+  eventVenue: string;
+  eventAddress: string;
+  eventCity: string;
+}
+
+// Envía el correo con el template dinámico
 export async function sendTicketEmail({
   to,
   name,
   qrCodeUrl,
   ticketId,
-}: {
-  to: string;
-  name: string;
-  qrCodeUrl: string;
-  ticketId: string;
-}): Promise<{ success: boolean; error?: string }> {
+  eventName,
+  eventDate,
+  eventVenue,
+  eventAddress,
+  eventCity,
+}: SendTicketEmailParams): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await resend.emails.send({
-      from: "Piso 12 - PassTix <notificaciones@piso12.com>",
+      from: `${eventName} - PassTix <notificaciones@piso12.com>`,
       to,
-      subject: `🎟️ Entrada Piso 12 - BICHIYAL`,
+      subject: `🎟️ Tu entrada para ${eventName}`,
       react: await TicketEmail({
         name,
         qrCodeUrl,
         ticketId,
+        eventName,
+        eventDate,
+        eventVenue,
+        eventAddress,
+        eventCity,
       }),
     });
 
@@ -36,6 +52,9 @@ export async function sendTicketEmail({
     return { success: true };
   } catch (err: unknown) {
     console.error(err);
-    return { success: false, error: err instanceof Error ? err.message : "Error al enviar el email" };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Error al enviar el email",
+    };
   }
 }
