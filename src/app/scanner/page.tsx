@@ -93,7 +93,7 @@ export default function ScannerPage() {
       </motion.div>
 
       {/* DEBUG INFO */}
-      {process.env.NODE_ENV !== "production" && (
+      {
         <div className="mt-4 text-xs text-yellow-400 text-center">
           <p>
             <strong>UID usuario:</strong> {debugInfo?.userUid}
@@ -102,7 +102,7 @@ export default function ScannerPage() {
             <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
           </p>
         </div>
-      )}
+      }
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
