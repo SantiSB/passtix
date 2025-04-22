@@ -100,24 +100,30 @@ export function useQrScanner() {
                 ? assistantSnap.data()
                 : null;
 
+              const now = new Date();
+
               if (ticket.phaseId) {
                 const phaseRef = doc(db, "phase", ticket.phaseId);
                 const phaseSnap = await getDoc(phaseRef);
                 if (phaseSnap.exists()) {
                   const phase = phaseSnap.data();
-                  const maxEntryTime: Timestamp = phase.maxEntryTime;
 
-                  const now = new Date();
-                  const maxTime = maxEntryTime.toDate();
+                  // ✅ Validar si tiene maxEntryTime
+                  if (
+                    phase.maxEntryTime &&
+                    typeof phase.maxEntryTime.toDate === "function"
+                  ) {
+                    const maxTime = phase.maxEntryTime.toDate();
 
-                  if (now > maxTime) {
-                    await updateDoc(ticketRef, {
-                      status: "disabled",
-                    });
-                    setStatus("❌ Ticket inhabilitado por horario");
-                    setAssistantName(assistant?.name || "Asistente");
-                    resetScanner();
-                    return;
+                    if (now > maxTime) {
+                      await updateDoc(ticketRef, {
+                        status: "disabled",
+                      });
+                      setStatus("❌ Ticket inhabilitado por horario");
+                      setAssistantName(assistant?.name || "Asistente");
+                      resetScanner();
+                      return;
+                    }
                   }
                 }
               }
@@ -127,7 +133,7 @@ export function useQrScanner() {
               } else {
                 await updateDoc(ticketRef, {
                   status: "joined",
-                  checkedInAt: new Date(),
+                  checkedInAt: now,
                 });
                 setStatus("✅ Ingreso registrado");
               }
