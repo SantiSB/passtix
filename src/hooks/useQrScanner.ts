@@ -32,7 +32,7 @@ export function useQrScanner() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user || !user.uid) return; // ✅ Esperar a que user esté listo
+    if (!user || !user.uid) return;
 
     const tryStart = async () => {
       if (!containerRef.current) {
@@ -70,7 +70,6 @@ export function useQrScanner() {
 
               const ticket = ticketSnap.data();
 
-              // Obtener evento del ticket
               const eventRef = doc(db, "event", ticket.eventId);
               const eventSnap = await getDoc(eventRef);
 
@@ -82,13 +81,11 @@ export function useQrScanner() {
 
               const event = eventSnap.data() as EventData;
 
-              // Debug info visible
               setDebugInfo({
                 userUid: user.uid,
                 eventProducerId: event?.producerId || "",
               });
 
-              // Validar que el evento sea del productor autenticado
               if (
                 String(event?.producerId).trim() !== String(user.uid).trim()
               ) {
@@ -136,9 +133,13 @@ export function useQrScanner() {
               }
 
               setAssistantName(assistant?.name || "Asistente");
-            } catch (err) {
+            } catch (err: unknown) {
+              let errorMessage = "al procesar el QR";
+              if (err instanceof Error) {
+                errorMessage = err.message;
+              }
               console.error("❌ Error escaneando QR:", err);
-              setStatus("❌ Error al procesar el QR");
+              setStatus(`❌ Error: ${errorMessage}`);
             }
 
             resetScanner();
@@ -170,5 +171,10 @@ export function useQrScanner() {
     };
   }, [user]);
 
-  return { status, assistantName, scannerRef: containerRef, debugInfo };
+  return {
+    status,
+    assistantName,
+    scannerRef: containerRef,
+    debugInfo,
+  };
 }

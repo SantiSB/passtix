@@ -39,7 +39,6 @@ export default function ScannerPage() {
 
   return (
     <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-4 py-8 relative text-white">
-      {/* Botón de logout */}
       <button
         onClick={logout}
         className="absolute top-4 right-4 text-sm text-white hover:text-red-400 transition font-medium z-50"
@@ -92,17 +91,14 @@ export default function ScannerPage() {
         )}
       </motion.div>
 
-      {/* DEBUG INFO */}
-      {
-        <div className="mt-4 text-xs text-yellow-400 text-center">
-          <p>
-            <strong>UID usuario:</strong> {debugInfo?.userUid}
-          </p>
-          <p>
-            <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
-          </p>
-        </div>
-      }
+      <div className="mt-4 text-xs text-yellow-400 text-center">
+        <p>
+          <strong>UID usuario:</strong> {debugInfo?.userUid}
+        </p>
+        <p>
+          <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
+        </p>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
