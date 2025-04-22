@@ -17,7 +17,7 @@ export default function EventsList() {
         >
           <h3 className="text-lg font-bold">{event.name}</h3>
           <p>{event.location}</p>
-          <p>{new Date(event.date).toLocaleString()}</p>
+          <p>{event.date.toDate().toLocaleString()}</p>
         </li>
       ))}
     </ul>
