@@ -10,9 +10,7 @@ interface SendTicketEmailParams {
   ticketId: string;
   eventName: string;
   eventDate: string;
-  eventVenue: string;
-  eventAddress: string;
-  eventCity: string;
+  eventLocation: string;
 }
 
 // Envía el correo con el template dinámico
@@ -23,9 +21,7 @@ export async function sendTicketEmail({
   ticketId,
   eventName,
   eventDate,
-  eventVenue,
-  eventAddress,
-  eventCity,
+  eventLocation,
 }: SendTicketEmailParams): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await resend.emails.send({
@@ -38,9 +34,7 @@ export async function sendTicketEmail({
         ticketId,
         eventName,
         eventDate,
-        eventVenue,
-        eventAddress,
-        eventCity,
+        eventLocation,
       }),
     });
 

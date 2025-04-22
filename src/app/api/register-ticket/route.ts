@@ -55,9 +55,7 @@ export async function POST(req: NextRequest) {
 
     const eventData = eventSnap.data() as Record<string, any>;
     const eventName = eventData.name ?? "Evento";
-    const eventVenue = eventData.venue ?? "";
-    const eventAddress = eventData.address ?? "";
-    const eventCity = eventData.city ?? "";
+    const eventLocation = eventData.location ?? "";
 
     // Formatear fecha a texto legible en español
     let eventDate = "";
@@ -105,9 +103,7 @@ export async function POST(req: NextRequest) {
       ticketId: ticket.id,
       eventName,
       eventDate,
-      eventVenue,
-      eventAddress,
-      eventCity,
+      eventLocation,
     });
 
     if (!emailResult.success) {

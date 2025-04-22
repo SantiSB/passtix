@@ -16,12 +16,9 @@ interface TicketEmailProps {
   ticketId: string;
   eventName: string;
   eventDate: string;
-  eventVenue: string;
-  eventAddress: string;
-  eventCity: string;
+  eventLocation: string;
 }
 
-/* 🔗 Diccionario de logos por nombre de evento o productor */
 const IMG_URLS: Record<string, string> = {
   sortech:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/latribu%2Flogo.png?alt=media&token=7bbe940b-ae6e-4adf-8c41-5fd1dcd1dca5",
@@ -40,9 +37,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
   ticketId,
   eventName,
   eventDate,
-  eventVenue,
-  eventAddress,
-  eventCity,
+  eventLocation,
 }) => {
   const normalizedKey = eventName.toLowerCase().replace(/\s/g, "");
   const logoUrl = IMG_URLS[normalizedKey] || IMG_URLS["passtix"];
@@ -52,114 +47,132 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
       <Head />
       <Body
         style={{
-          backgroundColor: "#f2f2f2",
+          backgroundColor: "#f9f9f9",
           fontFamily: "Helvetica, Arial, sans-serif",
+          padding: "0",
+          margin: "0",
         }}
       >
         <Container
           style={{
-            backgroundColor: "#fff",
-            padding: "32px",
+            backgroundColor: "#ffffff",
             maxWidth: "700px",
             margin: "0 auto",
             borderRadius: "8px",
+            overflow: "hidden",
+            textAlign: "center",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
           }}
         >
-          {/* ---------- header ---------- */}
-          <Section style={{ textAlign: "center", marginBottom: "24px" }}>
+          {/* ---------- header con degradado ---------- */}
+          <Section
+            style={{
+              background: "linear-gradient(90deg, #ffffff, #f0f0f0)",
+              padding: "24px",
+              borderBottom: "1px solid #eee",
+            }}
+          >
             <Img
               src={logoUrl}
               alt={`${eventName} logo`}
-              width="220"
-              style={{ margin: "0 auto 16px" }}
+              width="180"
+              style={{ margin: "0 auto", borderRadius: "8px" }}
             />
-            <Heading as="h1" style={{ fontSize: "24px", marginBottom: "8px" }}>
-              ¡Tu entrada ya está confirmada!
-            </Heading>
-            <Text style={{ fontSize: "14px", color: "#333" }}>{ticketId}</Text>
-            <Heading as="h2" style={{ fontSize: "20px", marginBottom: "8px" }}>
-              {eventName}
-            </Heading>
-            <Text style={{ fontSize: "14px", color: "#333" }}>
-              Hola {name}!
-            </Text>
-            <Text style={{ fontSize: "14px", color: "#333" }}>
-              Lleva este código QR al evento (impreso o en tu celular).
-            </Text>
           </Section>
 
-          {/* ---------- QR ---------- */}
-          <Section style={{ textAlign: "center", margin: "24px 0" }}>
+          {/* ---------- título y QR ---------- */}
+          <Section style={{ padding: "32px 24px" }}>
+            <Heading
+              as="h1"
+              style={{
+                fontSize: "24px",
+                marginBottom: "8px",
+                color: "#222",
+              }}
+            >
+              🎟 ¡Entrada confirmada!
+            </Heading>
+            <Text
+              style={{ fontSize: "14px", color: "#888", marginBottom: "16px" }}
+            >
+              ID de entrada: <strong>{ticketId}</strong>
+            </Text>
+            <Heading
+              as="h2"
+              style={{ fontSize: "20px", marginBottom: "4px", color: "#444" }}
+            >
+              {eventName}
+            </Heading>
+            <Text
+              style={{ fontSize: "14px", color: "#333", marginBottom: "8px" }}
+            >
+              Hola <strong>{name}</strong>, esta es tu entrada digital.
+            </Text>
+            <Text style={{ fontSize: "14px", color: "#333" }}>
+              Preséntala al ingresar al evento.
+            </Text>
             <Img
               src={qrCodeUrl}
               alt="Código QR"
-              width="360"
+              width="280"
               style={{
-                border: "1px solid #ccc",
-                padding: "10px",
-                borderRadius: "8px",
-                margin: "0 auto",
+                border: "1px solid #ddd",
+                padding: "12px",
+                borderRadius: "10px",
+                margin: "24px auto 8px",
               }}
             />
-            <Text style={{ marginTop: "8px", fontSize: "12px", color: "#999" }}>
-              Presenta este código QR al ingresar.
-            </Text>
           </Section>
 
-          {/* ---------- detalles ---------- */}
-          <Section style={{ marginTop: "20px", textAlign: "center" }}>
-            <Heading as="h2" style={{ fontSize: "18px", marginBottom: "12px" }}>
-              Detalles del evento
+          {/* ---------- detalles del evento ---------- */}
+          <Section style={{ backgroundColor: "#fafafa", padding: "24px" }}>
+            <Heading
+              as="h3"
+              style={{ fontSize: "16px", marginBottom: "12px", color: "#444" }}
+            >
+              📍 Detalles del evento
             </Heading>
-            <Text>
-              <strong>Evento:</strong> {eventName}
-            </Text>
-            <Text>
+            <Text
+              style={{ fontSize: "14px", color: "#444", marginBottom: "4px" }}
+            >
               <strong>Fecha:</strong> {eventDate}
             </Text>
-            {eventVenue && (
-              <Text>
-                <strong>Lugar:</strong> {eventVenue}
-              </Text>
-            )}
-            {eventAddress && (
-              <Text>
-                <strong>Dirección:</strong> {eventAddress}
-              </Text>
-            )}
-            {eventCity && (
-              <Text>
-                <strong>Ciudad:</strong> {eventCity}
+            {eventLocation && (
+              <Text
+                style={{ fontSize: "14px", color: "#444", marginBottom: "4px" }}
+              >
+                <strong>Lugar:</strong> {eventLocation}
               </Text>
             )}
           </Section>
 
           {/* ---------- footer ---------- */}
-          <Section style={{ marginTop: "32px", textAlign: "center" }}>
-            <Text>
-              <strong>¡Nos vemos pronto!</strong>
+          <Section style={{ padding: "24px", backgroundColor: "#fff" }}>
+            <Text style={{ fontSize: "14px", color: "#444" }}>
+              Te esperamos para vivir una experiencia inolvidable.
             </Text>
-            <Text>Gracias por elegir PassTix.</Text>
+
             <Text
               style={{
+                fontSize: "12px",
+                color: "#aaa",
                 marginTop: "12px",
-                fontSize: "10px",
-                color: "#666",
-                lineHeight: "1.4",
+                lineHeight: "1.5",
               }}
             >
-              AVISO DE CONFIDENCIALIDAD: la información contenida en este
-              mensaje es confidencial y se dirige sólo al destinatario.
+              Este correo contiene tu entrada digital. No lo compartas con otras
+              personas.
             </Text>
             <Text
               style={{
                 fontSize: "10px",
-                color: "#666",
-                lineHeight: "1.4",
+                color: "#ccc",
+                marginTop: "16px",
+                lineHeight: "1.5",
               }}
             >
-              CONFIDENTIALITY NOTICE: This e‑mail and any attachments are
-              confidential and intended only for the named recipient.
+              AVISO DE CONFIDENCIALIDAD: La información contenida en este
+              mensaje es confidencial y se dirige solo al destinatario.
             </Text>
           </Section>
         </Container>
