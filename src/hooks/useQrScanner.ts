@@ -63,7 +63,10 @@ export function useQrScanner() {
               const event = eventSnap.data();
 
               // 🔐 Validar que el evento le pertenezca al productor autenticado
-              if (event.producerId !== user?.uid) {
+              if (
+                !user ||
+                String(event.producerId).trim() !== String(user.uid).trim()
+              ) {
                 setStatus("❌ Este ticket no pertenece a tus eventos.");
                 resetScanner();
                 return;
