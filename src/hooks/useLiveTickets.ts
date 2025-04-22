@@ -9,7 +9,6 @@ import {
   query,
   where,
   orderBy,
-  DocumentReference,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebase";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";

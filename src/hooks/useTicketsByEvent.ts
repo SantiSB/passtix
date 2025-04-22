@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebase";
+import { Ticket } from "@/interfaces/Ticket";
 
 export default function useTicketsByEvent(eventId: string | null) {
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,9 +20,10 @@ export default function useTicketsByEvent(eventId: string | null) {
 
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map((doc) => ({
+        ...(doc.data() as Ticket),
         id: doc.id,
-        ...doc.data(),
       }));
+
       setTickets(data);
       setLoading(false);
     };

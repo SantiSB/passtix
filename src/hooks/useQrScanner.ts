@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { db } from "@/lib/firebase/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 export function useQrScanner() {
   const [status, setStatus] = useState<string | null>(null);
@@ -12,10 +12,8 @@ export function useQrScanner() {
 
   useEffect(() => {
     const tryStart = async () => {
-      // 🔁 Esperamos a que el contenedor exista en el DOM
       if (!containerRef.current) {
-        console.warn("⏳ containerRef aún no montado, reintentando...");
-        setTimeout(tryStart, 200); // Reintenta en 200ms
+        setTimeout(tryStart, 200);
         return;
       }
 
@@ -25,7 +23,6 @@ export function useQrScanner() {
       containerRef.current.innerHTML = "";
       containerRef.current.appendChild(scannerDiv);
 
-      console.log("🟢 Inicializando escáner en:", regionId);
       const html5QrCode = new Html5Qrcode(regionId);
       scannerRef.current = html5QrCode;
 
@@ -34,7 +31,6 @@ export function useQrScanner() {
           { facingMode: "environment" },
           { fps: 10, qrbox: 250 },
           async (qrText) => {
-            console.log("✅ QR detectado:", qrText);
             if (hasScannedRef.current) return;
             hasScannedRef.current = true;
             setStatus("Verificando...");
@@ -53,6 +49,29 @@ export function useQrScanner() {
                   ? assistantSnap.data()
                   : null;
 
+                // Validar hora máxima de entrada si tiene fase
+                if (ticket.phaseId) {
+                  const phaseRef = doc(db, "phase", ticket.phaseId);
+                  const phaseSnap = await getDoc(phaseRef);
+                  if (phaseSnap.exists()) {
+                    const phase = phaseSnap.data();
+                    const maxEntryTime: Timestamp = phase.maxEntryTime;
+
+                    const now = new Date();
+                    const maxTime = maxEntryTime.toDate();
+
+                    if (now > maxTime) {
+                      await updateDoc(ticketRef, {
+                        status: "disabled",
+                      });
+                      setStatus("❌ Ticket inhabilitado por horario");
+                      setAssistantName(assistant?.name || "Asistente");
+                      resetScanner();
+                      return;
+                    }
+                  }
+                }
+
                 if (ticket.status === "joined") {
                   setStatus("⚠️ Este ticket ya fue registrado.");
                 } else {
@@ -70,11 +89,7 @@ export function useQrScanner() {
               setStatus("❌ Error al procesar el QR");
             }
 
-            setTimeout(() => {
-              hasScannedRef.current = false;
-              setStatus(null);
-              setAssistantName(null);
-            }, 3000);
+            resetScanner();
           },
           (err) => {
             console.warn("⚠️ Error al escanear:", err);
@@ -86,12 +101,19 @@ export function useQrScanner() {
       }
     };
 
+    const resetScanner = () => {
+      setTimeout(() => {
+        hasScannedRef.current = false;
+        setStatus(null);
+        setAssistantName(null);
+      }, 3000);
+    };
+
     tryStart();
 
     return () => {
       scannerRef.current?.stop().then(() => {
         scannerRef.current?.clear();
-        console.log("🛑 Scanner detenido");
       });
     };
   }, []);

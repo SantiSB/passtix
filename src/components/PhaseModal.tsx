@@ -61,6 +61,7 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
       setMaxEntryTime("");
       onClose();
     } catch (err) {
+      console.error("Error al crear la fase:", err);
       setError("Error al crear la fase.");
     } finally {
       setLoading(false);

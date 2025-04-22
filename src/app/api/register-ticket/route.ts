@@ -5,6 +5,12 @@ import { createAssistant, saveAssistant } from "@/lib/utils/assistant";
 import { db } from "@/lib/firebase/firebase";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
 
+interface EventData {
+  name?: string;
+  location?: string;
+  date?: Timestamp | Date;
+}
+
 // POST /api/register-ticket
 export async function POST(req: NextRequest) {
   try {
@@ -53,7 +59,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const eventData = eventSnap.data() as Record<string, any>;
+    const eventData = eventSnap.data() as EventData;
     const eventName = eventData.name ?? "Evento";
     const eventLocation = eventData.location ?? "";
 
