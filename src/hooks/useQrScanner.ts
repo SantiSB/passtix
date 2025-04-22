@@ -5,7 +5,6 @@ import {
   doc,
   getDoc,
   updateDoc,
-  Timestamp,
   DocumentData,
 } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
