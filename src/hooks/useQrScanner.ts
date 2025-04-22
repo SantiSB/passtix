@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { db } from "@/lib/firebase/firebase";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  DocumentData,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc, DocumentData } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
+import { useQueryClient } from "@tanstack/react-query"; // ✅ NUEVO
 
 interface EventData extends DocumentData {
   producerId?: string;
@@ -29,6 +25,7 @@ export function useQrScanner() {
   const hasScannedRef = useRef(false);
 
   const { user } = useAuth();
+  const queryClient = useQueryClient(); // ✅ NUEVO
 
   useEffect(() => {
     if (!user || !user.uid) return;
@@ -107,7 +104,6 @@ export function useQrScanner() {
                 if (phaseSnap.exists()) {
                   const phase = phaseSnap.data();
 
-                  // ✅ Validar si tiene maxEntryTime
                   if (
                     phase.maxEntryTime &&
                     typeof phase.maxEntryTime.toDate === "function"
@@ -134,6 +130,9 @@ export function useQrScanner() {
                   status: "joined",
                   checkedInAt: now,
                 });
+
+                queryClient.invalidateQueries({ queryKey: ["tickets"] }); // ✅ FORZAR REFRESH DE PAGINACIÓN
+
                 setStatus("✅ Ingreso registrado");
               }
 
@@ -174,7 +173,7 @@ export function useQrScanner() {
         scannerRef.current?.clear();
       });
     };
-  }, [user]);
+  }, [user, queryClient]); // ✅ AÑADIR queryClient COMO DEPENDENCIA
 
   return {
     status,
