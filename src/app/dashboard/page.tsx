@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { motion } from "framer-motion";
+
 import EventModal from "@/components/EventModal";
 import TicketModal from "@/components/TicketModal";
-import EventSelector from "@/components/EventSelector";
-import TicketsTable from "@/components/TicketsTable";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import useAuth from "@/hooks/useAuth";
 import PhaseModal from "@/components/PhaseModal";
 import PromoterModal from "@/components/PromoterModal";
+import EventSelector from "@/components/EventSelector";
+import TicketsTable from "@/components/TicketsTable";
+import DashboardActions from "@/components/DashboardActions";
+import useAuth from "@/hooks/useAuth";
 
 const DashboardPage = () => {
   const { user, loading, logout } = useAuth();
@@ -40,9 +42,8 @@ const DashboardPage = () => {
 
   return (
     <section className="min-h-screen w-full flex flex-col">
-      {/* Barra superior */}
       <header className="sticky top-0 z-20 bg-black/90 backdrop-blur-md shadow-lg">
-        <div className="mx-auto flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex flex-wrap items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -59,72 +60,25 @@ const DashboardPage = () => {
             </div>
           </motion.div>
 
-          <motion.div
+          <motion.button
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            className="flex flex-wrap gap-4 items-center"
+            onClick={logout}
+            className="text-sm text-white hover:text-red-400 transition font-medium"
           >
-            <button
-              onClick={() => setIsEventModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition transform hover:scale-105 hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            >
-              Crear evento
-            </button>
-
-            <button
-              onClick={() => setIsPhaseModalOpen(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              Crear Fase
-            </button>
-
-            <button
-              onClick={() => setIsPromoterModalOpen(true)}
-              className="bg-purple-600 text-white px-4 py-2 rounded"
-            >
-              Crear Promotor
-            </button>
-
-            <button
-              onClick={() => setIsTicketModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-semibold text-black shadow-lg transition transform hover:scale-105 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Registrar asistente
-            </button>
-
-            <button
-              onClick={logout}
-              className="text-sm text-white hover:text-red-400 transition font-medium focus:outline-none focus:ring-2 focus:ring-red-300"
-            >
-              Cerrar sesión
-            </button>
-          </motion.div>
+            Cerrar sesión
+          </motion.button>
         </div>
       </header>
 
-      {/* Contenido principal */}
       <main className="flex flex-1 flex-col">
         <div className="mx-auto w-full flex-1 px-4 py-10 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl bg-gray-800 p-6"
+            className="rounded-2xl bg-gray-800 p-6 mb-8"
           >
             <h2 className="text-xl font-bold text-white mb-4">Tus eventos</h2>
             <EventSelector
@@ -133,11 +87,18 @@ const DashboardPage = () => {
             />
           </motion.div>
 
+          <DashboardActions
+            onCreateEvent={() => setIsEventModalOpen(true)}
+            onCreatePhase={() => setIsPhaseModalOpen(true)}
+            onCreatePromoter={() => setIsPromoterModalOpen(true)}
+            onRegisterTicket={() => setIsTicketModalOpen(true)}
+          />
+
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="mt-12 bg-gray-800 p-6 rounded-2xl"
+            className="bg-gray-800 p-6 rounded-2xl"
           >
             <h2 className="text-xl font-bold text-white mb-4">Boletas</h2>
             {selectedEventId ? (
