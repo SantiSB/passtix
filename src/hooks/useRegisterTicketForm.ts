@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const useRegisterTicketForm = (eventId: string ) => {
   // Hooks para obtener las opciones de los inputs de eventos y promotores
   const { phases, localities, loading: loadingOptions } = useEventOptions(eventId);
-  const { promoters, loading: loadingPromoters } = usePromoterOptions();
+  const { promoters, loading: loadingPromoters } = usePromoterOptions(eventId);
 
   const queryClient = useQueryClient();
 

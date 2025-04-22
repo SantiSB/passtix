@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import useAuth from "@/hooks/useAuth";
 import PhaseModal from "@/components/PhaseModal";
+import PromoterModal from "@/components/PromoterModal";
 
 const DashboardPage = () => {
   const { user, loading, logout } = useAuth();
@@ -18,6 +19,7 @@ const DashboardPage = () => {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isPhaseModalOpen, setIsPhaseModalOpen] = useState(false);
+  const [isPromoterModalOpen, setIsPromoterModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -75,6 +77,13 @@ const DashboardPage = () => {
               className="bg-blue-600 text-white px-4 py-2 rounded"
             >
               Crear Fase
+            </button>
+
+            <button
+              onClick={() => setIsPromoterModalOpen(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded"
+            >
+              Crear Promotor
             </button>
 
             <button
@@ -155,6 +164,11 @@ const DashboardPage = () => {
       <PhaseModal
         isOpen={isPhaseModalOpen}
         onClose={() => setIsPhaseModalOpen(false)}
+        eventId={selectedEventId || ""}
+      />
+      <PromoterModal
+        isOpen={isPromoterModalOpen}
+        onClose={() => setIsPromoterModalOpen(false)}
         eventId={selectedEventId || ""}
       />
     </section>
