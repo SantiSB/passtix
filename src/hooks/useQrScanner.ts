@@ -32,6 +32,8 @@ export function useQrScanner() {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (!user || !user.uid) return; // ✅ Esperar a que user esté listo
+
     const tryStart = async () => {
       if (!containerRef.current) {
         setTimeout(tryStart, 200);
@@ -80,15 +82,14 @@ export function useQrScanner() {
 
               const event = eventSnap.data() as EventData;
 
-              // Debug info
+              // Debug info visible
               setDebugInfo({
-                userUid: user?.uid || "",
+                userUid: user.uid,
                 eventProducerId: event?.producerId || "",
               });
 
               // Validar que el evento sea del productor autenticado
               if (
-                !user ||
                 String(event?.producerId).trim() !== String(user.uid).trim()
               ) {
                 setStatus("❌ Este ticket no pertenece a tus eventos.");
