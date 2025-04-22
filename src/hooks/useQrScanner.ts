@@ -1,12 +1,30 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { db } from "@/lib/firebase/firebase";
-import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  Timestamp,
+  DocumentData,
+} from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
+
+interface EventData extends DocumentData {
+  producerId?: string;
+}
 
 export function useQrScanner() {
   const [status, setStatus] = useState<string | null>(null);
   const [assistantName, setAssistantName] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<{
+    userUid: string;
+    eventProducerId: string;
+  }>({
+    userUid: "",
+    eventProducerId: "",
+  });
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const hasScannedRef = useRef(false);
@@ -50,7 +68,7 @@ export function useQrScanner() {
 
               const ticket = ticketSnap.data();
 
-              // 🔍 Cargar el evento del ticket
+              // Obtener evento del ticket
               const eventRef = doc(db, "event", ticket.eventId);
               const eventSnap = await getDoc(eventRef);
 
@@ -60,26 +78,30 @@ export function useQrScanner() {
                 return;
               }
 
-              const event = eventSnap.data();
+              const event = eventSnap.data() as EventData;
 
-              // 🔐 Validar que el evento le pertenezca al productor autenticado
+              // Debug info
+              setDebugInfo({
+                userUid: user?.uid || "",
+                eventProducerId: event?.producerId || "",
+              });
+
+              // Validar que el evento sea del productor autenticado
               if (
                 !user ||
-                String(event.producerId).trim() !== String(user.uid).trim()
+                String(event?.producerId).trim() !== String(user.uid).trim()
               ) {
                 setStatus("❌ Este ticket no pertenece a tus eventos.");
                 resetScanner();
                 return;
               }
 
-              // 👤 Cargar asistente
               const assistantRef = doc(db, "assistant", ticket.assistantId);
               const assistantSnap = await getDoc(assistantRef);
               const assistant = assistantSnap.exists()
                 ? assistantSnap.data()
                 : null;
 
-              // ⏰ Validar tiempo máximo de entrada
               if (ticket.phaseId) {
                 const phaseRef = doc(db, "phase", ticket.phaseId);
                 const phaseSnap = await getDoc(phaseRef);
@@ -91,7 +113,9 @@ export function useQrScanner() {
                   const maxTime = maxEntryTime.toDate();
 
                   if (now > maxTime) {
-                    await updateDoc(ticketRef, { status: "disabled" });
+                    await updateDoc(ticketRef, {
+                      status: "disabled",
+                    });
                     setStatus("❌ Ticket inhabilitado por horario");
                     setAssistantName(assistant?.name || "Asistente");
                     resetScanner();
@@ -100,7 +124,6 @@ export function useQrScanner() {
                 }
               }
 
-              // 🟡 Validación de uso previo
               if (ticket.status === "joined") {
                 setStatus("⚠️ Este ticket ya fue registrado.");
               } else {
@@ -146,5 +169,5 @@ export function useQrScanner() {
     };
   }, [user]);
 
-  return { status, assistantName, scannerRef: containerRef };
+  return { status, assistantName, scannerRef: containerRef, debugInfo };
 }

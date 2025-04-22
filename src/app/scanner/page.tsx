@@ -17,7 +17,7 @@ export default function ScannerPage() {
     }
   }, [user, loading, router]);
 
-  const { status, assistantName, scannerRef } = useQrScanner();
+  const { status, assistantName, scannerRef, debugInfo } = useQrScanner();
 
   const getStatusStyles = (status: string | null) => {
     if (!status) return "";
@@ -62,11 +62,10 @@ export default function ScannerPage() {
       </motion.div>
 
       <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-slate-50">
-      <div
-  ref={scannerRef}
-  className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
-></div>
-
+        <div
+          ref={scannerRef}
+          className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
+        ></div>
       </div>
 
       <motion.div
@@ -92,6 +91,18 @@ export default function ScannerPage() {
           </p>
         )}
       </motion.div>
+
+      {/* DEBUG INFO */}
+      {process.env.NODE_ENV !== "production" && (
+        <div className="mt-4 text-xs text-yellow-400 text-center">
+          <p>
+            <strong>UID usuario:</strong> {debugInfo?.userUid}
+          </p>
+          <p>
+            <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
+          </p>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
