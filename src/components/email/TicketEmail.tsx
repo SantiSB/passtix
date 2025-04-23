@@ -43,7 +43,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
   const logoUrl = IMG_URLS[normalizedKey] || IMG_URLS["passtix"];
 
   return (
-    <Html>
+    <Html lang="es">
       <Head />
       <Body
         style={{
@@ -64,7 +64,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
           }}
         >
-          {/* ---------- header con degradado ---------- */}
+          {/* Header */}
           <Section
             style={{
               background: "linear-gradient(90deg, #ffffff, #f0f0f0)",
@@ -74,22 +74,20 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
           >
             <Img
               src={logoUrl}
-              alt={`${eventName} logo`}
+              alt={`Logo de ${eventName}`}
+              title={`Logo de ${eventName}`}
               width="180"
-              style={{ margin: "0 auto", borderRadius: "8px" }}
+              style={{
+                display: "block",
+                margin: "0 auto",
+                borderRadius: "8px",
+              }}
             />
           </Section>
 
-          {/* ---------- título y QR ---------- */}
+          {/* Contenido principal */}
           <Section style={{ padding: "32px 24px" }}>
-            <Heading
-              as="h1"
-              style={{
-                fontSize: "24px",
-                marginBottom: "8px",
-                color: "#222",
-              }}
-            >
+            <Heading as="h1" style={{ fontSize: "24px", color: "#222" }}>
               🎟 ¡Entrada confirmada!
             </Heading>
             <Text
@@ -103,28 +101,33 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             >
               {eventName}
             </Heading>
-            <Text
-              style={{ fontSize: "14px", color: "#333", marginBottom: "8px" }}
-            >
+            <Text style={{ fontSize: "14px", color: "#333" }}>
               Hola <strong>{name}</strong>, esta es tu entrada digital.
             </Text>
-            <Text style={{ fontSize: "14px", color: "#333" }}>
+            <Text
+              style={{ fontSize: "14px", color: "#333", marginBottom: "24px" }}
+            >
               Preséntala al ingresar al evento.
             </Text>
             <Img
               src={qrCodeUrl}
-              alt="Código QR"
+              alt={`Código QR para tu entrada - Ticket URL: ${qrCodeUrl}`}
+              title={`Código QR para tu entrada - Ticket URL: ${qrCodeUrl}`}
               width="280"
               style={{
+                display: "block",
                 border: "1px solid #ddd",
                 padding: "12px",
                 borderRadius: "10px",
-                margin: "24px auto 8px",
+                margin: "0 auto 8px",
               }}
             />
+            <Text style={{ fontSize: "12px", color: "#aaa", marginTop: "8px" }}>
+              Si no ves el código QR, activa las imágenes en este correo.
+            </Text>
           </Section>
 
-          {/* ---------- detalles del evento ---------- */}
+          {/* Detalles del evento */}
           <Section style={{ backgroundColor: "#fafafa", padding: "24px" }}>
             <Heading
               as="h3"
@@ -132,26 +135,21 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             >
               📍 Detalles del evento
             </Heading>
-            <Text
-              style={{ fontSize: "14px", color: "#444", marginBottom: "4px" }}
-            >
+            <Text style={{ fontSize: "14px", color: "#444" }}>
               <strong>Fecha:</strong> {eventDate}
             </Text>
             {eventLocation && (
-              <Text
-                style={{ fontSize: "14px", color: "#444", marginBottom: "4px" }}
-              >
+              <Text style={{ fontSize: "14px", color: "#444" }}>
                 <strong>Lugar:</strong> {eventLocation}
               </Text>
             )}
           </Section>
 
-          {/* ---------- footer ---------- */}
+          {/* Footer */}
           <Section style={{ padding: "24px", backgroundColor: "#fff" }}>
             <Text style={{ fontSize: "14px", color: "#444" }}>
               Te esperamos para vivir una experiencia inolvidable.
             </Text>
-
             <Text
               style={{
                 fontSize: "12px",
