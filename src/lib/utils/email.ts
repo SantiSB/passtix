@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import TicketEmail from "@/components/email/TicketEmail";
-
+import { TicketType } from "@/types/enums";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface SendTicketEmailParams {
@@ -11,9 +11,9 @@ interface SendTicketEmailParams {
   eventName: string;
   eventDate: string;
   eventLocation: string;
+  ticketType: TicketType;
 }
 
-// Envía el correo con el template dinámico
 export async function sendTicketEmail({
   to,
   name,
@@ -22,6 +22,7 @@ export async function sendTicketEmail({
   eventName,
   eventDate,
   eventLocation,
+  ticketType,
 }: SendTicketEmailParams): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await resend.emails.send({
@@ -35,6 +36,7 @@ export async function sendTicketEmail({
         eventName,
         eventDate,
         eventLocation,
+        ticketType,
       }),
     });
 

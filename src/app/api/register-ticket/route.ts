@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
       eventName,
       eventDate,
       eventLocation,
+      ticketType,
     });
 
     if (!emailResult.success) {

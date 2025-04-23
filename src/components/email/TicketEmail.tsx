@@ -9,6 +9,7 @@ import {
   Heading,
   Img,
 } from "@react-email/components";
+import { TicketType } from "@/types/enums";
 
 interface TicketEmailProps {
   name: string;
@@ -17,18 +18,44 @@ interface TicketEmailProps {
   eventName: string;
   eventDate: string;
   eventLocation: string;
+  ticketType: TicketType;
 }
 
 const IMG_URLS: Record<string, string> = {
   sortech:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/latribu%2Flogo.png?alt=media&token=7bbe940b-ae6e-4adf-8c41-5fd1dcd1dca5",
-  ssoe: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/arkhes%2Flogo.png?alt=media&token=35d7d18b-c030-4a3a-a285-bc0b64a54892",
+  ssoe: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/ssoe%2Flogo.png?alt=media&token=bd0423b8-f5e7-47fc-a530-d603ad5a11c3",
   knockout:
-    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/plazanorte%2Flogo.PNG?alt=media&token=ad0c3952-089f-4ebb-b848-f0d4fbbbe5f4",
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/knockout%2Flogo.png?alt=media&token=a0e94ec7-bda0-47cf-b8de-dbf103aa1406",
   bichiyal:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2FpN8CiNC5oheHobFlxakX.png?alt=media&token=862f102e-0433-4bb1-8eba-414429ba6d36",
   passtix:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/passtix%2Flogo.png?alt=media&token=40c581ba-c63d-440f-99d0-4ae4e8290d3f",
+};
+
+const getTicketLabel = (type: TicketType) => {
+  switch (type) {
+    case "ticket":
+      return "Entrada";
+    case "courtesy":
+      return "Cortesía";
+    case "brunch":
+      return "Brunch (válido hasta las 6:00 p.m.)";
+    default:
+      return "Entrada";
+  }
+};
+
+const getTicketStyle = (type: TicketType) => {
+  switch (type) {
+    case "brunch":
+      return { bg: "#ffe0e9", color: "#d81b60" };
+    case "courtesy":
+      return { bg: "#e0f7fa", color: "#00796b" };
+    case "ticket":
+    default:
+      return { bg: "#e8eaf6", color: "#3f51b5" };
+  }
 };
 
 const TicketEmail: React.FC<TicketEmailProps> = ({
@@ -38,9 +65,11 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
   eventName,
   eventDate,
   eventLocation,
+  ticketType,
 }) => {
   const normalizedKey = eventName.toLowerCase().replace(/\s/g, "");
   const logoUrl = IMG_URLS[normalizedKey] || IMG_URLS["passtix"];
+  const { bg, color } = getTicketStyle(ticketType);
 
   return (
     <Html lang="es">
@@ -85,7 +114,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             />
           </Section>
 
-          {/* Contenido principal */}
+          {/* Main Content */}
           <Section style={{ padding: "32px 24px" }}>
             <Heading as="h1" style={{ fontSize: "24px", color: "#222" }}>
               🎟 ¡Entrada confirmada!
@@ -95,6 +124,20 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             >
               ID de entrada: <strong>{ticketId}</strong>
             </Text>
+            <Text
+              style={{
+                display: "inline-block",
+                padding: "6px 12px",
+                fontSize: "13px",
+                borderRadius: "20px",
+                backgroundColor: bg,
+                color,
+                fontWeight: "bold",
+                marginBottom: "16px",
+              }}
+            >
+              {getTicketLabel(ticketType)}
+            </Text>
             <Heading
               as="h2"
               style={{ fontSize: "20px", marginBottom: "4px", color: "#444" }}
@@ -102,24 +145,24 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               {eventName}
             </Heading>
             <Text style={{ fontSize: "14px", color: "#333" }}>
-              Hola <strong>{name}</strong>, esta es tu entrada digital.
-            </Text>
-            <Text
-              style={{ fontSize: "14px", color: "#333", marginBottom: "24px" }}
-            >
-              Preséntala al ingresar al evento.
+              Hola <strong>{name}</strong>,
+              {ticketType === "ticket" &&
+                " esta es tu entrada. Preséntala al ingresar al evento."}
+              {ticketType === "courtesy" &&
+                " has recibido una cortesía para este evento. Preséntala al ingresar."}
+              {ticketType === "brunch" &&
+                " esta entrada es válida únicamente para el brunch (hasta las 6:00 p.m.). Preséntala al ingresar."}
             </Text>
             <Img
               src={qrCodeUrl}
-              alt={`Código QR para tu entrada - Ticket URL: ${qrCodeUrl}`}
-              title={`Código QR para tu entrada - Ticket URL: ${qrCodeUrl}`}
+              alt="Código QR"
               width="280"
               style={{
                 display: "block",
                 border: "1px solid #ddd",
                 padding: "12px",
                 borderRadius: "10px",
-                margin: "0 auto 8px",
+                margin: "24px auto 8px",
               }}
             />
             <Text style={{ fontSize: "12px", color: "#aaa", marginTop: "8px" }}>
@@ -127,7 +170,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             </Text>
           </Section>
 
-          {/* Detalles del evento */}
+          {/* Event Details */}
           <Section style={{ backgroundColor: "#fafafa", padding: "24px" }}>
             <Heading
               as="h3"
