@@ -49,9 +49,9 @@ const getTicketLabel = (type: TicketType) => {
 const getTicketStyle = (type: TicketType) => {
   switch (type) {
     case "brunch":
-      return { bg: "#ffe0e9", color: "#d81b60" };
+      return { bg: "#fce4ec", color: "#c2185b" };
     case "courtesy":
-      return { bg: "#e0f7fa", color: "#00796b" };
+      return { bg: "#e0f2f1", color: "#00695c" };
     case "ticket":
     default:
       return { bg: "#e8eaf6", color: "#3f51b5" };
@@ -73,10 +73,13 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
 
   return (
     <Html lang="es">
-      <Head />
+      <Head>
+        <meta name="color-scheme" content="light dark" />
+        <meta name="supported-color-schemes" content="light dark" />
+      </Head>
       <Body
         style={{
-          backgroundColor: "#f9f9f9",
+          backgroundColor: "#ffffff",
           fontFamily: "Helvetica, Arial, sans-serif",
           padding: "0",
           margin: "0",
@@ -87,18 +90,19 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             backgroundColor: "#ffffff",
             maxWidth: "700px",
             margin: "0 auto",
-            borderRadius: "8px",
+            borderTopLeftRadius: "16px",
+            borderTopRightRadius: "16px",
             overflow: "hidden",
             textAlign: "center",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
           }}
         >
-          {/* Header */}
+          {/* Header con degradado plateado más brillante */}
           <Section
             style={{
-              background: "linear-gradient(90deg, #ffffff, #f0f0f0)",
+              background: "linear-gradient(90deg, #bbbbbb, #eeeeee)",
               padding: "24px",
-              borderBottom: "1px solid #eee",
+              borderBottom: "1px solid #ddd",
             }}
           >
             <Img
@@ -106,42 +110,33 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               alt={`Logo de ${eventName}`}
               title={`Logo de ${eventName}`}
               width="180"
-              style={{
-                display: "block",
-                margin: "0 auto",
-                borderRadius: "8px",
-              }}
+              style={{ display: "block", margin: "0 auto" }}
             />
           </Section>
 
-          {/* Main Content */}
-          <Section style={{ padding: "32px 24px" }}>
-            <Heading as="h1" style={{ fontSize: "24px", color: "#222" }}>
-              🎟 ¡Entrada confirmada!
+          {/* Contenido principal */}
+          <Section style={{ padding: "32px 24px", backgroundColor: "#ffffff" }}>
+            <Heading as="h1" style={{ fontSize: "22px", color: "#222" }}>
+              🎫 ¡Entrada confirmada!
             </Heading>
-            <Text
-              style={{ fontSize: "14px", color: "#888", marginBottom: "16px" }}
-            >
+            <Text style={{ fontSize: "14px", color: "#666", margin: "8px 0" }}>
               ID de entrada: <strong>{ticketId}</strong>
             </Text>
             <Text
               style={{
                 display: "inline-block",
-                padding: "6px 12px",
-                fontSize: "13px",
-                borderRadius: "20px",
+                padding: "6px 16px",
+                borderRadius: "999px",
                 backgroundColor: bg,
                 color,
+                fontSize: "13px",
                 fontWeight: "bold",
-                marginBottom: "16px",
+                marginTop: "12px",
               }}
             >
               {getTicketLabel(ticketType)}
             </Text>
-            <Heading
-              as="h2"
-              style={{ fontSize: "20px", marginBottom: "4px", color: "#444" }}
-            >
+            <Heading as="h2" style={{ fontSize: "18px", marginTop: "24px" }}>
               {eventName}
             </Heading>
             <Text style={{ fontSize: "14px", color: "#333" }}>
@@ -153,43 +148,62 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               {ticketType === "brunch" &&
                 " esta entrada es válida únicamente para el brunch (hasta las 6:00 p.m.). Preséntala al ingresar."}
             </Text>
+
+            {/* Línea punteada tipo corte */}
+            <div
+              style={{
+                margin: "24px auto 16px",
+                width: "80%",
+                borderBottom: "1px dashed #aaa",
+              }}
+            ></div>
+
+            {/* QR centrado */}
             <Img
               src={qrCodeUrl}
               alt="Código QR"
-              width="280"
+              width="260"
               style={{
                 display: "block",
-                border: "1px solid #ddd",
+                margin: "0 auto",
+                border: "1px solid #ccc",
+                borderRadius: "12px",
                 padding: "12px",
-                borderRadius: "10px",
-                margin: "24px auto 8px",
               }}
             />
-            <Text style={{ fontSize: "12px", color: "#aaa", marginTop: "8px" }}>
+            <Text
+              style={{ fontSize: "12px", color: "#888", marginTop: "12px" }}
+            >
               Si no ves el código QR, activa las imágenes en este correo.
             </Text>
           </Section>
 
-          {/* Event Details */}
-          <Section style={{ backgroundColor: "#fafafa", padding: "24px" }}>
+          {/* Detalles del evento con fondo gris sólido adaptado */}
+          <Section
+            style={{
+              padding: "24px",
+              backgroundColor: "#f2f2f2",
+              borderTop: "1px solid #ddd",
+            }}
+          >
             <Heading
               as="h3"
-              style={{ fontSize: "16px", marginBottom: "12px", color: "#444" }}
+              style={{ fontSize: "15px", color: "#333", marginBottom: "8px" }}
             >
               📍 Detalles del evento
             </Heading>
-            <Text style={{ fontSize: "14px", color: "#444" }}>
+            <Text style={{ fontSize: "14px", color: "#333" }}>
               <strong>Fecha:</strong> {eventDate}
             </Text>
             {eventLocation && (
-              <Text style={{ fontSize: "14px", color: "#444" }}>
+              <Text style={{ fontSize: "14px", color: "#333" }}>
                 <strong>Lugar:</strong> {eventLocation}
               </Text>
             )}
           </Section>
 
-          {/* Footer */}
-          <Section style={{ padding: "24px", backgroundColor: "#fff" }}>
+          {/* Footer blanco sin cortes */}
+          <Section style={{ padding: "24px", backgroundColor: "#ffffff" }}>
             <Text style={{ fontSize: "14px", color: "#444" }}>
               Te esperamos para vivir una experiencia inolvidable.
             </Text>
@@ -201,13 +215,12 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
                 lineHeight: "1.5",
               }}
             >
-              Este correo contiene tu entrada digital. No lo compartas con otras
-              personas.
+              Este correo contiene tu entrada digital. No la compartas.
             </Text>
             <Text
               style={{
                 fontSize: "10px",
-                color: "#ccc",
+                color: "#bbb",
                 marginTop: "16px",
                 lineHeight: "1.5",
               }}
