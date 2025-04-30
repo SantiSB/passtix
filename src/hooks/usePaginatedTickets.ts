@@ -14,6 +14,7 @@ export default function usePaginatedTickets(eventId: string) {
 
   const [searchName, setSearchName] = useState("");
   const [searchIdNumber, setSearchIdNumber] = useState("");
+  const [searchTicketId, setSearchTicketId] = useState(""); // 👈 nuevo
 
   const queryFn = useMemo(() => {
     return () =>
@@ -22,9 +23,10 @@ export default function usePaginatedTickets(eventId: string) {
         lastDoc,
         searchName,
         searchIdNumber,
+        searchTicketId,
         eventId
       );
-  }, [pageSize, lastDoc, searchName, searchIdNumber, eventId]);
+  }, [pageSize, lastDoc, searchName, searchIdNumber, searchTicketId, eventId]);
 
   const {
     data = { tickets: [], lastDoc: null, hasMore: false },
@@ -39,6 +41,7 @@ export default function usePaginatedTickets(eventId: string) {
       lastDoc?.id,
       searchName,
       searchIdNumber,
+      searchTicketId,
       eventId,
     ],
     queryFn,
@@ -73,6 +76,11 @@ export default function usePaginatedTickets(eventId: string) {
     resetPagination();
   };
 
+  const updateSearchTicketId = (id: string) => {
+    setSearchTicketId(id);
+    resetPagination();
+  };
+
   const resetPagination = () => {
     setLastDoc(null);
     setPageCursor(null);
@@ -96,5 +104,6 @@ export default function usePaginatedTickets(eventId: string) {
     searchIdNumber,
     updateSearchName,
     updateSearchIdNumber,
+    updateSearchTicketId, // 👈 exportamos
   };
 }

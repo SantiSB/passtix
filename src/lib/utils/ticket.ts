@@ -100,6 +100,7 @@ export async function fetchPaginatedTickets(
   lastDoc: DocumentSnapshot | null = null,
   searchName: string = "",
   searchIdNumber: string = "",
+  searchTicketId: string = "",
   eventId: string
 ): Promise<{
   tickets: EnrichedTicket[];
@@ -109,7 +110,7 @@ export async function fetchPaginatedTickets(
   try {
     const ticketCollection = collection(db, "ticket");
     const isFilteredSearch = Boolean(
-      searchName?.trim() || searchIdNumber?.trim()
+      searchName?.trim() || searchIdNumber?.trim() || searchTicketId?.trim()
     );
 
     let q;
@@ -117,8 +118,8 @@ export async function fetchPaginatedTickets(
     if (isFilteredSearch) {
       q = query(
         ticketCollection,
-        orderBy("createdAt", "asc"),
-        where("eventId", "==", eventId)
+        where("eventId", "==", eventId),
+        orderBy("createdAt", "asc")
       );
     } else {
       const queryConstraints = [
@@ -185,25 +186,32 @@ export async function fetchPaginatedTickets(
       })
     );
 
-    const filteredTickets = enrichedTickets.filter((ticket) => {
-      const matchesName = ticket.name
-        .toLowerCase()
-        .includes(searchName.toLowerCase());
-      const matchesIdNumber =
-        ticket.identificationNumber.includes(searchIdNumber);
-      return matchesName && matchesIdNumber;
-    });
+    // 🔍 Filtrado por cliente (solo si hay filtros activos)
+    const filteredTickets = isFilteredSearch
+      ? enrichedTickets.filter((ticket) => {
+          const matchName = ticket.name
+            .toLowerCase()
+            .includes(searchName.toLowerCase());
+          const matchIdNumber =
+            ticket.identificationNumber.includes(searchIdNumber);
+          const matchTicketId = ticket.id
+            .toLowerCase()
+            .includes(searchTicketId.toLowerCase());
+          return matchName && matchIdNumber && matchTicketId;
+        })
+      : enrichedTickets;
 
     return {
       tickets: filteredTickets,
-      lastDoc: isFilteredSearch
-        ? null
-        : (snapshot.docs[snapshot.docs.length - 1] ?? null),
+      lastDoc:
+        !isFilteredSearch && snapshot.docs.length > 0
+          ? snapshot.docs[snapshot.docs.length - 1]
+          : null,
       hasMore: !isFilteredSearch && snapshot.docs.length === pageSize,
     };
   } catch (err) {
     console.error("🔥 Error en fetchPaginatedTickets:", err);
-    throw err; // 🔁 para que React Query sepa que falló
+    throw err;
   }
 }
 
