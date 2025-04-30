@@ -284,3 +284,14 @@ export async function deleteTicket(id: string): Promise<{ success: boolean }> {
     return { success: false };
   }
 }
+
+export const getStatusBadgeClass = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "enabled":
+      return "bg-blue-800 text-white";
+    case "joined":
+      return "bg-green-800 text-white";
+    default:
+      return "bg-gray-300 text-gray-700";
+  }
+};

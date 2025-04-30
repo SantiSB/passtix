@@ -1,150 +1,63 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
-import useLiveTickets from "@/hooks/useLiveTickets";
-import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
-import { useState, useEffect, useMemo } from "react";
-import { Timestamp } from "firebase/firestore";
+import useFilteredTickets from "@/hooks/useFilteredTickets";
 import TicketModal from "./TicketModal";
-import { useDebounce } from "use-debounce";
-import { useQueryClient } from "@tanstack/react-query";
+import useTicketInputs from "@/hooks/useTicketInputs";
+import useTicketModal from "@/hooks/useTicketModal";
+import useDeleteTicket from "@/hooks/useDeleteTicket";
+import { getStatusBadgeClass } from "@/lib/utils/ticket";
+import { Timestamp } from "firebase/firestore";
 
-/* ───────────────────────── types ───────────────────────── */
 interface TicketsTableProps {
   eventId: string;
 }
 
-/* ───────────────────────── helpers ───────────────────────── */
-const getStatusBadgeClass = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "enabled":
-      return "bg-blue-800 text-white";
-    case "joined":
-      return "bg-green-800 text-white";
-    default:
-      return "bg-gray-300 text-gray-700";
-  }
-};
-
-/* ───────────────────────── component ───────────────────────── */
 const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
+  const {
+    nameInput,
+    setNameInput,
+    idInput,
+    setIdInput,
+    ticketIdInput,
+    setTicketIdInput,
+    debouncedName,
+    debouncedId,
+    debouncedTicketId,
+  } = useTicketInputs();
+
   const {
     tickets,
     isLoading,
     isFetching,
     isError,
-    hasMore,
-    nextPage,
-    prevPage,
-    canGoBack,
-    pageIndex,
-    searchName,
-    searchIdNumber,
-    updateSearchName,
-    updateSearchIdNumber,
-    updateSearchTicketId, // ✅ NUEVO
-  } = usePaginatedTickets(eventId);
+    usingPagination,
+    pagination,
+    sortBy,
+    sortDirection,
+    setSort,
+  } = useFilteredTickets(eventId, {
+    name: debouncedName,
+    idNumber: debouncedId,
+    ticketId: debouncedTicketId,
+  });
 
-  const live = useLiveTickets(eventId);
+  const {
+    isModalOpen,
+    modalMode,
+    selectedTicket,
+    openEditModal,
+    openDeleteModal,
+    closeModal,
+  } = useTicketModal();
 
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const [nameInput, setNameInput] = useState(searchName);
-  const [idInput, setIdInput] = useState(searchIdNumber);
-  const [ticketIdInput, setTicketIdInput] = useState(""); // ✅ NUEVO
+  const {
+    deleteTicket,
+    loading: loadingDelete,
+    error: errorDelete,
+  } = useDeleteTicket(closeModal);
 
-  const [debouncedName] = useDebounce(nameInput, 600);
-  const [debouncedId] = useDebounce(idInput, 600);
-  const [debouncedTicketId] = useDebounce(ticketIdInput, 600); // ✅ NUEVO
-
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (hasInitialized) updateSearchName(debouncedName);
-  }, [debouncedName]);
-
-  useEffect(() => {
-    if (hasInitialized) updateSearchIdNumber(debouncedId);
-  }, [debouncedId]);
-
-  useEffect(() => {
-    if (hasInitialized) updateSearchTicketId(debouncedTicketId); // ✅ NUEVO
-  }, [debouncedTicketId]);
-
-  useEffect(() => {
-    setHasInitialized(true);
-  }, []);
-
-  const hasFilters = Boolean(
-    debouncedName.trim() || debouncedId.trim() || debouncedTicketId.trim()
-  );
-  const usingPagination = !hasFilters;
-  const rawTickets = usingPagination ? tickets : live.tickets;
-
-  const filteredTickets = useMemo(() => {
-    const n = debouncedName.trim().toLowerCase();
-    const id = debouncedId.trim();
-    const ticketId = debouncedTicketId.trim().toLowerCase();
-
-    return rawTickets.filter((t) => {
-      const matchName = n ? t.name.toLowerCase().includes(n) : true;
-      const matchId = id ? t.identificationNumber.includes(id) : true;
-      const matchTicketId = ticketId
-        ? t.id.toLowerCase().includes(ticketId)
-        : true;
-      return matchName && matchId && matchTicketId;
-    });
-  }, [rawTickets, debouncedName, debouncedId, debouncedTicketId]);
-
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"edit" | "delete" | null>(null);
-  const [selectedTicket, setSelectedTicket] = useState<EnrichedTicket | null>(
-    null
-  );
-  const [loadingDelete, setLoadingDelete] = useState(false);
-  const [errorDelete, setErrorDelete] = useState<string | null>(null);
-
-  const openEditModal = (t: EnrichedTicket) => {
-    setSelectedTicket(t);
-    setModalMode("edit");
-    setModalOpen(true);
-  };
-
-  const openDeleteModal = (t: EnrichedTicket) => {
-    setSelectedTicket(t);
-    setModalMode("delete");
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setSelectedTicket(null);
-    setModalMode(null);
-    setErrorDelete(null);
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      setLoadingDelete(true);
-      const res = await fetch("/api/delete-ticket", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success)
-        throw new Error(json.error || "Error eliminando ticket");
-      queryClient.invalidateQueries({ queryKey: ["tickets"] });
-      closeModal();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error desconocido";
-      setErrorDelete(msg);
-    } finally {
-      setLoadingDelete(false);
-    }
-  };
-
-  if ((isLoading && usingPagination) || (live.loading && !usingPagination)) {
+  if (isLoading) {
     return <p className="p-4 text-gray-500">Cargando tickets…</p>;
   }
 
@@ -178,7 +91,8 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
           onChange={(e) => setTicketIdInput(e.target.value)}
         />
       </div>
-      {isFetching && hasFilters && (
+
+      {isFetching && (
         <p className="px-4 text-sm text-gray-500 animate-pulse">
           🔎 Buscando resultados…
         </p>
@@ -189,41 +103,72 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
         <table className="min-w-full text-sm text-left text-gray-700">
           <thead className="text-xs uppercase bg-black/90 text-white">
             <tr>
-              {[
-                "#",
-                "ID",
-                "Estado",
-                "Nombre",
-                "Tipo Doc",
-                "Documento",
-                "Tipo",
-                "Precio",
-                "Fase",
-                "Localidad",
-                "Promotor",
-                "Correo",
-                "Celular",
-                "Creado",
-                "Actualizado",
-                "Ingreso",
-                "URL QR",
-                "Acciones",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className="px-4 py-3 font-semibold whitespace-nowrap"
-                >
-                  {h}
-                </th>
-              ))}
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">#</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Estado
+              </th>
+              <th
+                onClick={() => setSort("name")}
+                className="cursor-pointer px-4 py-3 font-semibold whitespace-nowrap"
+              >
+                Nombre{" "}
+                {sortBy === "name" && (sortDirection === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Tipo Doc
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Documento
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Tipo
+              </th>
+              <th
+                onClick={() => setSort("price")}
+                className="cursor-pointer px-4 py-3 font-semibold whitespace-nowrap"
+              >
+                Precio{" "}
+                {sortBy === "price" && (sortDirection === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Fase
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Localidad
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Promotor
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Correo
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Celular
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Creado
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Actualizado
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Ingreso
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                URL QR
+              </th>
+              <th className="px-4 py-3 font-semibold whitespace-nowrap">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
-            {filteredTickets.map((t, i) => (
+            {tickets.map((t, i) => (
               <tr key={t.id} className="even:bg-gray-50 hover:bg-gray-100">
                 <td className="px-4 py-3">
-                  {usingPagination
-                    ? (pageIndex - 1) * PAGE_SIZE + i + 1
+                  {usingPagination && pagination
+                    ? (pagination.pageIndex - 1) * pagination.pageSize + i + 1
                     : i + 1}
                 </td>
                 <td className="px-4 py-3">{t.id}</td>
@@ -304,21 +249,21 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
       </div>
 
       {/* paginación */}
-      {usingPagination && (
+      {usingPagination && pagination && (
         <div className="flex justify-between items-center p-4">
           <button
-            onClick={prevPage}
-            disabled={!canGoBack || isFetching}
+            onClick={pagination.prevPage}
+            disabled={!pagination.canGoBack || isFetching}
             className="px-3 py-2 bg-amber-400 text-black rounded-lg shadow-md hover:scale-105 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-50"
           >
             ← Anterior
           </button>
           <span className="text-sm text-gray-600">
-            Página <strong>{pageIndex}</strong>
+            Página <strong>{pagination.pageIndex}</strong>
           </span>
           <button
-            onClick={nextPage}
-            disabled={!hasMore || isFetching}
+            onClick={pagination.nextPage}
+            disabled={!pagination.hasMore || isFetching}
             className="px-3 py-2 bg-amber-400 text-black rounded-lg shadow-md hover:scale-105 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-50"
           >
             Siguiente →
@@ -334,7 +279,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
           mode={modalMode}
           ticket={selectedTicket}
           eventId={eventId}
-          onConfirmDelete={() => handleDelete(selectedTicket.id)}
+          onConfirmDelete={() => deleteTicket(selectedTicket.id)}
           loadingDelete={loadingDelete}
           errorDelete={errorDelete}
         />
