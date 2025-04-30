@@ -6,7 +6,7 @@ import TicketModal from "./TicketModal";
 import useTicketInputs from "@/hooks/useTicketInputs";
 import useTicketModal from "@/hooks/useTicketModal";
 import useDeleteTicket from "@/hooks/useDeleteTicket";
-import { getStatusBadgeClass } from "@/lib/utils/ticket";
+import { getStatusBadgeClass, getPhaseBadgeClass } from "@/lib/utils/ticket";
 import { Timestamp } from "firebase/firestore";
 import { SortKey } from "@/hooks/useTicketSort";
 
@@ -185,7 +185,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                  </td>
                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">
                     {/* Basic phase styling - consider more colors if needed */}
-                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-600 text-gray-300">
+                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPhaseBadgeClass(t.phaseName)}`}>
                       {t.phaseName}
                    </span>
                  </td>

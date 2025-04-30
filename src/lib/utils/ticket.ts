@@ -295,3 +295,19 @@ export const getStatusBadgeClass = (status: string) => {
       return "bg-gray-300 text-gray-700";
   }
 };
+
+export const getPhaseBadgeClass = (phaseName: string | undefined) => {
+  const name = phaseName?.toLowerCase() ?? '';
+  if (name.includes('lanzamiento')) {
+    return "bg-green-900 text-green-300"; // Green for Launch
+  }
+  if (name.includes('preventa')) {
+    return "bg-yellow-900 text-yellow-300"; // Yellow for Presale
+  }
+  // Add more phase names and corresponding colors as needed
+  // Example:
+  // if (name.includes('regular')) {
+  //   return "bg-indigo-900 text-indigo-300";
+  // }
+  return "bg-gray-600 text-gray-300"; // Default Gray
+};
