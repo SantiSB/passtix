@@ -115,133 +115,137 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
         </p>
       )}
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
-           <thead className="bg-gray-700">
-            <tr>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">#</th>
-              {SortableHeader("Estado", "status")}
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">ID</th>
-              {SortableHeader("Nombre", "name")}
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                Documento
-              </th>
-              {SortableHeader("Tipo", "ticketType")}
-              {SortableHeader("Fase", "phaseName")}
-              {SortableHeader("Precio", "price")}
-              {SortableHeader("Promotor", "promoterName")}
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                Celular
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                Correo
-              </th>
-              {SortableHeader("Ingreso", "checkedInAt")}
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                URL QR
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-           <tbody className="bg-gray-800 divide-y divide-gray-700">
-            {tickets.map((t, i) => (
-               <tr key={t.id} className="hover:bg-gray-700/50 transition-colors">
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">{i + 1}</td>
-                 <td className="px-5 py-4 whitespace-nowrap">
-                   <span
-                     className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
-                       t.status
-                     )}`}
-                   >
-                     {t.status === "enabled"
-                       ? "Habilitado"
-                       : t.status === "joined"
-                         ? "Ingresado"
-                         : t.status}
-                   </span>
-                 </td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400 font-mono text-xs">{t.id}</td>
-                 <td className="px-5 py-4 whitespace-nowrap font-medium text-white">{t.name}</td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.identificationNumber}</td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">
-                   <span
-                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                       t.ticketType === "courtesy"
-                         ? "bg-purple-900 text-purple-300"
-                         : t.ticketType === "brunch"
-                         ? "bg-orange-900 text-orange-300"
-                         : "bg-blue-900 text-blue-300"
-                     }`}
-                   >
-                     {t.ticketType === "courtesy"
-                       ? "Cortesía"
-                       : t.ticketType === "brunch"
-                       ? "Brunch"
-                       : "Boleta"}
-                   </span>
-                 </td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">
-                    {/* Basic phase styling - consider more colors if needed */}
-                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPhaseBadgeClass(t.phaseName)}`}>
-                      {t.phaseName}
-                   </span>
-                 </td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.price ? `$${t.price}` : "—"}</td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.promoterName ?? "—"}</td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.phoneNumber}</td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.email}</td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-400 text-xs">
-                   {t.checkedInAt
-                     ? t.checkedInAt instanceof Timestamp
-                       ? t.checkedInAt.toDate().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
-                       : t.checkedInAt instanceof Date
-                         ? t.checkedInAt.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
-                         : "—"
-                     : "—"}
-                 </td>
-                 <td className="px-5 py-4 whitespace-nowrap">
-                   <a
-                     href={t.qrCode}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-sm p-1 hover:bg-gray-700 rounded"
-                      title="Ver QR"
-                   >
-                     🔗 <span className="sr-only">Ver QR</span>
-                   </a>
-                 </td>
-                 <td className="px-5 py-4 whitespace-nowrap text-right text-sm font-medium">
-                   <div className="flex items-center justify-end space-x-2">
-                    <button
-                      onClick={() => openEditModal(t)}
-                       className="p-1.5 rounded text-blue-400 hover:text-blue-300 hover:bg-gray-700 transition-colors"
-                       title="Editar"
-                    >
-                       ✏️ <span className="sr-only">Editar</span>
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(t)}
-                        className="p-1.5 rounded text-red-400 hover:text-red-300 hover:bg-gray-700 transition-colors"
-                        title="Eliminar"
-                    >
-                       🗑️ <span className="sr-only">Eliminar</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-             {tickets.length === 0 && !isFetching && (
+      {/* Table container with horizontal scroll indicator */}
+      <div className="relative">
+        {/* Scrollable Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-700">
               <tr>
-                 <td colSpan={15} className="text-center py-10 text-gray-400">
-                  No se encontraron tickets con los filtros actuales.
-                </td>
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">#</th>
+                {SortableHeader("Estado", "status")}
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">ID</th>
+                {SortableHeader("Nombre", "name")}
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                  Documento
+                </th>
+                {SortableHeader("Tipo", "ticketType")}
+                {SortableHeader("Fase", "phaseName")}
+                {SortableHeader("Precio", "price")}
+                {SortableHeader("Promotor", "promoterName")}
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                  Celular
+                </th>
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                  Correo
+                </th>
+                {SortableHeader("Ingreso", "checkedInAt")}
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                  URL QR
+                </th>
+                <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                  Acciones
+                </th>
               </tr>
-             )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-gray-800 divide-y divide-gray-700">
+              {tickets.map((t, i) => (
+                <tr key={t.id} className="hover:bg-gray-700/50 transition-colors">
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">{i + 1}</td>
+                  <td className="px-5 py-4 whitespace-nowrap">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                        t.status
+                      )}`}
+                    >
+                      {t.status === "enabled"
+                        ? "Habilitado"
+                        : t.status === "joined"
+                          ? "Ingresado"
+                          : t.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400 font-mono text-xs">{t.id}</td>
+                  <td className="px-5 py-4 whitespace-nowrap font-medium text-white">{t.name}</td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.identificationNumber}</td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        t.ticketType === "courtesy"
+                          ? "bg-purple-900 text-purple-300"
+                          : t.ticketType === "brunch"
+                          ? "bg-orange-900 text-orange-300"
+                          : "bg-blue-900 text-blue-300"
+                      }`}
+                    >
+                      {t.ticketType === "courtesy"
+                        ? "Cortesía"
+                        : t.ticketType === "brunch"
+                        ? "Brunch"
+                        : "Boleta"}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">
+                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPhaseBadgeClass(t.phaseName)}`}>
+                        {t.phaseName}
+                     </span>
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.price ? `$${t.price}` : "—"}</td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.promoterName ?? "—"}</td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.phoneNumber}</td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400">{t.email}</td>
+                  <td className="px-5 py-4 whitespace-nowrap text-gray-400 text-xs">
+                    {t.checkedInAt
+                      ? t.checkedInAt instanceof Timestamp
+                        ? t.checkedInAt.toDate().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
+                        : t.checkedInAt instanceof Date
+                          ? t.checkedInAt.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
+                          : "—"
+                      : "—"}
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap">
+                    <a
+                      href={t.qrCode}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                       className="text-blue-400 hover:text-blue-300 text-sm p-1 hover:bg-gray-700 rounded"
+                       title="Ver QR"
+                    >
+                      🔗 <span className="sr-only">Ver QR</span>
+                    </a>
+                  </td>
+                  <td className="px-5 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end space-x-2">
+                     <button
+                       onClick={() => openEditModal(t)}
+                        className="p-1.5 rounded text-blue-400 hover:text-blue-300 hover:bg-gray-700 transition-colors"
+                        title="Editar"
+                     >
+                        ✏️ <span className="sr-only">Editar</span>
+                     </button>
+                     <button
+                       onClick={() => openDeleteModal(t)}
+                         className="p-1.5 rounded text-red-400 hover:text-red-300 hover:bg-gray-700 transition-colors"
+                         title="Eliminar"
+                     >
+                        🗑️ <span className="sr-only">Eliminar</span>
+                     </button>
+                   </div>
+                 </td>
+               </tr>
+             ))}
+              {tickets.length === 0 && !isFetching && (
+               <tr>
+                  <td colSpan={15} className="text-center py-10 text-gray-400">
+                   No se encontraron tickets con los filtros actuales.
+                 </td>
+               </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+         {/* Right Fade Indicator */}
+        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-gray-700 to-transparent pointer-events-none"></div>
       </div>
 
        {/* {pagination && (
