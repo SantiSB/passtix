@@ -18,7 +18,7 @@ const SelectInput: React.FC<SelectInputProps> = ({
   required = false,
 }) => (
   <div className="space-y-3">
-    <label className="block text-sm font-medium text-black">
+    <label className="block text-sm font-medium text-gray-300">
       {label}
     </label>
     <select
@@ -26,13 +26,13 @@ const SelectInput: React.FC<SelectInputProps> = ({
       value={value}
       onChange={onChange}
       required={required}
-      className="w-full border p-3 rounded-md bg-white text-black"
+      className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
     >
-      <option value="" className="text-gray-500">
+      <option value="" className="bg-gray-800 text-gray-500">
         Selecciona
       </option>
       {options.map((option) => (
-        <option className="text-black" key={option.id} value={option.id.toString()}>
+        <option className="bg-gray-800 text-white" key={option.id} value={option.id.toString()}>
           {option.name}
         </option>
       ))}

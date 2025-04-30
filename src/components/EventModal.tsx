@@ -34,54 +34,70 @@ export default function EventModal({ isOpen, onClose }: Props) {
     onClose();
   };
 
+  /* Evitar cierre por clic fuera */
+  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-gray-900 text-white p-6 rounded-xl shadow-lg w-full max-w-md space-y-4"
+    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 ease-in-out z-50">
+      <div
+        className="bg-gray-900 rounded-xl shadow-2xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto animate-fadeIn text-white"
+        onClick={stopPropagation}
       >
-        <h2 className="text-xl font-bold">Crear nuevo evento</h2>
-        <input
-          type="text"
-          placeholder="Nombre del evento"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="w-full p-3 rounded bg-gray-800 border border-gray-700"
-        />
-        <input
-          type="text"
-          placeholder="Ubicación"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-          className="w-full p-3 rounded bg-gray-800 border border-gray-700"
-        />
-        <input
-          type="datetime-local"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-          className="w-full p-3 rounded bg-gray-800 border border-gray-700"
-        />
-        <div className="flex justify-between items-center pt-4">
+        {/* Header */}
+        <div className="sticky top-0 bg-gray-900 flex items-center justify-between px-6 py-4 border-b border-gray-700 z-10">
+          <h1 className="text-xl font-bold text-white">Crear nuevo evento</h1>
           <button
-            type="submit"
-            className="bg-amber-400 text-black font-semibold py-2 px-4 rounded hover:scale-105 transition"
-          >
-            Crear evento
-          </button>
-          <button
-            type="button"
+            className="text-gray-400 hover:text-white transition"
             onClick={onClose}
-            className="text-sm text-gray-400 hover:text-red-400"
           >
-            Cancelar
+            ❌
           </button>
         </div>
-      </form>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-5">
+          <input
+            type="text"
+            placeholder="Nombre del evento"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+          />
+          <input
+            type="text"
+            placeholder="Ubicación"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+          />
+          <input
+            type="datetime-local"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 calendar-dark"
+          />
+          {/* Actions */}
+          <div className="flex justify-end gap-4 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition text-sm"
+            >
+              Crear evento
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

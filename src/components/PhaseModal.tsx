@@ -68,19 +68,34 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
     }
   };
 
+  /* Evitar cierre por clic fuera */
+  const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white p-6 rounded-xl max-w-md w-full shadow-lg">
-        <h2 className="text-xl font-bold mb-4 text-center">Crear nueva fase</h2>
+    <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 ease-in-out z-50">
+      <div
+        className="bg-gray-900 rounded-xl shadow-2xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto animate-fadeIn text-white"
+        onClick={stopPropagation}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-gray-900 flex items-center justify-between px-6 py-4 border-b border-gray-700 z-10">
+          <h1 className="text-xl font-bold text-white">Crear nueva fase</h1>
+          <button
+            className="text-gray-400 hover:text-white transition"
+            onClick={onClose}
+          >
+            ❌
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-1">Nombre</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-300">Nombre</label>
             <input
               type="text"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -89,12 +104,12 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1">
+            <label className="block text-sm font-semibold mb-1 text-gray-300">
               Descripción
             </label>
             <input
               type="text"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ej. Primera etapa de ventas"
@@ -103,10 +118,10 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
 
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-semibold mb-1">Precio</label>
+              <label className="block text-sm font-semibold mb-1 text-gray-300">Precio</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded text-right"
+                className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 text-right"
                 value={priceInput}
                 onChange={(e) => {
                   const raw = e.target.value.replace(/\D/g, "");
@@ -118,10 +133,10 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
             </div>
 
             <div className="flex-1">
-              <label className="block text-sm font-semibold mb-1">Orden</label>
+              <label className="block text-sm font-semibold mb-1 text-gray-300">Orden</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded text-right"
+                className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 text-right"
                 value={orderInput}
                 onChange={(e) => {
                   const raw = e.target.value.replace(/\D/g, "");
@@ -139,19 +154,20 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
               type="checkbox"
               checked={isActive}
               onChange={(e) => setIsActive(e.target.checked)}
+              className="rounded border-gray-600 bg-gray-700 text-emerald-500 focus:ring-emerald-500"
             />
-            <label htmlFor="isActive" className="text-sm font-medium">
+            <label htmlFor="isActive" className="text-sm font-medium text-gray-300">
               ¿Está activa?
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1">
+            <label className="block text-sm font-semibold mb-1 text-gray-300">
               Fecha y hora de inicio
             </label>
             <input
               type="datetime-local"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 calendar-dark"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               required
@@ -159,12 +175,12 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1">
+            <label className="block text-sm font-semibold mb-1 text-gray-300">
               Fecha y hora de cierre
             </label>
             <input
               type="datetime-local"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 calendar-dark"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               required
@@ -172,32 +188,33 @@ const PhaseModal: React.FC<Props> = ({ eventId, isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-1">
+            <label className="block text-sm font-semibold mb-1 text-gray-300">
               Hora máxima de ingreso (opcional)
             </label>
             <input
               type="datetime-local"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 rounded bg-gray-800 border border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 calendar-dark"
               value={maxEntryTime}
               onChange={(e) => setMaxEntryTime(e.target.value)}
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-green-600 text-sm">Fase creada ✅</p>}
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {success && <p className="text-green-400 text-sm">Fase creada ✅</p>}
 
-          <div className="flex justify-between mt-4">
+          {/* Actions */}
+          <div className="flex justify-end gap-4 mt-4">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-200 text-black px-4 py-2 rounded"
+              className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-emerald-500 text-white px-4 py-2 rounded hover:bg-emerald-600 disabled:opacity-50"
+              className="px-4 py-2 rounded bg-emerald-600 text-white font-semibold hover:bg-emerald-700 disabled:opacity-50 text-sm"
             >
               {loading ? "Creando..." : "Crear fase"}
             </button>
