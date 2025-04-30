@@ -33,7 +33,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
     isFetching,
     isError,
     // usingPagination,
-    pagination,
+    // pagination,
     sortKey,
     sortDirection,
     setSort,
