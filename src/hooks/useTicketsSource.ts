@@ -1,4 +1,4 @@
-import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
+import usePaginatedTickets from "@/hooks/usePaginatedTickets";
 import useLiveTickets from "@/hooks/useLiveTickets";
 
 export default function useTicketsSource(

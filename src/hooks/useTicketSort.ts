@@ -6,7 +6,11 @@ export type SortKey =
   | "status"
   | "createdAt"
   | "updatedAt"
-  | "checkedInAt";
+  | "checkedInAt"
+  | "ticketType"
+  | "phaseName"
+  | "localityName"
+  | "promoterName";
 
 export type SortDirection = "asc" | "desc";
 

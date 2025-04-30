@@ -8,6 +8,7 @@ import useTicketModal from "@/hooks/useTicketModal";
 import useDeleteTicket from "@/hooks/useDeleteTicket";
 import { getStatusBadgeClass } from "@/lib/utils/ticket";
 import { Timestamp } from "firebase/firestore";
+import { SortKey } from "@/hooks/useTicketSort";
 
 interface TicketsTableProps {
   eventId: string;
@@ -33,7 +34,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
     isError,
     usingPagination,
     pagination,
-    sortBy,
+    sortKey,
     sortDirection,
     setSort,
   } = useFilteredTickets(eventId, {
@@ -54,39 +55,46 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
   const {
     deleteTicket,
     loading: loadingDelete,
-    error: errorDelete,
+    error,
   } = useDeleteTicket(closeModal);
 
-  if (isLoading) {
-    return <p className="p-4 text-gray-500">Cargando tickets…</p>;
-  }
+  const errorDelete = error;
 
-  if (isError) {
+  if (isLoading) return <p className="p-4 text-gray-500">Cargando tickets…</p>;
+  if (isError)
     return <p className="p-4 text-red-500">Error al cargar los tickets.</p>;
-  }
+
+  const SortableHeader = (label: string, key: SortKey) => (
+    <th
+      onClick={() => setSort(key)}
+      className="cursor-pointer px-4 py-3 font-semibold whitespace-nowrap select-none"
+    >
+      {label} {sortKey === key && (sortDirection === "asc" ? "↑" : "↓")}
+    </th>
+  );
 
   return (
     <div className="rounded-xl border border-gray-200 shadow-sm bg-white">
       {/* filtros */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-end px-4 py-3 text-black">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-end px-4 py-3">
         <input
           type="text"
           placeholder="Buscar por nombre…"
-          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full text-black"
+          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
           value={nameInput}
           onChange={(e) => setNameInput(e.target.value)}
         />
         <input
           type="text"
           placeholder="Buscar por cédula…"
-          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full text-black"
+          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
           value={idInput}
           onChange={(e) => setIdInput(e.target.value)}
         />
         <input
           type="text"
           placeholder="Buscar por ID de boleta…"
-          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full text-black"
+          className="border border-gray-300 px-3 py-2 rounded-md text-sm w-full"
           value={ticketIdInput}
           onChange={(e) => setTicketIdInput(e.target.value)}
         />
@@ -105,56 +113,28 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
             <tr>
               <th className="px-4 py-3 font-semibold whitespace-nowrap">#</th>
               <th className="px-4 py-3 font-semibold whitespace-nowrap">ID</th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Estado
-              </th>
-              <th
-                onClick={() => setSort("name")}
-                className="cursor-pointer px-4 py-3 font-semibold whitespace-nowrap"
-              >
-                Nombre{" "}
-                {sortBy === "name" && (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
+              {SortableHeader("Estado", "status")}
+              {SortableHeader("Nombre", "name")}
               <th className="px-4 py-3 font-semibold whitespace-nowrap">
                 Tipo Doc
               </th>
               <th className="px-4 py-3 font-semibold whitespace-nowrap">
                 Documento
               </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Tipo
-              </th>
-              <th
-                onClick={() => setSort("price")}
-                className="cursor-pointer px-4 py-3 font-semibold whitespace-nowrap"
-              >
-                Precio{" "}
-                {sortBy === "price" && (sortDirection === "asc" ? "↑" : "↓")}
-              </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Fase
-              </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Localidad
-              </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Promotor
-              </th>
+              {SortableHeader("Tipo", "ticketType")}
+              {SortableHeader("Precio", "price")}
+              {SortableHeader("Fase", "phaseName")}
+              {SortableHeader("Localidad", "localityName")}
+              {SortableHeader("Promotor", "promoterName")}
               <th className="px-4 py-3 font-semibold whitespace-nowrap">
                 Correo
               </th>
               <th className="px-4 py-3 font-semibold whitespace-nowrap">
                 Celular
               </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Creado
-              </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Actualizado
-              </th>
-              <th className="px-4 py-3 font-semibold whitespace-nowrap">
-                Ingreso
-              </th>
+              {SortableHeader("Creado", "createdAt")}
+              {SortableHeader("Actualizado", "updatedAt")}
+              {SortableHeader("Ingreso", "checkedInAt")}
               <th className="px-4 py-3 font-semibold whitespace-nowrap">
                 URL QR
               </th>
@@ -166,15 +146,13 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
           <tbody>
             {tickets.map((t, i) => (
               <tr key={t.id} className="even:bg-gray-50 hover:bg-gray-100">
-                <td className="px-4 py-3">
-                  {usingPagination && pagination
-                    ? (pagination.pageIndex - 1) * pagination.pageSize + i + 1
-                    : i + 1}
-                </td>
+                <td className="px-4 py-3">{i + 1}</td>
                 <td className="px-4 py-3">{t.id}</td>
                 <td className="px-4 py-3">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
+                      t.status
+                    )}`}
                   >
                     {t.status === "enabled"
                       ? "Habilitado"
@@ -223,7 +201,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                     href={t.qrCode}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 underline hover:text-blue-800 text-xs break-all"
+                    className="text-blue-600 underline break-all"
                   >
                     Ver QR
                   </a>
@@ -248,13 +226,14 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
         </table>
       </div>
 
-      {/* paginación */}
+      {/* paginación (desactivada temporalmente para ordenamiento global) */}
+      {/*
       {usingPagination && pagination && (
         <div className="flex justify-between items-center p-4">
           <button
             onClick={pagination.prevPage}
             disabled={!pagination.canGoBack || isFetching}
-            className="px-3 py-2 bg-amber-400 text-black rounded-lg shadow-md hover:scale-105 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-50"
+            className="px-3 py-2 bg-amber-400 rounded-lg shadow disabled:opacity-50"
           >
             ← Anterior
           </button>
@@ -264,14 +243,14 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
           <button
             onClick={pagination.nextPage}
             disabled={!pagination.hasMore || isFetching}
-            className="px-3 py-2 bg-amber-400 text-black rounded-lg shadow-md hover:scale-105 disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-50"
+            className="px-3 py-2 bg-amber-400 rounded-lg shadow disabled:opacity-50"
           >
             Siguiente →
           </button>
         </div>
       )}
+      */}
 
-      {/* modal */}
       {selectedTicket && modalMode && (
         <TicketModal
           isOpen={isModalOpen}

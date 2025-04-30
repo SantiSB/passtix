@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
-import usePaginatedTickets, { PAGE_SIZE } from "@/hooks/usePaginatedTickets";
+import { useMemo } from "react";
 import useLiveTickets from "@/hooks/useLiveTickets";
 import useTicketFilters from "@/hooks/useTicketFilters";
+import useTicketSort, { SortKey, SortDirection } from "@/hooks/useTicketSort";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
 interface Filters {
@@ -10,88 +10,53 @@ interface Filters {
   ticketId: string;
 }
 
-export default function useFilteredTickets(eventId: string, filters: Filters) {
-  const {
-    tickets: paginatedTickets,
-    isLoading,
-    isFetching,
-    isError,
-    hasMore,
-    nextPage,
-    prevPage,
-    canGoBack,
-    pageIndex,
-    pageSize,
-    updateSearchName,
-    updateSearchIdNumber,
-    updateSearchTicketId,
-  } = usePaginatedTickets(eventId);
+export interface UseFilteredTicketsReturn {
+  tickets: EnrichedTicket[];
+  isLoading: boolean;
+  isError: boolean;
+  isFetching: boolean;
+  usingPagination: boolean;
+  pagination: null;
+  /** ordenamiento */
+  sortKey: SortKey;
+  sortDirection: SortDirection;
+  setSort: (key: SortKey) => void;
+}
 
-  const live = useLiveTickets(eventId);
+export default function useFilteredTickets(
+  eventId: string,
+  filters: Filters
+): UseFilteredTicketsReturn {
+  const { tickets: liveTickets, loading } = useLiveTickets(eventId);
+  const { sortKey, sortDirection, toggleSort: setSort } = useTicketSort();
 
-  const [sortBy, setSortBy] = useState<keyof EnrichedTicket | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const hasFilters = Boolean(
-    filters.name.trim() || filters.idNumber.trim() || filters.ticketId.trim()
-  );
-
-  const usingPagination = !hasFilters;
-
-  const rawTickets = usingPagination ? paginatedTickets : live.tickets;
-
-  const filteredTickets = useTicketFilters(rawTickets, filters);
+  const filteredTickets = useTicketFilters(liveTickets, filters);
 
   const sortedTickets = useMemo(() => {
-    if (!sortBy) return filteredTickets;
+    const normalize = (val: unknown) => {
+      if (val == null) return "";
+      if (val instanceof Date) return val.getTime();
+      return typeof val === "string" ? val.toLowerCase() : val;
+    };
 
     return [...filteredTickets].sort((a, b) => {
-      const aValue = a[sortBy];
-      const bValue = b[sortBy];
+      const aVal = normalize(a[sortKey]);
+      const bVal = normalize(b[sortKey]);
 
-      const normalize = (val: any) => {
-        if (val == null) return "";
-        if (typeof val === "string" || typeof val === "number") return val;
-        if (val instanceof Date) return val.getTime();
-        return String(val);
-      };
-
-      const aComparable = normalize(aValue);
-      const bComparable = normalize(bValue);
-
-      if (aComparable < bComparable) return sortDirection === "asc" ? -1 : 1;
-      if (aComparable > bComparable) return sortDirection === "asc" ? 1 : -1;
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
-  }, [filteredTickets, sortBy, sortDirection]);
-
-  const setSort = (field: keyof EnrichedTicket) => {
-    if (sortBy === field) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortBy(field);
-      setSortDirection("asc");
-    }
-  };
+  }, [filteredTickets, sortKey, sortDirection]);
 
   return {
     tickets: sortedTickets,
-    isLoading,
-    isError,
-    isFetching,
-    usingPagination,
-    pagination: {
-      hasMore,
-      nextPage,
-      prevPage,
-      canGoBack,
-      pageIndex,
-      pageSize,
-    },
-    updateSearchName,
-    updateSearchIdNumber,
-    updateSearchTicketId,
-    sortBy,
+    isLoading: loading,
+    isError: false,
+    isFetching: loading,
+    usingPagination: false,
+    pagination: null,
+    sortKey,
     sortDirection,
     setSort,
   };
