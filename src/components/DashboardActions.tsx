@@ -9,6 +9,10 @@ interface Props {
   onRegisterTicket: () => void;
 }
 
+// Define a base style for buttons
+const buttonBaseStyle =
+  "px-4 py-2 rounded-lg text-sm font-semibold shadow-md transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900";
+
 const DashboardActions: React.FC<Props> = ({
   onCreateEvent,
   onCreatePhase,
@@ -16,47 +20,33 @@ const DashboardActions: React.FC<Props> = ({
   onRegisterTicket,
 }) => {
   return (
-    <div className="flex flex-wrap gap-4 mb-6">
+    <div className="flex flex-wrap gap-3 mb-8"> {/* Reduced gap slightly and increased mb */}
       <button
         onClick={onCreateEvent}
-        className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition transform hover:scale-105 hover:bg-emerald-600"
+        className={`${buttonBaseStyle} bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500`}
       >
-        Crear evento
+        ✨ Crear Evento
       </button>
 
       <button
         onClick={onCreatePhase}
-        className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+        className={`${buttonBaseStyle} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`}
       >
-        Crear Fase
+        ➕ Crear Fase
       </button>
 
       <button
         onClick={onCreatePromoter}
-        className="bg-purple-600 text-white px-4 py-2 rounded shadow hover:bg-purple-700 transition"
+        className={`${buttonBaseStyle} bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500`}
       >
-        Crear Promotor
+        👤 Crear Promotor
       </button>
 
       <button
         onClick={onRegisterTicket}
-        className="inline-flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-semibold text-black shadow-lg transition transform hover:scale-105 hover:bg-amber-500"
+        className={`${buttonBaseStyle} bg-amber-500 text-black hover:bg-amber-600 focus:ring-amber-400`}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Registrar asistente
+        🎟️ Registrar Asistente
       </button>
     </div>
   );

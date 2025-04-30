@@ -41,7 +41,7 @@ const DashboardPage = () => {
   if (!user) return null;
 
   return (
-    <section className="min-h-screen w-full flex flex-col">
+    <section className="min-h-screen w-full flex flex-col overflow-x-hidden">
       <header className="sticky top-0 z-20 bg-black/90 backdrop-blur-md shadow-lg">
         <div className="mx-auto flex flex-wrap items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <motion.div
@@ -72,13 +72,13 @@ const DashboardPage = () => {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col">
-        <div className="mx-auto w-full flex-1 px-4 py-10 sm:px-6 lg:px-8">
+      <main className="flex flex-1 flex-col bg-gray-900 overflow-x-hidden">
+        <div className="mx-auto w-full flex-1 px-4 py-12 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl bg-gray-800 p-6 mb-8"
+            className="rounded-2xl bg-gray-800 border border-gray-700 p-6 mb-8 shadow-md"
           >
             <h2 className="text-xl font-bold text-white mb-4">Tus eventos</h2>
             <EventSelector
@@ -87,24 +87,26 @@ const DashboardPage = () => {
             />
           </motion.div>
 
-          <DashboardActions
-            onCreateEvent={() => setIsEventModalOpen(true)}
-            onCreatePhase={() => setIsPhaseModalOpen(true)}
-            onCreatePromoter={() => setIsPromoterModalOpen(true)}
-            onRegisterTicket={() => setIsTicketModalOpen(true)}
-          />
+          <div className="mt-10 mb-8">
+            <DashboardActions
+              onCreateEvent={() => setIsEventModalOpen(true)}
+              onCreatePhase={() => setIsPhaseModalOpen(true)}
+              onCreatePromoter={() => setIsPromoterModalOpen(true)}
+              onRegisterTicket={() => setIsTicketModalOpen(true)}
+            />
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="bg-gray-800 p-6 rounded-2xl"
+            className="bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-md"
           >
             <h2 className="text-xl font-bold text-white mb-4">Boletas</h2>
             {selectedEventId ? (
               <TicketsTable eventId={selectedEventId} />
             ) : (
-              <p className="text-white">
+              <p className="text-white/70 text-center py-4">
                 Selecciona un evento para ver sus boletas.
               </p>
             )}

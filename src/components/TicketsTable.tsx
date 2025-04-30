@@ -117,32 +117,26 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full text-sm text-left">
+        <table className="w-full text-sm text-left">
            <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
               <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">#</th>
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">ID</th>
               {SortableHeader("Estado", "status")}
+              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">ID</th>
               {SortableHeader("Nombre", "name")}
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                Tipo Doc
-              </th>
               <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                 Documento
               </th>
               {SortableHeader("Tipo", "ticketType")}
-              {SortableHeader("Precio", "price")}
               {SortableHeader("Fase", "phaseName")}
-              {SortableHeader("Localidad", "localityName")}
+              {SortableHeader("Precio", "price")}
               {SortableHeader("Promotor", "promoterName")}
-              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                Correo
-              </th>
               <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                 Celular
               </th>
-              {SortableHeader("Creado", "createdAt")}
-              {SortableHeader("Actualizado", "updatedAt")}
+              <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                Correo
+              </th>
               {SortableHeader("Ingreso", "checkedInAt")}
               <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                 URL QR
@@ -156,65 +150,53 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
             {tickets.map((t, i) => (
                <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{i + 1}</td>
+                 <td className="px-5 py-4 whitespace-nowrap">
+                   <span
+                     className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
+                       t.status
+                     )}`}
+                   >
+                     {t.status === "enabled"
+                       ? "Habilitado"
+                       : t.status === "joined"
+                         ? "Ingresado"
+                         : t.status}
+                   </span>
+                 </td>
                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400 font-mono text-xs">{t.id}</td>
-                 <td className="px-5 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
-                      t.status
-                    )}`}
-                  >
-                    {t.status === "enabled"
-                      ? "Habilitado"
-                      : t.status === "joined"
-                        ? "Ingresado"
-                        : t.status}
-                  </span>
-                </td>
-                <td className="px-5 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">{t.name}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.identificationType}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.identificationNumber}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                  {t.ticketType === "courtesy"
-                    ? "Cortesía"
-                    : t.ticketType === "brunch"
-                      ? "Brunch"
-                      : "Boleta"}
-                </td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.price ? `$${t.price}` : "—"}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.phaseName}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.localityName}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.promoterName ?? "—"}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.email}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.phoneNumber}</td>
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
-                  {t.createdAt instanceof Date
-                    ? t.createdAt.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
-                    : "—"}
-                </td>
+                 <td className="px-5 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">{t.name}</td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.identificationNumber}</td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
+                   {t.ticketType === "courtesy"
+                     ? "Cortesía"
+                     : t.ticketType === "brunch"
+                       ? "Brunch"
+                       : "Boleta"}
+                 </td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.phaseName}</td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.price ? `$${t.price}` : "—"}</td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.promoterName ?? "—"}</td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.phoneNumber}</td>
+                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{t.email}</td>
                  <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
-                  {t.updatedAt instanceof Date
-                    ? t.updatedAt.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
-                    : "—"}
-                </td>
-                 <td className="px-5 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
-                  {t.checkedInAt
-                    ? t.checkedInAt instanceof Timestamp
-                      ? t.checkedInAt.toDate().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
-                      : t.checkedInAt instanceof Date
-                        ? t.checkedInAt.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
-                        : "—"
-                    : "—"}
-                </td>
+                   {t.checkedInAt
+                     ? t.checkedInAt instanceof Timestamp
+                       ? t.checkedInAt.toDate().toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
+                       : t.checkedInAt instanceof Date
+                         ? t.checkedInAt.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })
+                         : "—"
+                     : "—"}
+                 </td>
                  <td className="px-5 py-4 whitespace-nowrap">
-                  <a
-                    href={t.qrCode}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                     className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline text-xs"
-                  >
-                    Ver QR
-                  </a>
-                </td>
+                   <a
+                     href={t.qrCode}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline text-xs"
+                   >
+                     Ver QR
+                   </a>
+                 </td>
                  <td className="px-5 py-4 whitespace-nowrap text-right text-sm font-medium">
                    <div className="flex items-center justify-end space-x-2">
                     <button
@@ -237,7 +219,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
             ))}
              {tickets.length === 0 && !isFetching && (
               <tr>
-                 <td colSpan={19} className="text-center py-10 text-gray-500 dark:text-gray-400">
+                 <td colSpan={15} className="text-center py-10 text-gray-500 dark:text-gray-400">
                   No se encontraron tickets con los filtros actuales.
                 </td>
               </tr>

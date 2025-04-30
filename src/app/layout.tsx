@@ -14,8 +14,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className="h-full w-full  ">
-      <body className={`${inter.className} h-full w-full bg-gray-50 antialiased`}>
+    <html lang="es" className="h-full w-full overflow-hidden ">
+      <body className={`${inter.className} h-full w-full bg-gray-50 antialiased overflow-x-hidden`}>
         <Providers>{children}</Providers>
       </body>
     </html>
