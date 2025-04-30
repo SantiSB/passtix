@@ -165,88 +165,102 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
       {/* tabla */}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-left text-gray-700">
-          <thead className="text-xs uppercase bg-black/90 text-white">
-            <tr>
-              {[
-                "#",
-                "Estado",
-                "Nombre",
-                "Cédula",
-                "Tipo",
-                "Precio",
-                "Fase",
-                "Localidad",
-                "Promotor",
-                "Correo",
-                "Celular",
-                "Ingreso",
-                "Acciones",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className="px-4 py-3 font-semibold whitespace-nowrap"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTickets.map((t, i) => (
-              <tr key={t.id} className="even:bg-gray-50 hover:bg-gray-100">
-                <td className="px-4 py-3">
-                  {usingPagination
-                    ? (pageIndex - 1) * PAGE_SIZE + i + 1
-                    : i + 1}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}
-                  >
-                    {t.status === "enabled"
-                      ? "Habilitado"
-                      : t.status === "joined"
-                        ? "Ingresado"
-                        : t.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 font-medium">{t.name}</td>
-                <td className="px-4 py-3">{t.identificationNumber}</td>
-                <td className="px-4 py-3">
-                  {t.ticketType === "courtesy" ? "Cortesía" : t.ticketType === "brunch" ? "Brunch" : "Boleta"}
-                </td>
-                <td className="px-4 py-3">{t.price ? `$${t.price}` : "—"}</td>
-                <td className="px-4 py-3">{t.phaseName}</td>
-                <td className="px-4 py-3">{t.localityName}</td>
-                <td className="px-4 py-3">{t.promoterName ?? "—"}</td>
-                <td className="px-4 py-3">{t.email}</td>
-                <td className="px-4 py-3">{t.phoneNumber}</td>
-                <td className="px-4 py-3">
-                  {t.checkedInAt
-                    ? t.checkedInAt instanceof Timestamp
-                      ? t.checkedInAt.toDate().toLocaleString()
-                      : t.checkedInAt instanceof Date
-                        ? t.checkedInAt.toLocaleString()
-                        : "—"
-                    : "—"}
-                </td>
-                <td className="px-4 py-3 flex space-x-2">
-                  <button
-                    onClick={() => openEditModal(t)}
-                    className="px-2 py-1 bg-black/80 text-white rounded-lg text-xs"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => openDeleteModal(t)}
-                    className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs"
-                  >
-                    🗑️
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+        <thead className="text-xs uppercase bg-black/90 text-white">
+  <tr>
+    {[
+      "#",
+      "ID",
+      "Estado",
+      "Nombre",
+      "Tipo Doc",
+      "Documento",
+      "Tipo",
+      "Precio",
+      "Fase",
+      "Localidad",
+      "Promotor",
+      "Correo",
+      "Celular",
+      "Creado",
+      "Actualizado",
+      "Ingreso",
+      "URL QR",
+      "Acciones",
+    ].map((h) => (
+      <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">
+        {h}
+      </th>
+    ))}
+  </tr>
+</thead>
+
+<tbody>
+  {filteredTickets.map((t, i) => (
+    <tr key={t.id} className="even:bg-gray-50 hover:bg-gray-100">
+      <td className="px-4 py-3">
+        {usingPagination ? (pageIndex - 1) * PAGE_SIZE + i + 1 : i + 1}
+      </td>
+      <td className="px-4 py-3">{t.id}</td>
+      <td className="px-4 py-3">
+        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(t.status)}`}>
+          {t.status === "enabled" ? "Habilitado" : t.status === "joined" ? "Ingresado" : t.status}
+        </span>
+      </td>
+      <td className="px-4 py-3 font-medium">{t.name}</td>
+      <td className="px-4 py-3">{t.identificationType}</td>
+      <td className="px-4 py-3">{t.identificationNumber}</td>
+      <td className="px-4 py-3">
+        {t.ticketType === "courtesy" ? "Cortesía" : t.ticketType === "brunch" ? "Brunch" : "Boleta"}
+      </td>
+      <td className="px-4 py-3">{t.price ? `$${t.price}` : "—"}</td>
+      <td className="px-4 py-3">{t.phaseName}</td>
+      <td className="px-4 py-3">{t.localityName}</td>
+      <td className="px-4 py-3">{t.promoterName ?? "—"}</td>
+      <td className="px-4 py-3">{t.email}</td>
+      <td className="px-4 py-3">{t.phoneNumber}</td>
+      <td className="px-4 py-3">
+        {t.createdAt instanceof Date ? t.createdAt.toLocaleString() : "—"}
+      </td>
+      <td className="px-4 py-3">
+        {t.updatedAt instanceof Date ? t.updatedAt.toLocaleString() : "—"}
+      </td>
+      <td className="px-4 py-3">
+        {t.checkedInAt
+          ? t.checkedInAt instanceof Timestamp
+            ? t.checkedInAt.toDate().toLocaleString()
+            : t.checkedInAt instanceof Date
+              ? t.checkedInAt.toLocaleString()
+              : "—"
+          : "—"}
+      </td>
+      <td className="px-4 py-3">
+        <a
+          href={t.qrCode}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline hover:text-blue-800 text-xs break-all"
+        >
+          Ver QR
+        </a>
+      </td>
+      <td className="px-4 py-3 flex space-x-2">
+        <button
+          onClick={() => openEditModal(t)}
+          className="px-2 py-1 bg-black/80 text-white rounded-lg text-xs"
+        >
+          ✏️
+        </button>
+        <button
+          onClick={() => openDeleteModal(t)}
+          className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs"
+        >
+          🗑️
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
         </table>
       </div>
 
