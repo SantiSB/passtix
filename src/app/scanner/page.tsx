@@ -28,7 +28,7 @@ export default function ScannerPage() {
     return "text-white";
   };
 
-  const renderDataBlock = (title: string, data: any) => {
+  const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
     if (!data) return null;
 
     return (
@@ -38,7 +38,10 @@ export default function ScannerPage() {
           {Object.entries(data).map(([key, value]) => (
             <div key={key}>
               <strong>{key}:</strong>{" "}
-              {typeof value === "object" && value?.toDate
+              {typeof value === "object" &&
+              value !== null &&
+              "toDate" in value &&
+              typeof value.toDate === "function"
                 ? value.toDate().toLocaleString()
                 : String(value)}
             </div>
