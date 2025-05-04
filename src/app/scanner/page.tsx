@@ -28,24 +28,34 @@ export default function ScannerPage() {
     return "text-white";
   };
 
+  const relevantKeys: Record<string, string[]> = {
+    "🎟️ Ticket": ["id", "type", "status", "validationTimestamp", "entryTimestamp"],
+    "🧑 Asistente": ["name", "email", "dni"],
+    "📅 Evento": ["name", "date", "location"],
+  };
+
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
     if (!data) return null;
+
+    const keysToShow = relevantKeys[title] || Object.keys(data);
 
     return (
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
         <div className="text-sm text-gray-200 space-y-1">
-          {Object.entries(data).map(([key, value]) => (
-            <div key={key}>
-              <strong>{key}:</strong>{" "}
-              {typeof value === "object" &&
-              value !== null &&
-              "toDate" in value &&
-              typeof value.toDate === "function"
-                ? value.toDate().toLocaleString()
-                : String(value)}
-            </div>
-          ))}
+          {Object.entries(data)
+            .filter(([key]) => keysToShow.includes(key))
+            .map(([key, value]) => (
+              <div key={key}>
+                <strong>{key}:</strong>{" "}
+                {typeof value === "object" &&
+                value !== null &&
+                "toDate" in value &&
+                typeof value.toDate === "function"
+                  ? value.toDate().toLocaleString()
+                  : String(value)}
+              </div>
+            ))}
         </div>
       </div>
     );
@@ -128,7 +138,7 @@ export default function ScannerPage() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
             <h2 className="text-xl font-bold text-white mb-4 text-center">
-              ✅ Datos del escaneo
+              ✅ caneo
             </h2>
 
             {renderDataBlock("🎟️ Ticket", scannedData.ticket)}
