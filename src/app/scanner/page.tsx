@@ -17,7 +17,8 @@ export default function ScannerPage() {
     }
   }, [user, loading, router]);
 
-  const { status, assistantName, scannerRef, debugInfo } = useQrScanner();
+  const { status, assistantName, scannerRef, debugInfo, scannedData } =
+    useQrScanner();
 
   const getStatusStyles = (status: string | null) => {
     if (!status) return "";
@@ -25,6 +26,26 @@ export default function ScannerPage() {
     if (status.includes("❌")) return "text-red-400";
     if (status.includes("⚠️")) return "text-yellow-400";
     return "text-white";
+  };
+
+  const renderDataBlock = (title: string, data: any) => {
+    if (!data) return null;
+
+    return (
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
+        <div className="text-sm text-gray-200 space-y-1">
+          {Object.entries(data).map(([key, value]) => (
+            <div key={key}>
+              <strong>{key}:</strong>{" "}
+              {typeof value === "object" && value?.toDate
+                ? value.toDate().toLocaleString()
+                : String(value)}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   if (loading) {
@@ -99,6 +120,27 @@ export default function ScannerPage() {
           <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
         </p>
       </div>
+
+      {scannedData && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
+            <h2 className="text-xl font-bold text-white mb-4 text-center">
+              ✅ Datos del escaneo
+            </h2>
+
+            {renderDataBlock("🎟️ Ticket", scannedData.ticket)}
+            {renderDataBlock("🧑 Asistente", scannedData.assistant)}
+            {renderDataBlock("📅 Evento", scannedData.event)}
+
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-6 w-full text-sm py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-lg"
+            >
+              Escanear otro
+            </button>
+          </div>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}

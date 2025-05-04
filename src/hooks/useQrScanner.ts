@@ -3,7 +3,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { db } from "@/lib/firebase/firebase";
 import { doc, getDoc, updateDoc, DocumentData } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
-import { useQueryClient } from "@tanstack/react-query"; // ✅ NUEVO
+import { useQueryClient } from "@tanstack/react-query";
 
 interface EventData extends DocumentData {
   producerId?: string;
@@ -20,12 +20,18 @@ export function useQrScanner() {
     eventProducerId: "",
   });
 
+  const [scannedData, setScannedData] = useState<{
+    ticket: DocumentData;
+    assistant: DocumentData | null;
+    event: DocumentData | null;
+  } | null>(null);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const hasScannedRef = useRef(false);
 
   const { user } = useAuth();
-  const queryClient = useQueryClient(); // ✅ NUEVO
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!user || !user.uid) return;
@@ -65,7 +71,6 @@ export function useQrScanner() {
               }
 
               const ticket = ticketSnap.data();
-
               const eventRef = doc(db, "event", ticket.eventId);
               const eventSnap = await getDoc(eventRef);
 
@@ -103,40 +108,37 @@ export function useQrScanner() {
                 const phaseSnap = await getDoc(phaseRef);
                 if (phaseSnap.exists()) {
                   const phase = phaseSnap.data();
-
                   if (
                     phase.maxEntryTime &&
                     typeof phase.maxEntryTime.toDate === "function"
                   ) {
                     const maxTime = phase.maxEntryTime.toDate();
-
                     if (now > maxTime) {
                       await updateDoc(ticketRef, {
                         status: "disabled",
                       });
                       setStatus("❌ Ticket inhabilitado por horario");
                       setAssistantName(assistant?.name || "Asistente");
-                      resetScanner();
+                      setScannedData({ ticket, assistant, event });
                       return;
                     }
                   }
                 }
               }
 
-              if (ticket.status === "joined") {
-                setStatus("⚠️ Este ticket ya fue registrado.");
-              } else {
+              if (ticket.status !== "joined") {
                 await updateDoc(ticketRef, {
                   status: "joined",
                   checkedInAt: now,
                 });
-
-                queryClient.invalidateQueries({ queryKey: ["tickets"] }); // ✅ FORZAR REFRESH DE PAGINACIÓN
-
+                queryClient.invalidateQueries({ queryKey: ["tickets"] });
                 setStatus("✅ Ingreso registrado");
+              } else {
+                setStatus("⚠️ Este ticket ya fue registrado.");
               }
 
               setAssistantName(assistant?.name || "Asistente");
+              setScannedData({ ticket, assistant, event });
             } catch (err: unknown) {
               let errorMessage = "al procesar el QR";
               if (err instanceof Error) {
@@ -144,9 +146,8 @@ export function useQrScanner() {
               }
               console.error("❌ Error escaneando QR:", err);
               setStatus(`❌ Error: ${errorMessage}`);
+              resetScanner();
             }
-
-            resetScanner();
           },
           (err) => {
             console.warn("⚠️ Error al escanear:", err);
@@ -173,12 +174,13 @@ export function useQrScanner() {
         scannerRef.current?.clear();
       });
     };
-  }, [user, queryClient]); // ✅ AÑADIR queryClient COMO DEPENDENCIA
+  }, [user, queryClient]);
 
   return {
     status,
     assistantName,
     scannerRef: containerRef,
     debugInfo,
+    scannedData,
   };
 }
