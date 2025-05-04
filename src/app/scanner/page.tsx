@@ -127,7 +127,7 @@ export default function ScannerPage() {
 
       <div className="mt-4 text-xs text-yellow-400 text-center">
         <p>
-          <strong>UID usuario:</strong> {debugInfo?.userUid}
+          <strong>ID de Usuario:</strong> {debugInfo?.userUid}
         </p>
         <p>
           <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
