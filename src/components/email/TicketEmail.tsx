@@ -38,7 +38,7 @@ const getTicketLabel = (type: TicketType) => {
     case "ticket":
       return "Entrada";
     case "courtesy":
-      return "SSOE PASS";
+      return "Cortesia";
     case "brunch":
       return "Brunch (válido hasta las 6:00 p.m.)";
     default:
@@ -144,7 +144,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               {ticketType === "ticket" &&
                 " esta es tu entrada. Preséntala al ingresar al evento."}
               {ticketType === "courtesy" &&
-                " has recibido un SSOE PASS para este evento. Preséntalo al ingresar."}
+                " has recibido una cortesia para este evento. Preséntalo al ingresar."}
               {ticketType === "brunch" &&
                 " esta entrada es válida únicamente para el brunch (hasta las 6:00 p.m.). Preséntala al ingresar."}
             </Text>
