@@ -29,31 +29,52 @@ export default function ScannerPage() {
   };
 
   const relevantKeys: Record<string, string[]> = {
-    "🎟️ Ticket": ["id", "type", "status", "validationTimestamp", "entryTimestamp"],
+    "🎟️ Boleto": ["id", "type", "status", "validationTimestamp", "entryTimestamp"],
     "🧑 Asistente": ["name", "email", "dni"],
     "📅 Evento": ["name", "date", "location"],
   };
 
+  const fieldLabels: Record<string, string> = {
+    id: "ID",
+    type: "Tipo",
+    status: "Estado",
+    validationTimestamp: "Validado el",
+    entryTimestamp: "Ingreso el",
+    name: "Nombre",
+    email: "Correo",
+    dni: "DNI",
+    date: "Fecha",
+    location: "Ubicación",
+  };
+
+  const statusTranslations: Record<string, string> = {
+    enabled: "Habilitado",
+    disabled: "Deshabilitado",
+    used: "Usado",
+    invalid: "Inválido",
+  };
+
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
     if (!data) return null;
-
     const keysToShow = relevantKeys[title] || Object.keys(data);
-
     return (
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-        <div className="text-sm text-gray-200 space-y-1">
+      <div className="mb-4 bg-gray-800 rounded-xl p-4 shadow-md">
+        <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+          {title}
+        </h3>
+        <div className="text-base text-gray-200 space-y-2">
           {Object.entries(data)
             .filter(([key]) => keysToShow.includes(key))
             .map(([key, value]) => (
-              <div key={key}>
-                <strong>{key}:</strong>{" "}
-                {typeof value === "object" &&
-                value !== null &&
-                "toDate" in value &&
-                typeof value.toDate === "function"
-                  ? value.toDate().toLocaleString()
-                  : String(value)}
+              <div key={key} className="flex items-center gap-2">
+                <span className="font-bold text-amber-400">{fieldLabels[key] || key}:</span>
+                <span>
+                  {key === "status" && typeof value === "string"
+                    ? statusTranslations[value] || value
+                    : typeof value === "object" && value !== null && "toDate" in value && typeof value.toDate === "function"
+                    ? value.toDate().toLocaleString("es-ES")
+                    : String(value)}
+                </span>
               </div>
             ))}
         </div>
@@ -72,10 +93,10 @@ export default function ScannerPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-4 py-8 relative text-white">
+    <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-2 py-4 relative text-white">
       <button
         onClick={logout}
-        className="absolute top-4 right-4 text-sm text-white hover:text-red-400 transition font-medium z-50"
+        className="absolute top-3 right-3 text-xs text-white bg-red-500/80 hover:bg-red-600 px-3 py-1 rounded-lg shadow font-medium z-50 transition"
       >
         Cerrar sesión
       </button>
@@ -84,20 +105,20 @@ export default function ScannerPage() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
-        className="mb-8"
+        className="mb-4"
       >
         <Image
           src="/branding/ImagotipoBlanco.png"
           alt="Logo PassTix"
-          width={180}
-          height={180}
+          width={120}
+          height={120}
         />
       </motion.div>
 
-      <div className="relative w-full max-w-md rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-slate-50">
+      <div className="relative w-full max-w-sm rounded-2xl p-1 bg-gradient-to-tr from-amber-400 to-purple-600 shadow-2xl ring-2 ring-offset-slate-50">
         <div
           ref={scannerRef}
-          className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2"
+          className="rounded-xl overflow-hidden bg-black/80 backdrop-blur-md p-2 min-h-[180px] flex items-center justify-center"
         ></div>
       </div>
 
@@ -105,51 +126,51 @@ export default function ScannerPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="mt-6 text-center"
+        className="mt-4 text-center"
       >
         {status ? (
           <div className="space-y-2">
             {assistantName && (
-              <p className="text-xl font-semibold text-white">
+              <p className="text-lg font-semibold text-white">
                 {assistantName}
               </p>
             )}
-            <p className={`text-lg font-medium ${getStatusStyles(status)}`}>
-              {status}
+            <p className={`text-base font-medium ${getStatusStyles(status)}`}>
+              {status.replace("Ticket", "Boleto")}
             </p>
           </div>
         ) : (
-          <p className="text-gray-400 mt-4 animate-pulse">
+          <p className="text-gray-400 mt-4 animate-pulse text-base">
             📷 Escaneando código QR...
           </p>
         )}
       </motion.div>
 
-      <div className="mt-4 text-xs text-yellow-400 text-center">
+      <div className="mt-2 text-xs text-yellow-400 text-center">
         <p>
-          <strong>ID de Usuario:</strong> {debugInfo?.userUid}
+          <strong>ID de usuario:</strong> {debugInfo?.userUid}
         </p>
         <p>
-          <strong>Producer del evento:</strong> {debugInfo?.eventProducerId}
+          <strong>Productor del evento:</strong> {debugInfo?.eventProducerId}
         </p>
       </div>
 
       {scannedData && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
-          <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-4 text-center">
-              ✅ 
+        <div className="fixed inset-0 bg-black/90 flex items-end justify-center z-50 px-2 py-4 sm:items-center sm:py-0">
+          <div className="bg-gray-900 rounded-2xl p-4 w-full max-w-sm max-h-[85vh] overflow-y-auto shadow-2xl border border-gray-700 flex flex-col gap-2 relative">
+            <h2 className="text-3xl font-bold text-emerald-400 mb-2 text-center">
+              ✅ ¡Boleto válido!
             </h2>
 
-            {renderDataBlock("🎟️ Ticket", scannedData.ticket)}
+            {renderDataBlock("🎟️ Boleto", scannedData.ticket)}
             {renderDataBlock("🧑 Asistente", scannedData.assistant)}
             {renderDataBlock("📅 Evento", scannedData.event)}
 
             <button
               onClick={() => window.location.reload()}
-              className="mt-6 w-full text-sm py-2 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-lg"
+              className="mt-4 w-full text-base py-3 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl shadow-lg"
             >
-              Escanear otro
+              Escanear otro boleto
             </button>
           </div>
         </div>
@@ -159,7 +180,7 @@ export default function ScannerPage() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6, duration: 0.5 }}
-        className="absolute bottom-4 text-xs text-gray-500"
+        className="absolute bottom-2 text-xs text-gray-500 text-center w-full"
       >
         © 2025 PassTix. Todos los derechos reservados.
       </motion.div>
