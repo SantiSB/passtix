@@ -249,13 +249,13 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
-                      <button
+                      {/* <button
                         onClick={() => openEditModal(t)}
                         className="p-1.5 rounded text-blue-400 hover:text-blue-300 hover:bg-gray-700 transition-colors"
                         title="Editar"
                       >
                         ✏️ <span className="sr-only">Editar</span>
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => openDeleteModal(t)}
                         className="p-1.5 rounded text-red-400 hover:text-red-300 hover:bg-gray-700 transition-colors"
