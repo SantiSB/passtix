@@ -29,7 +29,6 @@ export default function ScannerPage() {
   };
 
   const relevantKeys: Record<string, string[]> = {
-    "🎟️ Boleto": ["id", "status", "price"],
     "🧑 Asistente": ["name", "email", "dni"],
     "📅 Evento": ["name", "date", "location"],
   };
