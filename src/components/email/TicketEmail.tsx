@@ -17,7 +17,7 @@ interface TicketEmailProps {
   eventName: string;
   eventDate: string;
   eventLocation: string;
-  ticketType: string;
+  ticketTypeName: string;
 }
 
 const IMG_URLS: Record<string, string> = {
@@ -64,10 +64,10 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
   eventName,
   eventDate,
   eventLocation,
-  ticketType,
+  ticketTypeName,
 }) => {
   const logoUrl = IMG_URLS[eventName] || IMG_URLS["passtix"];
-  const { bg, color } = getTicketStyle(ticketType);
+  const { bg, color } = getTicketStyle(ticketTypeName);
 
   return (
     <Html lang="es">
@@ -95,7 +95,6 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
           }}
         >
-          {/* Header con logo */}
           <Section
             style={{
               background: "linear-gradient(90deg, #bbbbbb, #eeeeee)",
@@ -112,7 +111,6 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             />
           </Section>
 
-          {/* Contenido principal */}
           <Section style={{ padding: "32px 24px" }}>
             <Heading as="h1" style={{ fontSize: "22px", color: "#222" }}>
               🎫 ¡Entrada confirmada!
@@ -132,7 +130,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
                 marginTop: "12px",
               }}
             >
-              {ticketType}
+              {ticketTypeName}
             </Text>
             <Heading as="h2" style={{ fontSize: "18px", marginTop: "24px" }}>
               {eventName}
@@ -142,7 +140,6 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               ingresar al evento.
             </Text>
 
-            {/* Línea punteada */}
             <div
               style={{
                 margin: "24px auto 16px",
@@ -151,7 +148,6 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               }}
             ></div>
 
-            {/* QR */}
             <Img
               src={qrCodeUrl}
               alt="Código QR"
@@ -171,7 +167,6 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             </Text>
           </Section>
 
-          {/* Detalles */}
           <Section
             style={{
               padding: "24px",
@@ -195,7 +190,6 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             )}
           </Section>
 
-          {/* Footer */}
           <Section style={{ padding: "24px" }}>
             <Text style={{ fontSize: "14px", color: "#444" }}>
               Te esperamos para vivir una experiencia inolvidable.

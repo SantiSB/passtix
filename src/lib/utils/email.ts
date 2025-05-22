@@ -10,8 +10,9 @@ interface SendTicketEmailParams {
   eventName: string;
   eventDate: string;
   eventLocation: string;
-  ticketType: string;
+  ticketTypeName: string; // ✅ CAMBIO aquí también
 }
+
 
 export async function sendTicketEmail({
   to,
@@ -21,8 +22,10 @@ export async function sendTicketEmail({
   eventName,
   eventDate,
   eventLocation,
-  ticketType,
+  ticketTypeName, // ✅
 }: SendTicketEmailParams): Promise<{ success: boolean; error?: string }> {
+
+  
   try {
     const { error } = await resend.emails.send({
       from: `${eventName} - PassTix <tickets@passtix.online>`,
@@ -35,7 +38,7 @@ export async function sendTicketEmail({
         eventName,
         eventDate,
         eventLocation,
-        ticketType,
+        ticketTypeName, // ✅
       }),
     });
 

@@ -11,14 +11,10 @@ interface EventData {
   date?: Timestamp | Date;
 }
 
-// POST /api/register-ticket
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    /* ------------------------------------------------------------------ */
-    /* 1. Datos recibidos del front                                        */
-    /* ------------------------------------------------------------------ */
     const {
       eventId,
       name,
@@ -26,21 +22,20 @@ export async function POST(req: NextRequest) {
       phoneNumber,
       identificationNumber,
       identificationType,
-      ticketTypeId, // ✅
+      ticketTypeId,
       localityId,
       phaseId,
       promoterId,
       price,
     } = body;
 
-    // Validación de campos básicos
     if (
       !eventId ||
       !name ||
       !email ||
       !identificationNumber ||
       !identificationType ||
-      !ticketTypeId // ✅ validamos ticketTypeId
+      !ticketTypeId
     ) {
       return NextResponse.json(
         { success: false, error: "Faltan campos obligatorios." },
@@ -48,9 +43,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    /* ------------------------------------------------------------------ */
-    /* 2. Traer datos del evento                                           */
-    /* ------------------------------------------------------------------ */
+    // 1. Obtener datos del evento
     const eventSnap = await getDoc(doc(db, "event", eventId));
     if (!eventSnap.exists()) {
       return NextResponse.json(
@@ -63,7 +56,6 @@ export async function POST(req: NextRequest) {
     const eventName = eventData.name ?? "Evento";
     const eventLocation = eventData.location ?? "";
 
-    // Formatear fecha a texto legible en español
     let eventDate = "";
     if (eventData.date) {
       const dateObj =
@@ -77,9 +69,14 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    /* ------------------------------------------------------------------ */
-    /* 3. Crear asistente y ticket                                         */
-    /* ------------------------------------------------------------------ */
+    // 2. Obtener nombre del tipo de ticket
+    const ticketTypeSnap = await getDoc(doc(db, "ticketTypes", ticketTypeId));
+    const ticketTypeName = ticketTypeSnap.exists()
+      ? ticketTypeSnap.data().name
+      : ticketTypeId;
+
+
+    // 3. Crear asistente y ticket
     const assistant = await createAssistant(
       name,
       email,
@@ -92,16 +89,14 @@ export async function POST(req: NextRequest) {
       eventId,
       assistantId: assistant.id,
       phaseId,
-      ticketTypeId, // ✅ importante: usamos ticketTypeId
+      ticketTypeId,
       localityId,
       price: price ?? null,
       promoterId: promoterId || null,
       status: "enabled",
     });
 
-    /* ------------------------------------------------------------------ */
-    /* 4. Enviar correo                                                    */
-    /* ------------------------------------------------------------------ */
+    // 4. Enviar correo
     const emailResult = await sendTicketEmail({
       to: email,
       name,
@@ -110,7 +105,7 @@ export async function POST(req: NextRequest) {
       eventName,
       eventDate,
       eventLocation,
-      ticketType: ticketTypeId, // ✅ le pasamos el ID como está en el ticket
+      ticketTypeName, // ✅ nombre real aquí
     });
 
     if (!emailResult.success) {
@@ -121,9 +116,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    /* ------------------------------------------------------------------ */
-    /* 5. Guardar en Firestore                                             */
-    /* ------------------------------------------------------------------ */
+    // 5. Guardar en Firestore
     await saveTicket(ticket);
     await saveAssistant(assistant);
 
