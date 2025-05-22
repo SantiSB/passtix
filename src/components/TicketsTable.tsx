@@ -210,7 +210,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                     </span>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
-                    {typeof t.price === "number" && t.price > 0 ? `$${t.price}` : "—"}
+                    {t.price ? `$${t.price}` : "$0"}
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
                     {t.promoterName ?? "—"}

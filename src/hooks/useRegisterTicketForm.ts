@@ -101,7 +101,10 @@ const useRegisterTicketForm = (eventId: string) => {
       if (!res.ok || !json.success) throw new Error(json.error || "Error");
 
       setSuccess(true);
-      queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      queryClient.invalidateQueries({ 
+        queryKey: ["tickets"],
+        refetchType: "all"
+      });
 
       setForm({
         name: "",
