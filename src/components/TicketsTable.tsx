@@ -48,7 +48,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
     isModalOpen,
     modalMode,
     selectedTicket,
-    openEditModal,
+    // openEditModal,
     openDeleteModal,
     closeModal,
   } = useTicketModal();
