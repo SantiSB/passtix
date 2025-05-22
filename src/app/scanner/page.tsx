@@ -17,7 +17,7 @@ export default function ScannerPage() {
     }
   }, [user, loading, router]);
 
-  const { status, assistantName, scannerRef, debugInfo, scannedData } =
+  const { status, assistantName, scannerRef, scannedData } =
     useQrScanner();
 
   const getStatusStyles = (status: string | null) => {
