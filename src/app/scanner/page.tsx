@@ -159,7 +159,6 @@ export default function ScannerPage() {
               Escaneo exitoso
             </h2>
 
-            {renderDataBlock("🎟️ Ticket", scannedData.ticket)}
             {renderDataBlock("🧑 Asistente", scannedData.assistant)}
             {renderDataBlock("📅 Evento", scannedData.event)}
 
