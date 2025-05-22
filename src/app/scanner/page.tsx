@@ -29,7 +29,7 @@ export default function ScannerPage() {
   };
 
   const relevantKeys: Record<string, string[]> = {
-    "🎟️ Boleto": ["id", "type", "status", "validationTimestamp", "entryTimestamp"],
+    "��️ Boleto": ["id", "ticketTypeName", "status", "checkedInAt", "maxEntryTime"],
     "🧑 Asistente": ["name", "email", "dni"],
     "📅 Evento": ["name", "date", "location"],
   };
@@ -51,6 +51,7 @@ export default function ScannerPage() {
     createdAt: "Fecha de creación",
     updatedAt: "Última actualización",
     checkedInAt: "Fecha de entrada",
+    maxEntryTime: "Hora límite de entrada",
     phaseName: "Fase",
     localityName: "Localidad",
     promoterName: "Promotor"
@@ -75,6 +76,12 @@ export default function ScannerPage() {
                 "toDate" in value &&
                 typeof value.toDate === "function"
                   ? value.toDate().toLocaleString()
+                  : value === "joined"
+                  ? "Registrado"
+                  : value === "disabled"
+                  ? "Deshabilitado"
+                  : value === "enabled"
+                  ? "Habilitado"
                   : String(value)}
               </div>
             ))}
