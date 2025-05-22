@@ -29,32 +29,20 @@ export default function ScannerPage() {
   };
 
   const relevantKeys: Record<string, string[]> = {
-    "��️ Boleto": ["id", "ticketTypeName", "status", "checkedInAt", "maxEntryTime"],
+    "🎟️ Boleto": ["id", "status", "price"],
     "🧑 Asistente": ["name", "email", "dni"],
     "📅 Evento": ["name", "date", "location"],
   };
 
   const translations: Record<string, string> = {
     id: "ID",
-    type: "Tipo",
     status: "Estado",
-    validationTimestamp: "Fecha de validación",
-    entryTimestamp: "Fecha de entrada",
+    price: "Precio",
     name: "Nombre",
     email: "Correo electrónico",
     dni: "DNI",
     date: "Fecha",
-    location: "Ubicación",
-    ticketTypeName: "Tipo de ticket",
-    price: "Precio",
-    qrCode: "Código QR",
-    createdAt: "Fecha de creación",
-    updatedAt: "Última actualización",
-    checkedInAt: "Fecha de entrada",
-    maxEntryTime: "Hora límite de entrada",
-    phaseName: "Fase",
-    localityName: "Localidad",
-    promoterName: "Promotor"
+    location: "Ubicación"
   };
 
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
@@ -82,6 +70,8 @@ export default function ScannerPage() {
                   ? "Deshabilitado"
                   : value === "enabled"
                   ? "Habilitado"
+                  : key === "price" && value !== null
+                  ? `$${Number(value).toLocaleString('es-AR')}`
                   : String(value)}
               </div>
             ))}
