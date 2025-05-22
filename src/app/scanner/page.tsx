@@ -44,7 +44,16 @@ export default function ScannerPage() {
     email: "Correo electrónico",
     dni: "DNI",
     date: "Fecha",
-    location: "Ubicación"
+    location: "Ubicación",
+    ticketTypeName: "Tipo de ticket",
+    price: "Precio",
+    qrCode: "Código QR",
+    createdAt: "Fecha de creación",
+    updatedAt: "Última actualización",
+    checkedInAt: "Fecha de entrada",
+    phaseName: "Fase",
+    localityName: "Localidad",
+    promoterName: "Promotor"
   };
 
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
