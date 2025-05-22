@@ -41,10 +41,17 @@ const useRegisterTicketForm = (eventId: string) => {
 
   // Calcular precio y hora de entrada máxima
   useEffect(() => {
+    console.log("[DEBUG] ticketTypes:", ticketTypes);
+    console.log("[DEBUG] phases:", phases);
     const selectedType = ticketTypes.find((t) => t.id === form.ticketTypeId);
     const selectedPhase = phases.find((p) => p.id === form.phaseId);
-
-    const price = selectedType?.price ?? selectedPhase?.price ?? 0;
+    const price =
+      selectedType && typeof selectedType.price === "number"
+        ? selectedType.price
+        : (selectedPhase?.price ?? 0);
+    console.log("[DEBUG] selectedType:", selectedType);
+    console.log("[DEBUG] selectedPhase:", selectedPhase);
+    console.log("[DEBUG] Calculated price:", price);
 
     const typeTime = selectedType?.maxEntryTime?.getTime?.() ?? Infinity;
     const phaseTime = selectedPhase?.maxEntryTime?.getTime?.() ?? Infinity;
@@ -76,11 +83,17 @@ const useRegisterTicketForm = (eventId: string) => {
     setSuccess(false);
     setError(null);
 
+    // Obtener el nombre del tipo de ticket seleccionado
+    const selectedType = ticketTypes.find((t) => t.id === form.ticketTypeId);
+    const ticketTypeName = selectedType?.name || "";
+
+    console.log("[DEBUG] Form data to submit:", form);
+
     try {
       const res = await fetch("/api/register-ticket", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, eventId }),
+        body: JSON.stringify({ ...form, eventId, ticketTypeName }),
       });
 
       const json = await res.json();

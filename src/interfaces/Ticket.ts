@@ -14,4 +14,5 @@ export interface Ticket {
   createdAt: Date;
   updatedAt: Date;
   checkedInAt: Date | null;
+  ticketTypeName?: string;
 }

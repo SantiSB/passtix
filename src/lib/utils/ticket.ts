@@ -32,6 +32,7 @@ export async function createTicket(params: {
   price: number | null;
   promoterId?: string;
   status: TicketStatus;
+  ticketTypeName?: string;
 }): Promise<Ticket> {
   const {
     eventId,
@@ -42,6 +43,7 @@ export async function createTicket(params: {
     price,
     promoterId,
     status,
+    ticketTypeName,
   } = params;
 
   const ticketId = uuid();
@@ -67,6 +69,7 @@ export async function createTicket(params: {
     createdAt: now,
     updatedAt: now,
     checkedInAt: null,
+    ticketTypeName: ticketTypeName || undefined,
   };
 
   return ticket;

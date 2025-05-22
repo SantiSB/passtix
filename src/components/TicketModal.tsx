@@ -192,6 +192,19 @@ const TicketModal = ({
               options={promoters}
             />
 
+            {/* Mostrar precio calculado al final, como texto pequeño y estilizado */}
+            <div className="mt-4 text-left">
+              <span
+                className={`inline-block text-xs font-semibold px-3 py-1 rounded-full ${
+                  (form.price ?? 0) > 0
+                    ? 'bg-emerald-900 text-emerald-300'
+                    : 'bg-gray-700 text-gray-400'
+                }`}
+              >
+                Precio: {typeof form.price === 'number' ? `$${form.price}` : '—'}
+              </span>
+            </div>
+
             <FormActions
               onClose={onClose}
               loading={loading}

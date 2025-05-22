@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       price: price ?? null,
       promoterId: promoterId || null,
       status: "enabled",
+      ticketTypeName,
     });
 
     // 4. Enviar correo

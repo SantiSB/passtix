@@ -197,9 +197,9 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTicketTypeStyle(t.ticketTypeName ?? "")}`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTicketTypeStyle(t.ticketTypeName ?? t.ticketTypeId ?? "")}`}
                     >
-                      {t.ticketTypeName ?? "—"}
+                      {t.ticketTypeName ?? t.ticketTypeId ?? "—"}
                     </span>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
@@ -210,7 +210,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                     </span>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
-                    {t.price ? `$${t.price}` : "—"}
+                    {typeof t.price === "number" && t.price > 0 ? `$${t.price}` : "—"}
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
                     {t.promoterName ?? "—"}
