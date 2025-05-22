@@ -34,6 +34,19 @@ export default function ScannerPage() {
     "📅 Evento": ["name", "date", "location"],
   };
 
+  const translations: Record<string, string> = {
+    id: "ID",
+    type: "Tipo",
+    status: "Estado",
+    validationTimestamp: "Fecha de validación",
+    entryTimestamp: "Fecha de entrada",
+    name: "Nombre",
+    email: "Correo electrónico",
+    dni: "DNI",
+    date: "Fecha",
+    location: "Ubicación"
+  };
+
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
     if (!data) return null;
 
@@ -47,7 +60,7 @@ export default function ScannerPage() {
             .filter(([key]) => keysToShow.includes(key))
             .map(([key, value]) => (
               <div key={key}>
-                <strong>{key}:</strong>{" "}
+                <strong>{translations[key] || key}:</strong>{" "}
                 {typeof value === "object" &&
                 value !== null &&
                 "toDate" in value &&
