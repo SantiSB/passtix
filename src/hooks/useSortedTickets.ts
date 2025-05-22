@@ -7,8 +7,8 @@ export default function useSortedTickets(
   sortDirection: SortDirection
 ) {
   const sorted = [...tickets].sort((a, b) => {
-    const aVal = a[sortKey];
-    const bVal = b[sortKey];
+    const aVal = a[sortKey as keyof EnrichedTicket];
+    const bVal = b[sortKey as keyof EnrichedTicket];
 
     if (aVal == null && bVal == null) return 0;
     if (aVal == null) return sortDirection === "asc" ? 1 : -1;

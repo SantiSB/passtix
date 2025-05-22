@@ -2,25 +2,22 @@ import { db } from "@/lib/firebase/firebase";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
-// Endpoint para obtener todos los tickets
+// Endpoint para obtener todos los tickets enriquecidos
 export async function GET() {
   try {
-    // Obtener todos los tickets
     const snapshot = await getDocs(collection(db, "ticket"));
 
-    // Mapear los tickets
     const tickets = await Promise.all(
       snapshot.docs.map(async (docSnap) => {
-        // Obtener los datos del ticket
         const data = docSnap.data();
 
-        // Obtener los datos de los asistentes, eventos, fases, localidades y promotores
         const [
           assistantSnap,
           eventSnap,
           phaseSnap,
           localitySnap,
           promoterSnap,
+          ticketTypeSnap,
         ] = await Promise.all([
           getDoc(doc(db, "assistant", data.assistantId)),
           getDoc(doc(db, "event", data.eventId)),
@@ -29,12 +26,12 @@ export async function GET() {
           data.promoterId
             ? getDoc(doc(db, "promoter", data.promoterId))
             : Promise.resolve(null),
+          getDoc(doc(db, "ticketType", data.ticketTypeId)),
         ]);
 
-        // Devolver los datos del ticket
         return {
           id: docSnap.id,
-          ticketType: data.ticketType,
+          ticketTypeId: data.ticketTypeId ?? "",
           status: data.status,
           price: data.price,
           qrCode: data.qrCode,
@@ -42,33 +39,35 @@ export async function GET() {
           updatedAt: data.updatedAt?.toDate?.() ?? null,
           checkedInAt: data.checkedInAt?.toDate?.() ?? null,
 
-          // Datos del asistente
-          name: assistantSnap.exists()
-            ? assistantSnap.data().name
-            : "—",
-          email: assistantSnap.exists()
-            ? assistantSnap.data().email
-            : "—",
+          // Asistente
+          name: assistantSnap.exists() ? assistantSnap.data().name : "—",
+          email: assistantSnap.exists() ? assistantSnap.data().email : "—",
           phoneNumber: assistantSnap.exists()
-            ? assistantSnap.data().phoneNumber ?? "—"
+            ? (assistantSnap.data().phoneNumber ?? "—")
             : "—",
           identificationNumber: assistantSnap.exists()
-            ? assistantSnap.data().identificationNumber ?? "—"
+            ? (assistantSnap.data().identificationNumber ?? "—")
+            : "—",
+          identificationType: assistantSnap.exists()
+            ? (assistantSnap.data().identificationType ?? "—")
             : "—",
 
-          // Datos del evento
+          // Evento
           eventName: eventSnap.exists() ? eventSnap.data().name : "—",
 
-          // Datos de la fase
+          // Fase
           phaseName: phaseSnap.exists() ? phaseSnap.data().name : "—",
 
-          // Datos de la localidad
+          // Localidad
           localityName: localitySnap.exists() ? localitySnap.data().name : "—",
 
-          // Datos del promotor
-          promoterName: promoterSnap?.exists()
-            ? promoterSnap.data().name
-            : null,
+          // Promotor
+          promoterName: promoterSnap?.exists() ? promoterSnap.data().name : "—",
+
+          // ✅ Si necesitas el nombre del tipo de ticket
+          ticketTypeName: ticketTypeSnap.exists()
+            ? ticketTypeSnap.data().name
+            : "—",
         };
       })
     );

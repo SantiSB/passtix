@@ -9,7 +9,6 @@ import {
   Heading,
   Img,
 } from "@react-email/components";
-import { TicketType } from "@/types/enums";
 
 interface TicketEmailProps {
   name: string;
@@ -18,7 +17,7 @@ interface TicketEmailProps {
   eventName: string;
   eventDate: string;
   eventLocation: string;
-  ticketType: TicketType;
+  ticketType: string;
 }
 
 const IMG_URLS: Record<string, string> = {
@@ -29,33 +28,33 @@ const IMG_URLS: Record<string, string> = {
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/knockout%2Flogo.png?alt=media&token=a0e94ec7-bda0-47cf-b8de-dbf103aa1406",
   bichiyal:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/piso12%2FpN8CiNC5oheHobFlxakX.png?alt=media&token=862f102e-0433-4bb1-8eba-414429ba6d36",
+  "Future Club":
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/distress%2Flogo.png?alt=media&token=54c9c3e4-3ca2-4806-9427-15eb3409018a",
   passtix:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/passtix%2Flogo.png?alt=media&token=40c581ba-c63d-440f-99d0-4ae4e8290d3f",
 };
 
-const getTicketLabel = (type: TicketType) => {
-  switch (type) {
-    case "ticket":
-      return "Entrada";
-    case "courtesy":
-      return "Cortesia";
-    case "brunch":
-      return "Brunch (válido hasta las 6:00 p.m.)";
-    default:
-      return "Entrada";
-  }
-};
+const getTicketStyle = (type: string) => {
+  const hash = Math.abs(
+    type
+      .toLowerCase()
+      .split("")
+      .reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
+  );
 
-const getTicketStyle = (type: TicketType) => {
-  switch (type) {
-    case "brunch":
-      return { bg: "#fce4ec", color: "#c2185b" };
-    case "courtesy":
-      return { bg: "#e0f2f1", color: "#00695c" };
-    case "ticket":
-    default:
-      return { bg: "#e8eaf6", color: "#3f51b5" };
-  }
+  const COLORS = [
+    { bg: "#e8eaf6", color: "#3f51b5" },
+    { bg: "#fce4ec", color: "#c2185b" },
+    { bg: "#e0f2f1", color: "#00695c" },
+    { bg: "#fff3e0", color: "#ef6c00" },
+    { bg: "#ede7f6", color: "#5e35b1" },
+    { bg: "#f1f8e9", color: "#33691e" },
+    { bg: "#f3e5f5", color: "#8e24aa" },
+    { bg: "#e1f5fe", color: "#0277bd" },
+    { bg: "#ffe0b2", color: "#e65100" },
+  ];
+
+  return COLORS[hash % COLORS.length];
 };
 
 const TicketEmail: React.FC<TicketEmailProps> = ({
@@ -67,8 +66,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
   eventLocation,
   ticketType,
 }) => {
-  const normalizedKey = eventName.toLowerCase().replace(/\s/g, "");
-  const logoUrl = IMG_URLS[normalizedKey] || IMG_URLS["passtix"];
+  const logoUrl = IMG_URLS[eventName] || IMG_URLS["passtix"];
   const { bg, color } = getTicketStyle(ticketType);
 
   return (
@@ -97,7 +95,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
           }}
         >
-          {/* Header con degradado plateado más brillante */}
+          {/* Header con logo */}
           <Section
             style={{
               background: "linear-gradient(90deg, #bbbbbb, #eeeeee)",
@@ -109,13 +107,13 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               src={logoUrl}
               alt={`Logo de ${eventName}`}
               title={`Logo de ${eventName}`}
-              width="180"
+              width="360"
               style={{ display: "block", margin: "0 auto" }}
             />
           </Section>
 
           {/* Contenido principal */}
-          <Section style={{ padding: "32px 24px", backgroundColor: "#ffffff" }}>
+          <Section style={{ padding: "32px 24px" }}>
             <Heading as="h1" style={{ fontSize: "22px", color: "#222" }}>
               🎫 ¡Entrada confirmada!
             </Heading>
@@ -134,22 +132,17 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
                 marginTop: "12px",
               }}
             >
-              {getTicketLabel(ticketType)}
+              {ticketType}
             </Text>
             <Heading as="h2" style={{ fontSize: "18px", marginTop: "24px" }}>
               {eventName}
             </Heading>
             <Text style={{ fontSize: "14px", color: "#333" }}>
-              Hola <strong>{name}</strong>,
-              {ticketType === "ticket" &&
-                " esta es tu entrada. Preséntala al ingresar al evento."}
-              {ticketType === "courtesy" &&
-                " has recibido una cortesia para este evento. Preséntalo al ingresar."}
-              {ticketType === "brunch" &&
-                " esta entrada es válida únicamente para el brunch (hasta las 6:00 p.m.). Preséntala al ingresar."}
+              Hola <strong>{name}</strong>, esta es tu entrada. Preséntala al
+              ingresar al evento.
             </Text>
 
-            {/* Línea punteada tipo corte */}
+            {/* Línea punteada */}
             <div
               style={{
                 margin: "24px auto 16px",
@@ -158,7 +151,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
               }}
             ></div>
 
-            {/* QR centrado */}
+            {/* QR */}
             <Img
               src={qrCodeUrl}
               alt="Código QR"
@@ -178,7 +171,7 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             </Text>
           </Section>
 
-          {/* Detalles del evento con fondo gris sólido adaptado */}
+          {/* Detalles */}
           <Section
             style={{
               padding: "24px",
@@ -202,8 +195,8 @@ const TicketEmail: React.FC<TicketEmailProps> = ({
             )}
           </Section>
 
-          {/* Footer blanco sin cortes */}
-          <Section style={{ padding: "24px", backgroundColor: "#ffffff" }}>
+          {/* Footer */}
+          <Section style={{ padding: "24px" }}>
             <Text style={{ fontSize: "14px", color: "#444" }}>
               Te esperamos para vivir una experiencia inolvidable.
             </Text>

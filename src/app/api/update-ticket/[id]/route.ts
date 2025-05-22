@@ -15,7 +15,7 @@ export async function PUT(req: NextRequest) {
       phoneNumber,
       identificationNumber,
       identificationType,
-      ticketType,
+      ticketTypeId, // ✅ corregido
       localityId,
       phaseId,
       promoterId,
@@ -31,7 +31,7 @@ export async function PUT(req: NextRequest) {
       !phoneNumber ||
       !identificationNumber ||
       !identificationType ||
-      !ticketType ||
+      !ticketTypeId || // ✅ corregido
       !price
     ) {
       return NextResponse.json(
@@ -63,7 +63,7 @@ export async function PUT(req: NextRequest) {
       phoneNumber,
       identificationNumber,
       identificationType,
-      ticketType,
+      ticketTypeId,
       localityId,
       phaseId,
       promoterId,

@@ -12,10 +12,7 @@ interface EventData extends DocumentData {
 export function useQrScanner() {
   const [status, setStatus] = useState<string | null>(null);
   const [assistantName, setAssistantName] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<{
-    userUid: string;
-    eventProducerId: string;
-  }>({
+  const [debugInfo, setDebugInfo] = useState({
     userUid: "",
     eventProducerId: "",
   });
@@ -101,32 +98,43 @@ export function useQrScanner() {
                 ? assistantSnap.data()
                 : null;
 
+              const ticketTypeRef = doc(db, "ticketType", ticket.ticketTypeId);
+              const ticketTypeSnap = await getDoc(ticketTypeRef);
+              const ticketType = ticketTypeSnap.exists()
+                ? ticketTypeSnap.data()
+                : null;
+
               const now = new Date();
 
-              if (ticket.phaseId) {
-                const phaseRef = doc(db, "phase", ticket.phaseId);
-                const phaseSnap = await getDoc(phaseRef);
-                if (phaseSnap.exists()) {
-                  const phase = phaseSnap.data();
-                  if (
-                    phase.maxEntryTime &&
-                    typeof phase.maxEntryTime.toDate === "function"
-                  ) {
-                    const maxTime = phase.maxEntryTime.toDate();
-                    if (now > maxTime) {
-                      await updateDoc(ticketRef, {
-                        status: "disabled",
-                      });
-                      setStatus("❌ Ticket inhabilitado por horario");
-                      setAssistantName(assistant?.name || "Asistente");
-                      setScannedData({ ticket, assistant, event });
-                      return;
-                    }
-                  }
-                }
+              // Validar maxEntryTime desde phase
+              const maxEntryTime =
+                (ticket.phaseId &&
+                  (await getDoc(doc(db, "phase", ticket.phaseId)))
+                    .data()
+                    ?.maxEntryTime?.toDate?.()) ??
+                null;
+
+              if (maxEntryTime && now > maxEntryTime) {
+                await updateDoc(ticketRef, {
+                  status: "disabled",
+                });
+                setStatus("❌ Ticket inhabilitado por horario");
+                setAssistantName(assistant?.name || "Asistente");
+                setScannedData({
+                  ticket: {
+                    ...ticket,
+                    ticketTypeName: ticketType?.name ?? "—",
+                    maxEntryTime,
+                  },
+                  assistant,
+                  event,
+                });
+                return;
               }
 
-              if (ticket.status !== "joined") {
+              if (ticket.status === "disabled") {
+                setStatus("❌ Este ticket está deshabilitado.");
+              } else if (ticket.status !== "joined") {
                 await updateDoc(ticketRef, {
                   status: "joined",
                   checkedInAt: now,
@@ -138,7 +146,15 @@ export function useQrScanner() {
               }
 
               setAssistantName(assistant?.name || "Asistente");
-              setScannedData({ ticket, assistant, event });
+              setScannedData({
+                ticket: {
+                  ...ticket,
+                  ticketTypeName: ticketType?.name ?? "—",
+                  maxEntryTime,
+                },
+                assistant,
+                event,
+              });
             } catch (err: unknown) {
               let errorMessage = "al procesar el QR";
               if (err instanceof Error) {

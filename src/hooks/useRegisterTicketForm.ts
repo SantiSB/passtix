@@ -1,18 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Phase } from "@/interfaces/Phase";
 import useEventOptions from "@/hooks/useEventOptions";
 import usePromoterOptions from "@/hooks/usePromoterOptions";
+import useTicketTypeOptions from "@/hooks/useTicketTypeOptions";
 import { useQueryClient } from "@tanstack/react-query";
 
-const useRegisterTicketForm = (eventId: string ) => {
-  // Hooks para obtener las opciones de los inputs de eventos y promotores
-  const { phases, localities, loading: loadingOptions } = useEventOptions(eventId);
+const useRegisterTicketForm = (eventId: string) => {
+  // Opciones dinámicas
+  const {
+    phases,
+    localities,
+    loading: loadingOptions,
+  } = useEventOptions(eventId);
   const { promoters, loading: loadingPromoters } = usePromoterOptions(eventId);
+  const { ticketTypes, loading: loadingTicketTypes } =
+    useTicketTypeOptions(eventId);
 
   const queryClient = useQueryClient();
-
 
   // Estado del formulario
   const [form, setForm] = useState({
@@ -21,33 +26,42 @@ const useRegisterTicketForm = (eventId: string ) => {
     phoneNumber: "",
     identificationNumber: "",
     identificationType: "",
-    ticketType: "",
+    ticketTypeId: "",
     localityId: "",
     phaseId: "",
     promoterId: "",
     price: 0,
+    maxEntryTime: null as Date | null,
   });
 
-  // Estado de la carga, éxito y error
+  // Estados de control
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cambia el precio del ticket según la fase seleccionada o si es de cortesía
+  // Calcular precio y hora de entrada máxima
   useEffect(() => {
-    if (form.ticketType === 'courtesy') {
-      setForm((prev) => ({ ...prev, price: 0 }));
-    } else if (form.ticketType === 'brunch') {
-      setForm((prev) => ({ ...prev, price: 0 }));
-    } else {
-      const selectedPhase = phases.find((p: Phase) => p.id === form.phaseId);
-      if (selectedPhase?.price !== undefined) {
-        setForm((prev) => ({ ...prev, price: selectedPhase.price }));
-      }
-    }
-  }, [form.phaseId, form.ticketType, phases]);
+    const selectedType = ticketTypes.find((t) => t.id === form.ticketTypeId);
+    const selectedPhase = phases.find((p) => p.id === form.phaseId);
 
-  // Cambia el valor de un input
+    const price = selectedType?.price ?? selectedPhase?.price ?? 0;
+
+    const typeTime = selectedType?.maxEntryTime?.getTime?.() ?? Infinity;
+    const phaseTime = selectedPhase?.maxEntryTime?.getTime?.() ?? Infinity;
+
+    const earliestTime =
+      typeTime === Infinity && phaseTime === Infinity
+        ? null
+        : new Date(Math.min(typeTime, phaseTime));
+
+    setForm((prev) => ({
+      ...prev,
+      price,
+      maxEntryTime: earliestTime,
+    }));
+  }, [form.ticketTypeId, form.phaseId, ticketTypes, phases]);
+
+  // Cambios en campos del formulario
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -55,17 +69,13 @@ const useRegisterTicketForm = (eventId: string ) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Envía el formulario
+  // Envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
-    // Prevenir el envío del formulario
     e.preventDefault();
-
-    // Iniciar el proceso de carga
     setLoading(true);
     setSuccess(false);
     setError(null);
 
-    // Intentar registrar el ticket
     try {
       const res = await fetch("/api/register-ticket", {
         method: "POST",
@@ -73,33 +83,30 @@ const useRegisterTicketForm = (eventId: string ) => {
         body: JSON.stringify({ ...form, eventId }),
       });
 
-      // Obtener la respuesta
       const json = await res.json();
 
-      // Si la respuesta no es exitosa, lanzar un error
       if (!res.ok || !json.success) throw new Error(json.error || "Error");
 
-      // Si la respuesta es exitosa, limpiar el formulario
       setSuccess(true);
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
+
       setForm({
         name: "",
         email: "",
         phoneNumber: "",
         identificationNumber: "",
         identificationType: "",
-        ticketType: "",
+        ticketTypeId: "",
         localityId: "",
         phaseId: "",
         promoterId: "",
         price: 0,
+        maxEntryTime: null,
       });
     } catch (err) {
-      // Si hay un error, mostrarlo
       const error = err instanceof Error ? err.message : "Error desconocido";
       setError(error);
     } finally {
-      // Finalizar el proceso de carga
       setLoading(false);
     }
   };
@@ -115,8 +122,10 @@ const useRegisterTicketForm = (eventId: string ) => {
     phases,
     localities,
     promoters,
+    ticketTypes,
     loadingOptions,
     loadingPromoters,
+    loadingTicketTypes,
   };
 };
 

@@ -9,6 +9,7 @@ import useDeleteTicket from "@/hooks/useDeleteTicket";
 import { getStatusBadgeClass, getPhaseBadgeClass } from "@/lib/utils/ticket";
 import { Timestamp } from "firebase/firestore";
 import { SortKey } from "@/hooks/useTicketSort";
+import { getTicketTypeStyle } from "@/lib/utils/ticketStyle";
 
 interface TicketsTableProps {
   eventId: string;
@@ -142,7 +143,7 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                 <th className="px-5 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Documento
                 </th>
-                {SortableHeader("Tipo", "ticketType")}
+                {SortableHeader("Tipo", "ticketTypeName")}
                 {SortableHeader("Fase", "phaseName")}
                 {SortableHeader("Precio", "price")}
                 {SortableHeader("Promotor", "promoterName")}
@@ -196,19 +197,9 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        t.ticketType === "courtesy"
-                          ? "bg-purple-900 text-purple-300"
-                          : t.ticketType === "brunch"
-                            ? "bg-orange-900 text-orange-300"
-                            : "bg-blue-900 text-blue-300"
-                      }`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTicketTypeStyle(t.ticketTypeName ?? "")}`}
                     >
-                      {t.ticketType === "courtesy"
-                        ? "Cortesía"
-                        : t.ticketType === "brunch"
-                          ? "Brunch"
-                          : "Boleta"}
+                      {t.ticketTypeName ?? "—"}
                     </span>
                   </td>
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400">
@@ -233,12 +224,10 @@ const TicketsTable: React.FC<TicketsTableProps> = ({ eventId }) => {
                   <td className="px-5 py-4 whitespace-nowrap text-gray-400 text-xs">
                     {t.checkedInAt
                       ? t.checkedInAt instanceof Timestamp
-                        ? t.checkedInAt
-                            .toDate()
-                            .toLocaleString([], {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })
+                        ? t.checkedInAt.toDate().toLocaleString([], {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                          })
                         : t.checkedInAt instanceof Date
                           ? t.checkedInAt.toLocaleString([], {
                               dateStyle: "short",

@@ -2,21 +2,30 @@ import { useEffect, useState } from "react";
 
 interface EnrichedTicket {
   id: string;
-  ticketType: string;
+  ticketTypeId: string;
+  ticketTypeName: string;
   price: number | null;
   status: string;
   qrCode: string;
   createdAt: Date | null;
   updatedAt: Date | null;
   checkedInAt: Date | null;
+
   identificationNumber: string;
   identificationType: string;
   name: string;
   email: string;
   phoneNumber: string;
+
+  phaseId?: string;
   phaseName: string;
+
+  localityId?: string;
   localityName: string;
+
+  promoterId?: string;
   promoterName?: string;
+
   discountAmount?: number;
   discountType?: string;
 }
@@ -37,6 +46,7 @@ const useTickets = () => {
         setLoading(false);
       }
     };
+
     fetchTickets();
   }, []);
 

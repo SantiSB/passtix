@@ -42,6 +42,7 @@ const useEventOptions = (eventId: string | null) => {
                 isActive: data.isActive,
                 startDate: data.startDate?.toDate?.() ?? null,
                 endDate: data.endDate?.toDate?.() ?? null,
+                maxEntryTime: data.maxEntryTime?.toDate?.() ?? null, // 👈 agregado
                 createdAt: data.createdAt?.toDate?.() ?? new Date(),
                 updatedAt: data.updatedAt?.toDate?.() ?? new Date(),
               };

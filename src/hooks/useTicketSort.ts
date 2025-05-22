@@ -7,7 +7,7 @@ export type SortKey =
   | "createdAt"
   | "updatedAt"
   | "checkedInAt"
-  | "ticketType"
+  | "ticketTypeName"
   | "phaseName"
   | "localityName"
   | "promoterName";

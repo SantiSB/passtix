@@ -13,6 +13,8 @@ import EventSelector from "@/components/EventSelector";
 import TicketsTable from "@/components/TicketsTable";
 import DashboardActions from "@/components/DashboardActions";
 import useAuth from "@/hooks/useAuth";
+import TicketTypeModal from "@/components/TicketTypeModal";
+import LocalityModal from "@/components/LocalityModal";
 
 const DashboardPage = () => {
   const { user, loading, logout } = useAuth();
@@ -22,6 +24,8 @@ const DashboardPage = () => {
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isPhaseModalOpen, setIsPhaseModalOpen] = useState(false);
   const [isPromoterModalOpen, setIsPromoterModalOpen] = useState(false);
+  const [isTicketTypeModalOpen, setIsTicketTypeModalOpen] = useState(false);
+  const [isLocalityModalOpen, setIsLocalityModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -92,7 +96,10 @@ const DashboardPage = () => {
               onCreateEvent={() => setIsEventModalOpen(true)}
               onCreatePhase={() => setIsPhaseModalOpen(true)}
               onCreatePromoter={() => setIsPromoterModalOpen(true)}
+              onCreateLocality={() => setIsLocalityModalOpen(true)}
+              onCreateTicketType={() => setIsTicketTypeModalOpen(true)} // ✅ agregado
               onRegisterTicket={() => setIsTicketModalOpen(true)}
+              isEventSelected={!!selectedEventId} // ✅ agregado
             />
           </div>
 
@@ -132,6 +139,16 @@ const DashboardPage = () => {
       <PromoterModal
         isOpen={isPromoterModalOpen}
         onClose={() => setIsPromoterModalOpen(false)}
+        eventId={selectedEventId || ""}
+      />
+      <TicketTypeModal
+        isOpen={isTicketTypeModalOpen}
+        onClose={() => setIsTicketTypeModalOpen(false)}
+        eventId={selectedEventId || ""}
+      />
+      <LocalityModal
+        isOpen={isLocalityModalOpen}
+        onClose={() => setIsLocalityModalOpen(false)}
         eventId={selectedEventId || ""}
       />
     </section>

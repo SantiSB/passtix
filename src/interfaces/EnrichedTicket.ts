@@ -1,14 +1,15 @@
 export interface EnrichedTicket {
   // Datos del ticket
   id: string;
-  ticketType: string;
+  ticketTypeId: string;
+  ticketTypeName?: string; // 👈 NUEVO
   price: number | null;
   status: string;
   qrCode: string;
   createdAt: Date | null;
   updatedAt: Date | null;
   checkedInAt: Date | null;
-  
+
   // Datos del asistente
   identificationNumber: string;
   identificationType: string;

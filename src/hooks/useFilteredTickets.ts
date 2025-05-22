@@ -17,7 +17,6 @@ export interface UseFilteredTicketsReturn {
   isFetching: boolean;
   usingPagination: boolean;
   pagination: null;
-  /** ordenamiento */
   sortKey: SortKey;
   sortDirection: SortDirection;
   setSort: (key: SortKey) => void;
@@ -40,8 +39,8 @@ export default function useFilteredTickets(
     };
 
     return [...filteredTickets].sort((a, b) => {
-      const aVal = normalize(a[sortKey]);
-      const bVal = normalize(b[sortKey]);
+      const aVal = normalize(a[sortKey as keyof EnrichedTicket]);
+      const bVal = normalize(b[sortKey as keyof EnrichedTicket]);
 
       if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
       if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;

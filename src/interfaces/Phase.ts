@@ -4,9 +4,10 @@ export interface Phase {
   eventId: string;
   price: number;
   order: number;
+  isActive: boolean;
   startDate?: Date;
   endDate?: Date;
-  isActive: boolean;
+  maxEntryTime?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }

@@ -1,11 +1,11 @@
-import { TicketStatus, TicketType } from "@/types/enums";
+import { TicketStatus } from "@/types/enums";
 
 export interface Ticket {
   id: string;
   eventId: string;
   assistantId: string;
   promoterId?: string;
-  ticketType: TicketType;
+  ticketTypeId: string;
   localityId: string;
   phaseId: string;
   price: number | null;

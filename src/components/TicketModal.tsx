@@ -8,24 +8,17 @@ import FormActions from "./common/FormActions";
 import { SuccessMessage, ErrorMessage } from "./common/Messages";
 import { EnrichedTicket } from "@/interfaces/EnrichedTicket";
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Tipos                                                                     */
-/* ────────────────────────────────────────────────────────────────────────── */
 interface TicketModalProps {
   isOpen: boolean;
   onClose: () => void;
   mode: "create" | "edit" | "delete";
   ticket?: EnrichedTicket;
   eventId: string;
-  /* Props para modo delete */
   onConfirmDelete?: () => void;
   loadingDelete?: boolean;
   errorDelete?: string | null;
 }
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Componente                                                                */
-/* ────────────────────────────────────────────────────────────────────────── */
 const TicketModal = ({
   isOpen,
   onClose,
@@ -36,7 +29,6 @@ const TicketModal = ({
   errorDelete,
   eventId,
 }: TicketModalProps) => {
-  /* Hooks de formulario */
   const editFormHook = useEditTicketForm(
     ticket || ({} as EnrichedTicket),
     eventId
@@ -58,13 +50,12 @@ const TicketModal = ({
     loadingPromoters,
   } = formHook;
 
-  /* Evitar cierre por clic fuera */
+  const ticketTypes =
+    mode === "create" && "ticketTypes" in formHook ? formHook.ticketTypes : [];
+
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
   if (!isOpen) return null;
 
-  /* ────────────────────────────────────────────────────────────────────── */
-  /* Render                                                                */
-  /* ────────────────────────────────────────────────────────────────────── */
   return (
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 ease-in-out z-50">
       <div
@@ -88,7 +79,7 @@ const TicketModal = ({
           </button>
         </div>
 
-        {/* ───────────────────── MODO DELETE ───────────────────── */}
+        {/* DELETE MODE */}
         {mode === "delete" && ticket ? (
           <div className="px-6 py-6 space-y-6">
             <p className="text-gray-300">
@@ -115,16 +106,15 @@ const TicketModal = ({
             </div>
           </div>
         ) : (
-          /* ────────────────── MODO CREATE / EDIT ────────────────── */
+          // CREATE / EDIT FORM
           <form onSubmit={handleSubmit} className="px-6 py-4 space-y-5">
-            {/* Campos texto */}
             {[
               { label: "Nombre", name: "name", required: true },
               {
                 label: "Correo Electrónico",
                 name: "email",
-                required: true,
                 type: "email",
+                required: true,
               },
               {
                 label: "Número de documento",
@@ -143,7 +133,6 @@ const TicketModal = ({
               />
             ))}
 
-            {/* Selects */}
             <SelectInput
               label="Tipo de documento"
               name="identificationType"
@@ -162,21 +151,22 @@ const TicketModal = ({
               label="Celular"
               name="phoneNumber"
               type="tel"
-              value={form.phoneNumber as string}
+              value={form.phoneNumber}
               onChange={handleChange}
             />
 
-            <SelectInput
-              label="Tipo de ticket"
-              name="ticketType"
-              value={form.ticketType}
-              onChange={handleChange}
-              options={[
-                { id: "ticket", name: "Boleta" },
-                { id: "courtesy", name: "Cortesía" },
-                { id: "brunch", name: "Brunch" },
-              ]}
-            />
+            {mode === "create" && (
+              <SelectInput
+                label="Tipo de ticket"
+                name="ticketTypeId"
+                value={form.ticketTypeId}
+                onChange={handleChange}
+                options={ticketTypes.map((t) => ({
+                  id: t.id,
+                  name: t.name,
+                }))}
+              />
+            )}
 
             <SelectInput
               label="Localidad"
@@ -202,7 +192,6 @@ const TicketModal = ({
               options={promoters}
             />
 
-            {/* Acciones */}
             <FormActions
               onClose={onClose}
               loading={loading}
@@ -210,7 +199,6 @@ const TicketModal = ({
               loadingPromoters={loadingPromoters}
             />
 
-            {/* Mensajes */}
             {success && (
               <SuccessMessage
                 message={

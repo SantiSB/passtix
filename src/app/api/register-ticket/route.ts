@@ -20,13 +20,13 @@ export async function POST(req: NextRequest) {
     /* 1. Datos recibidos del front                                        */
     /* ------------------------------------------------------------------ */
     const {
-      eventId, // <- obligatorio: id del evento
+      eventId,
       name,
       email,
       phoneNumber,
       identificationNumber,
       identificationType,
-      ticketType,
+      ticketTypeId, // ✅
       localityId,
       phaseId,
       promoterId,
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       !email ||
       !identificationNumber ||
       !identificationType ||
-      !ticketType
+      !ticketTypeId // ✅ validamos ticketTypeId
     ) {
       return NextResponse.json(
         { success: false, error: "Faltan campos obligatorios." },
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       eventId,
       assistantId: assistant.id,
       phaseId,
-      ticketType,
+      ticketTypeId, // ✅ importante: usamos ticketTypeId
       localityId,
       price: price ?? null,
       promoterId: promoterId || null,
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       eventName,
       eventDate,
       eventLocation,
-      ticketType,
+      ticketType: ticketTypeId, // ✅ le pasamos el ID como está en el ticket
     });
 
     if (!emailResult.success) {

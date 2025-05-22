@@ -1,6 +1,5 @@
 import { Resend } from "resend";
 import TicketEmail from "@/components/email/TicketEmail";
-import { TicketType } from "@/types/enums";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface SendTicketEmailParams {
@@ -11,7 +10,7 @@ interface SendTicketEmailParams {
   eventName: string;
   eventDate: string;
   eventLocation: string;
-  ticketType: TicketType;
+  ticketType: string;
 }
 
 export async function sendTicketEmail({
