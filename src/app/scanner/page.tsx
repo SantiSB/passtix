@@ -23,9 +23,16 @@ export default function ScannerPage() {
   const getStatusStyles = (status: string | null) => {
     if (!status) return "";
     if (status.includes("✅")) return "text-emerald-400";
-    if (status.includes("❌")) return "text-red-400";
-    if (status.includes("⚠️")) return "text-yellow-400";
+    if (status.includes("❌") || status.includes("⚠️")) return "text-red-400";
     return "text-white";
+  };
+
+  const getScanResult = (status: string | null) => {
+    if (!status) return { type: "scanning", reason: "" };
+    if (status.includes("✅")) return { type: "success", reason: status.replace("✅", "").trim() };
+    if (status.includes("❌")) return { type: "error", reason: status.replace("❌", "").trim() };
+    if (status.includes("⚠️")) return { type: "error", reason: status.replace("⚠️", "").trim() };
+    return { type: "scanning", reason: "" };
   };
 
   const relevantKeys: Record<string, string[]> = {
@@ -162,8 +169,16 @@ export default function ScannerPage() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
             <h2 className="text-xl font-bold text-white mb-4 text-center">
-              {status?.includes("❌") ? "Escaneo fallido" : "Escaneo exitoso"}
+              {getScanResult(status).type === "success" ? "Escaneo exitoso" : "Escaneo fallido"}
             </h2>
+            
+            {getScanResult(status).reason && (
+              <div className="mb-4 p-3 rounded-lg bg-gray-800 text-center">
+                <p className={`text-sm ${getStatusStyles(status)}`}>
+                  {getScanResult(status).reason}
+                </p>
+              </div>
+            )}
 
             {renderDataBlock("🧑 Asistente", scannedData.assistant)}
             {renderDataBlock("📅 Evento", scannedData.event)}
