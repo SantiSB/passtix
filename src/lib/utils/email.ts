@@ -10,7 +10,7 @@ interface SendTicketEmailParams {
   eventName: string;
   eventDate: string;
   eventLocation: string;
-  ticketTypeName: string; // ✅ CAMBIO aquí también
+  ticketTypeName: string;
 }
 
 
@@ -22,7 +22,7 @@ export async function sendTicketEmail({
   eventName,
   eventDate,
   eventLocation,
-  ticketTypeName, // ✅
+  ticketTypeName,
 }: SendTicketEmailParams): Promise<{ success: boolean; error?: string }> {
 
   
@@ -38,7 +38,7 @@ export async function sendTicketEmail({
         eventName,
         eventDate,
         eventLocation,
-        ticketTypeName, // ✅
+        ticketTypeName, 
       }),
     });
 

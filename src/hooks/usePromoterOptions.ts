@@ -27,7 +27,9 @@ const usePromoterOptions = (eventId: string) => {
           id: doc.id,
           name: doc.data().name,
         }));
-        setPromoters(data);
+        // Ordenar promotores alfabéticamente por nombre
+        const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
+        setPromoters(sortedData);
       } catch (error) {
         console.error("Error al cargar promotores:", error);
       } finally {

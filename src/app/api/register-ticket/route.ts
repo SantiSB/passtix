@@ -62,10 +62,15 @@ export async function POST(req: NextRequest) {
         eventData.date instanceof Timestamp
           ? eventData.date.toDate()
           : new Date(eventData.date);
-      eventDate = dateObj.toLocaleDateString("es-CO", {
+      
+      // Ajustar la fecha a la zona horaria de Colombia
+      const colombiaDate = new Date(dateObj.toLocaleString('en-US', { timeZone: 'America/Bogota' }));
+      
+      eventDate = colombiaDate.toLocaleDateString("es-CO", {
         day: "2-digit",
         month: "long",
         year: "numeric",
+        timeZone: 'America/Bogota'
       });
     }
 
@@ -106,7 +111,7 @@ export async function POST(req: NextRequest) {
       eventName,
       eventDate,
       eventLocation,
-      ticketTypeName, // ✅ nombre real aquí
+      ticketTypeName, 
     });
 
     if (!emailResult.success) {

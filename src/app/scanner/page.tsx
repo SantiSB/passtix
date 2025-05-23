@@ -89,6 +89,7 @@ export default function ScannerPage() {
 
   if (!user) return null;
 
+  console.log(status);
   return (
     <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-4 py-8 relative text-white">
       <button
@@ -156,7 +157,7 @@ export default function ScannerPage() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
             <h2 className="text-xl font-bold text-white mb-4 text-center">
-              Escaneo exitoso
+              {status?.includes("❌") ? "Escaneo fallido" : "Escaneo exitoso"}
             </h2>
 
             {renderDataBlock("🧑 Asistente", scannedData.assistant)}
