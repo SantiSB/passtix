@@ -89,7 +89,12 @@ export default function ScannerPage() {
 
   if (!user) return null;
 
-  console.log(status);
+  console.log('Scanner Status:', {
+    status,
+    assistantName,
+    timestamp: new Date().toISOString()
+  });
+
   return (
     <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-4 py-8 relative text-white">
       <button
