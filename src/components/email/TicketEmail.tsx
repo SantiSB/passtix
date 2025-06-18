@@ -32,6 +32,10 @@ const IMG_URLS: Record<string, string> = {
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/distress%2Flogo.png?alt=media&token=54c9c3e4-3ca2-4806-9427-15eb3409018a",
   passtix:
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/passtix%2Flogo.png?alt=media&token=40c581ba-c63d-440f-99d0-4ae4e8290d3f",
+  "Aniversario Hot Groove":
+    "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/hotgroove%2Flogo.png?alt=media&token=378b45f5-1461-4718-9525-fbac2ba7df89",
+  "DSTEV Sessions #3": "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/dstev%2Flogo.png?alt=media&token=45e920c1-5910-4853-a54f-9dbbdecf598a",
+  "Aimée": ""
 };
 
 const getTicketStyle = (type: string) => {
