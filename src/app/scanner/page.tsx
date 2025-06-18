@@ -38,6 +38,7 @@ export default function ScannerPage() {
   const relevantKeys: Record<string, string[]> = {
     "🧑 Asistente": ["name", "identificationNumber", "email"],
     "🎟️ Ticket": ["ticketTypeName", "localityName", "phaseName"],
+    "🤝 Promotor": ["name", "phone"],
     "📅 Evento": ["name", "location", "date"],
   };
 
@@ -50,6 +51,7 @@ export default function ScannerPage() {
     phaseName: "Fase",
     location: "Ubicación",
     date: "Fecha",
+    phone: "Celular",
   };
 
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
@@ -184,6 +186,7 @@ export default function ScannerPage() {
 
             {renderDataBlock("🧑 Asistente", scannedData.assistant)}
             {renderDataBlock("🎟️ Ticket", scannedData.ticket)}
+            {renderDataBlock("🤝 Promotor", scannedData.promoter)}
             {renderDataBlock("📅 Evento", scannedData.event)}
 
             <button

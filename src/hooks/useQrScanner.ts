@@ -21,6 +21,7 @@ export function useQrScanner() {
     ticket: DocumentData;
     assistant: DocumentData | null;
     event: DocumentData | null;
+    promoter: DocumentData | null;
   } | null>(null);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -112,6 +113,10 @@ export function useQrScanner() {
               const localitySnap = await getDoc(localityRef);
               const locality = localitySnap.exists() ? localitySnap.data() : null;
 
+              const promoterRef = doc(db, "promoter", ticket.promoterId);
+              const promoterSnap = await getDoc(promoterRef);
+              const promoter = promoterSnap.exists() ? promoterSnap.data() : null;
+
               const now = new Date();
 
               // Validar maxEntryTime desde phase
@@ -137,6 +142,7 @@ export function useQrScanner() {
                     maxEntryTime,
                   },
                   assistant,
+                  promoter,
                   event,
                 });
                 return;
@@ -165,6 +171,7 @@ export function useQrScanner() {
                   maxEntryTime,
                 },
                 assistant,
+                promoter,
                 event,
               });
             } catch (err: unknown) {
