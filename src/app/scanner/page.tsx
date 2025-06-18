@@ -37,12 +37,13 @@ export default function ScannerPage() {
 
   const relevantKeys: Record<string, string[]> = {
     "🧑 Asistente": ["name", "identificationNumber", "email"],
-    "🎟️ Ticket": ["ticketTypeName", "localityName", "phaseName"],
+    "🎟️ Ticket": ["id", "ticketTypeName", "localityName", "phaseName", "checkedInAt"],
     "🤝 Promotor": ["name", "phone"],
     "📅 Evento": ["name", "location", "date"],
   };
 
   const translations: Record<string, string> = {
+    id: "ID",
     name: "Nombre",
     identificationNumber: "Cédula",
     email: "Correo electrónico",
@@ -52,6 +53,7 @@ export default function ScannerPage() {
     location: "Ubicación",
     date: "Fecha",
     phone: "Celular",
+    checkedInAt: "Hora de escaneo",
   };
 
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
@@ -73,6 +75,12 @@ export default function ScannerPage() {
                 "toDate" in value &&
                 typeof value.toDate === "function"
                   ? value.toDate().toLocaleString()
+                  : key === "checkedInAt" && value
+                  ? (value instanceof Date
+                      ? value.toLocaleString()
+                      : typeof value === "string"
+                        ? new Date(value).toLocaleString()
+                        : String(value))
                   : value === "joined"
                   ? "Registrado"
                   : value === "disabled"
