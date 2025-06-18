@@ -36,19 +36,20 @@ export default function ScannerPage() {
   };
 
   const relevantKeys: Record<string, string[]> = {
-    "🧑 Asistente": ["name", "email", "dni"],
-    "📅 Evento": ["name", "date", "location"],
+    "🧑 Asistente": ["name", "identificationNumber", "email"],
+    "🎟️ Ticket": ["ticketTypeName", "localityName", "phaseName"],
+    "📅 Evento": ["name", "location", "date"],
   };
 
   const translations: Record<string, string> = {
-    id: "ID",
-    status: "Estado",
-    price: "Precio",
     name: "Nombre",
+    identificationNumber: "Cédula",
     email: "Correo electrónico",
-    dni: "DNI",
+    ticketTypeName: "Tipo de Ticket",
+    localityName: "Localidad",
+    phaseName: "Fase",
+    location: "Ubicación",
     date: "Fecha",
-    location: "Ubicación"
   };
 
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
@@ -60,9 +61,9 @@ export default function ScannerPage() {
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
         <div className="text-sm text-gray-200 space-y-1">
-          {Object.entries(data)
-            .filter(([key]) => keysToShow.includes(key))
-            .map(([key, value]) => (
+          {keysToShow.map((key) => {
+            const value = data[key];
+            return (
               <div key={key}>
                 <strong>{translations[key] || key}:</strong>{" "}
                 {typeof value === "object" &&
@@ -80,7 +81,8 @@ export default function ScannerPage() {
                   ? `$${Number(value).toLocaleString('es-AR')}`
                   : String(value)}
               </div>
-            ))}
+            );
+          })}
         </div>
       </div>
     );
@@ -181,6 +183,7 @@ export default function ScannerPage() {
             )}
 
             {renderDataBlock("🧑 Asistente", scannedData.assistant)}
+            {renderDataBlock("🎟️ Ticket", scannedData.ticket)}
             {renderDataBlock("📅 Evento", scannedData.event)}
 
             <button

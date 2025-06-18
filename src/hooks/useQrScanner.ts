@@ -98,11 +98,19 @@ export function useQrScanner() {
                 ? assistantSnap.data()
                 : null;
 
-              const ticketTypeRef = doc(db, "ticketType", ticket.ticketTypeId);
+              const ticketTypeRef = doc(db, "ticketTypes", ticket.ticketTypeId);
               const ticketTypeSnap = await getDoc(ticketTypeRef);
               const ticketType = ticketTypeSnap.exists()
                 ? ticketTypeSnap.data()
                 : null;
+
+              const phaseRef = doc(db, "phase", ticket.phaseId);
+              const phaseSnap = await getDoc(phaseRef);
+              const phase = phaseSnap.exists() ? phaseSnap.data() : null;
+
+              const localityRef = doc(db, "locality", ticket.localityId);
+              const localitySnap = await getDoc(localityRef);
+              const locality = localitySnap.exists() ? localitySnap.data() : null;
 
               const now = new Date();
 
@@ -124,6 +132,8 @@ export function useQrScanner() {
                   ticket: {
                     ...ticket,
                     ticketTypeName: ticketType?.name ?? "—",
+                    phaseName: phase?.name ?? "—",
+                    localityName: locality?.name ?? "—",
                     maxEntryTime,
                   },
                   assistant,
@@ -150,6 +160,8 @@ export function useQrScanner() {
                 ticket: {
                   ...ticket,
                   ticketTypeName: ticketType?.name ?? "—",
+                  phaseName: phase?.name ?? "—",
+                  localityName: locality?.name ?? "—",
                   maxEntryTime,
                 },
                 assistant,
