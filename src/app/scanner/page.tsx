@@ -57,9 +57,19 @@ export default function ScannerPage() {
   };
 
   const renderDataBlock = (title: string, data: Record<string, unknown> | null) => {
-    if (!data) return null;
+    // Validación adicional para datos nulos o vacíos
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
 
     const keysToShow = relevantKeys[title] || Object.keys(data);
+
+    // Si es la sección del promotor y no hay datos válidos, no mostrar la sección
+    if (title === "🤝 Promotor") {
+      const hasValidPromoterData = keysToShow.some(key => {
+        const value = data[key];
+        return value !== null && value !== undefined && value !== "";
+      });
+      if (!hasValidPromoterData) return null;
+    }
 
     return (
       <div className="mb-4">
@@ -67,6 +77,16 @@ export default function ScannerPage() {
         <div className="text-sm text-gray-200 space-y-1">
           {keysToShow.map((key) => {
             const value = data[key];
+            
+            // Validación adicional para el valor
+            if (value === null || value === undefined) {
+              return (
+                <div key={key}>
+                  <strong>{translations[key] || key}:</strong> No disponible
+                </div>
+              );
+            }
+
             return (
               <div key={key}>
                 <strong>{translations[key] || key}:</strong>{" "}
@@ -89,6 +109,8 @@ export default function ScannerPage() {
                   ? "Habilitado"
                   : key === "price" && value !== null
                   ? `$${Number(value).toLocaleString('es-AR')}`
+                  : value === null || value === undefined || value === ""
+                  ? "No disponible"
                   : String(value)}
               </div>
             );
@@ -107,12 +129,6 @@ export default function ScannerPage() {
   }
 
   if (!user) return null;
-
-  console.log('Scanner Status:', {
-    status,
-    assistantName,
-    timestamp: new Date().toISOString()
-  });
 
   return (
     <div className="min-h-screen h-[100dvh] overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black flex flex-col items-center justify-center px-4 py-8 relative text-white">

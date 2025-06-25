@@ -113,9 +113,13 @@ export function useQrScanner() {
               const localitySnap = await getDoc(localityRef);
               const locality = localitySnap.exists() ? localitySnap.data() : null;
 
-              const promoterRef = doc(db, "promoter", ticket.promoterId);
-              const promoterSnap = await getDoc(promoterRef);
-              const promoter = promoterSnap.exists() ? promoterSnap.data() : null;
+              // Validar que promoterId existe antes de crear la referencia
+              const promoterRef = ticket.promoterId ? doc(db, "promoter", ticket.promoterId) : null;
+              const promoterSnap = promoterRef ? await getDoc(promoterRef) : null;
+              const promoter = promoterSnap?.exists() ? promoterSnap.data() : null;
+
+              // Limpiar datos del promotor si no tiene información válida
+              const cleanPromoter = promoter && (promoter.name || promoter.phone) ? promoter : null;
 
               const now = new Date();
 
@@ -142,7 +146,7 @@ export function useQrScanner() {
                     maxEntryTime,
                   },
                   assistant,
-                  promoter,
+                  promoter: cleanPromoter,
                   event,
                 });
                 return;
@@ -171,7 +175,7 @@ export function useQrScanner() {
                   maxEntryTime,
                 },
                 assistant,
-                promoter,
+                promoter: cleanPromoter,
                 event,
               });
             } catch (err: unknown) {
