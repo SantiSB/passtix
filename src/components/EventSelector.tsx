@@ -18,8 +18,6 @@ export default function EventSelector({ selectedEventId, onSelect }: Props) {
       </p>
     );
 
-  console.log(events);
-
   return (
     <div className="relative">
       <label
