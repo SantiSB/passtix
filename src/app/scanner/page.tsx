@@ -196,7 +196,7 @@ export default function ScannerPage() {
       {scannedData && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-4 text-center">
+            <h2 className="text-3xl font-bold text-white mb-4 text-center">
               {getScanResult(status).type === "success" ? "Escaneo exitoso" : "Escaneo fallido"}
             </h2>
             
