@@ -45,7 +45,7 @@ export default function useLiveTickets(eventId: string) {
             const assistantRef = getSafeDoc("assistant", ticket.assistantId);
             const phaseRef = getSafeDoc("phase", ticket.phaseId);
             const localityRef = getSafeDoc("locality", ticket.localityId);
-            const promoterRef = getSafeDoc("promoter", ticket.promoterId ?? "");
+            const promoterRef = getSafeDoc("promoter", ticket.promoterId);
 
             const [assistantSnap, phaseSnap, localitySnap, promoterSnap] =
               await Promise.all([

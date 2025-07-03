@@ -21,8 +21,8 @@ export async function GET() {
         ] = await Promise.all([
           getDoc(doc(db, "assistant", data.assistantId)),
           getDoc(doc(db, "event", data.eventId)),
-          getDoc(doc(db, "phase", data.phaseId)),
-          getDoc(doc(db, "locality", data.localityId)),
+          data.phaseId ? getDoc(doc(db, "phase", data.phaseId)) : Promise.resolve(null),
+          data.localityId ? getDoc(doc(db, "locality", data.localityId)) : Promise.resolve(null),
           data.promoterId
             ? getDoc(doc(db, "promoter", data.promoterId))
             : Promise.resolve(null),
@@ -56,10 +56,10 @@ export async function GET() {
           eventName: eventSnap.exists() ? eventSnap.data().name : "—",
 
           // Fase
-          phaseName: phaseSnap.exists() ? phaseSnap.data().name : "—",
+          phaseName: phaseSnap?.exists() ? phaseSnap.data().name : "—",
 
           // Localidad
-          localityName: localitySnap.exists() ? localitySnap.data().name : "—",
+          localityName: localitySnap?.exists() ? localitySnap.data().name : "—",
 
           // Promotor
           promoterName: promoterSnap?.exists() ? promoterSnap.data().name : "—",

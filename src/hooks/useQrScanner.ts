@@ -105,13 +105,15 @@ export function useQrScanner() {
                 ? ticketTypeSnap.data()
                 : null;
 
-              const phaseRef = doc(db, "phase", ticket.phaseId);
-              const phaseSnap = await getDoc(phaseRef);
-              const phase = phaseSnap.exists() ? phaseSnap.data() : null;
+              // Validar que phaseId existe antes de crear la referencia
+              const phaseRef = ticket.phaseId ? doc(db, "phase", ticket.phaseId) : null;
+              const phaseSnap = phaseRef ? await getDoc(phaseRef) : null;
+              const phase = phaseSnap?.exists() ? phaseSnap.data() : null;
 
-              const localityRef = doc(db, "locality", ticket.localityId);
-              const localitySnap = await getDoc(localityRef);
-              const locality = localitySnap.exists() ? localitySnap.data() : null;
+              // Validar que localityId existe antes de crear la referencia
+              const localityRef = ticket.localityId ? doc(db, "locality", ticket.localityId) : null;
+              const localitySnap = localityRef ? await getDoc(localityRef) : null;
+              const locality = localitySnap?.exists() ? localitySnap.data() : null;
 
               // Validar que promoterId existe antes de crear la referencia
               const promoterRef = ticket.promoterId ? doc(db, "promoter", ticket.promoterId) : null;
@@ -125,11 +127,7 @@ export function useQrScanner() {
 
               // Validar maxEntryTime desde phase
               const maxEntryTime =
-                (ticket.phaseId &&
-                  (await getDoc(doc(db, "phase", ticket.phaseId)))
-                    .data()
-                    ?.maxEntryTime?.toDate?.()) ??
-                null;
+                (ticket.phaseId && phase?.maxEntryTime?.toDate?.()) ?? null;
 
               if (maxEntryTime && now > maxEntryTime) {
                 await updateDoc(ticketRef, {
