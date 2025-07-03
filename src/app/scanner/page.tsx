@@ -196,13 +196,17 @@ export default function ScannerPage() {
       {scannedData && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
           <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-xl border border-gray-700">
-            <h2 className="text-3xl font-bold text-white mb-4 text-center">
+            <h2 className={`text-3xl font-bold mb-4 text-center ${
+              getScanResult(status).type === "success" 
+                ? "text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]" 
+                : "text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.5)]"
+            }`}>
               {getScanResult(status).type === "success" ? "Escaneo exitoso" : "Escaneo fallido"}
             </h2>
             
             {getScanResult(status).reason && (
               <div className="mb-4 p-3 rounded-lg bg-gray-800 text-center">
-                <p className={`text-sm ${getStatusStyles(status)}`}>
+                <p className={`text-lg ${getStatusStyles(status)}`}>
                   {getScanResult(status).reason}
                 </p>
               </div>
