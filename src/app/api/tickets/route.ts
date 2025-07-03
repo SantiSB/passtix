@@ -19,14 +19,14 @@ export async function GET() {
           promoterSnap,
           ticketTypeSnap,
         ] = await Promise.all([
-          getDoc(doc(db, "assistant", data.assistantId)),
-          getDoc(doc(db, "event", data.eventId)),
+          data.assistantId ? getDoc(doc(db, "assistant", data.assistantId)) : Promise.resolve(null),
+          data.eventId ? getDoc(doc(db, "event", data.eventId)) : Promise.resolve(null),
           data.phaseId ? getDoc(doc(db, "phase", data.phaseId)) : Promise.resolve(null),
           data.localityId ? getDoc(doc(db, "locality", data.localityId)) : Promise.resolve(null),
           data.promoterId
             ? getDoc(doc(db, "promoter", data.promoterId))
             : Promise.resolve(null),
-          getDoc(doc(db, "ticketType", data.ticketTypeId)),
+          data.ticketTypeId ? getDoc(doc(db, "ticketType", data.ticketTypeId)) : Promise.resolve(null),
         ]);
 
         return {
@@ -40,20 +40,20 @@ export async function GET() {
           checkedInAt: data.checkedInAt?.toDate?.() ?? null,
 
           // Asistente
-          name: assistantSnap.exists() ? assistantSnap.data().name : "—",
-          email: assistantSnap.exists() ? assistantSnap.data().email : "—",
-          phoneNumber: assistantSnap.exists()
+          name: assistantSnap?.exists() ? assistantSnap.data().name : "—",
+          email: assistantSnap?.exists() ? assistantSnap.data().email : "—",
+          phoneNumber: assistantSnap?.exists()
             ? (assistantSnap.data().phoneNumber ?? "—")
             : "—",
-          identificationNumber: assistantSnap.exists()
+          identificationNumber: assistantSnap?.exists()
             ? (assistantSnap.data().identificationNumber ?? "—")
             : "—",
-          identificationType: assistantSnap.exists()
+          identificationType: assistantSnap?.exists()
             ? (assistantSnap.data().identificationType ?? "—")
             : "—",
 
           // Evento
-          eventName: eventSnap.exists() ? eventSnap.data().name : "—",
+          eventName: eventSnap?.exists() ? eventSnap.data().name : "—",
 
           // Fase
           phaseName: phaseSnap?.exists() ? phaseSnap.data().name : "—",
@@ -65,7 +65,7 @@ export async function GET() {
           promoterName: promoterSnap?.exists() ? promoterSnap.data().name : "—",
 
           // ✅ Si necesitas el nombre del tipo de ticket
-          ticketTypeName: ticketTypeSnap.exists()
+          ticketTypeName: ticketTypeSnap?.exists()
             ? ticketTypeSnap.data().name
             : "—",
         };

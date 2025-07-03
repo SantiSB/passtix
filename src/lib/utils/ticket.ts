@@ -132,7 +132,7 @@ export async function fetchPaginatedTickets(
         const ticket = docSnap.data() as Ticket;
 
         try {
-          const [assistantSnap, phaseSnap, localitySnap, promoterSnap] =
+          const [assistantSnap, phaseSnap, localitySnap, promoterSnap, ticketTypeSnap] =
             await Promise.all([
               ticket.assistantId
                 ? getDoc(doc(db, "assistant", ticket.assistantId))
@@ -144,12 +144,16 @@ export async function fetchPaginatedTickets(
               ticket.promoterId
                 ? getDoc(doc(db, "promoter", ticket.promoterId))
                 : null,
+              ticket.ticketTypeId
+                ? getDoc(doc(db, "ticketTypes", ticket.ticketTypeId))
+                : null,
             ]);
 
           const assistant = assistantSnap?.data();
           const phase = phaseSnap?.data();
           const locality = localitySnap?.data();
           const promoter = promoterSnap?.data();
+          const ticketType = ticketTypeSnap?.data();
 
           return {
             ...ticket,
@@ -163,6 +167,7 @@ export async function fetchPaginatedTickets(
             phaseName: phase?.name ?? "—",
             localityName: locality?.name ?? "—",
             promoterName: promoter?.name ?? "—",
+            ticketTypeName: ticketType?.name ?? "—",
           };
         } catch (error) {
           console.warn(`⚠️ Error enriqueciendo ticket ${docSnap.id}:`, error);
@@ -178,6 +183,7 @@ export async function fetchPaginatedTickets(
             phaseName: "—",
             localityName: "—",
             promoterName: "—",
+            ticketTypeName: "—",
           };
         }
       })

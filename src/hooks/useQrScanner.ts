@@ -69,6 +69,14 @@ export function useQrScanner() {
               }
 
               const ticket = ticketSnap.data();
+              
+              // Validar que eventId existe antes de crear la referencia
+              if (!ticket.eventId) {
+                setStatus("❌ Ticket sin evento asociado.");
+                resetScanner();
+                return;
+              }
+              
               const eventRef = doc(db, "event", ticket.eventId);
               const eventSnap = await getDoc(eventRef);
 
@@ -93,12 +101,26 @@ export function useQrScanner() {
                 return;
               }
 
+              // Validar que assistantId existe antes de crear la referencia
+              if (!ticket.assistantId) {
+                setStatus("❌ Ticket sin asistente asociado.");
+                resetScanner();
+                return;
+              }
+              
               const assistantRef = doc(db, "assistant", ticket.assistantId);
               const assistantSnap = await getDoc(assistantRef);
               const assistant = assistantSnap.exists()
                 ? assistantSnap.data()
                 : null;
 
+              // Validar que ticketTypeId existe antes de crear la referencia
+              if (!ticket.ticketTypeId) {
+                setStatus("❌ Ticket sin tipo asociado.");
+                resetScanner();
+                return;
+              }
+              
               const ticketTypeRef = doc(db, "ticketTypes", ticket.ticketTypeId);
               const ticketTypeSnap = await getDoc(ticketTypeRef);
               const ticketType = ticketTypeSnap.exists()

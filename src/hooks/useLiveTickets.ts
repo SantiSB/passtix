@@ -46,19 +46,22 @@ export default function useLiveTickets(eventId: string) {
             const phaseRef = getSafeDoc("phase", ticket.phaseId);
             const localityRef = getSafeDoc("locality", ticket.localityId);
             const promoterRef = getSafeDoc("promoter", ticket.promoterId);
+            const ticketTypeRef = getSafeDoc("ticketTypes", ticket.ticketTypeId);
 
-            const [assistantSnap, phaseSnap, localitySnap, promoterSnap] =
+            const [assistantSnap, phaseSnap, localitySnap, promoterSnap, ticketTypeSnap] =
               await Promise.all([
                 assistantRef ? getDoc(assistantRef) : Promise.resolve(null),
                 phaseRef ? getDoc(phaseRef) : Promise.resolve(null),
                 localityRef ? getDoc(localityRef) : Promise.resolve(null),
                 promoterRef ? getDoc(promoterRef) : Promise.resolve(null),
+                ticketTypeRef ? getDoc(ticketTypeRef) : Promise.resolve(null),
               ]);
 
             const assistant = assistantSnap?.data();
             const phase = phaseSnap?.data();
             const locality = localitySnap?.data();
             const promoter = promoterSnap?.data();
+            const ticketType = ticketTypeSnap?.data();
 
             return {
               ...ticket,
@@ -71,6 +74,7 @@ export default function useLiveTickets(eventId: string) {
               phaseName: phase?.name ?? "—",
               localityName: locality?.name ?? "—",
               promoterName: promoter?.name ?? "—",
+              ticketTypeName: ticketType?.name ?? "—",
             };
           } catch (error) {
             console.warn(`❌ Error enriqueciendo ticket ${docSnap.id}:`, error);
@@ -85,6 +89,7 @@ export default function useLiveTickets(eventId: string) {
               phaseName: "—",
               localityName: "—",
               promoterName: "—",
+              ticketTypeName: "—",
             };
           }
         })
