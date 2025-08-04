@@ -36,7 +36,8 @@ const IMG_URLS: Record<string, string> = {
     "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/hotgroove%2Flogo.png?alt=media&token=378b45f5-1461-4718-9525-fbac2ba7df89",
   "DSTEV Sessions #3": "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/dstev%2Flogo.png?alt=media&token=45e920c1-5910-4853-a54f-9dbbdecf598a",
   Aimée: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/zagara%2Flogo.png?alt=media&token=f02135ec-ec39-4034-a611-a82f9c7beac0",
-  Extravaganzza: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/extravaganzza%2Flogo.png?alt=media&token=e5ae8377-2251-4e5f-99d1-7e56fb8fb05d"
+  Extravaganzza: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/extravaganzza%2Flogo.png?alt=media&token=e5ae8377-2251-4e5f-99d1-7e56fb8fb05d",
+  Shamanika: "https://firebasestorage.googleapis.com/v0/b/passtix-f9e3e.firebasestorage.app/o/1537%2Fpasstix.png?alt=media&token=04467520-1a59-44df-8d9e-0c6b2c5efb37",
 };
 
 const getTicketStyle = (type: string) => {
