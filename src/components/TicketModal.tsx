@@ -43,8 +43,8 @@ const TicketModal = ({
     error,
     handleChange,
     handleSubmit,
-    phases,
-    localities,
+    // phases,
+    // localities,
     promoters,
     loadingOptions,
     loadingPromoters,
@@ -168,21 +168,21 @@ const TicketModal = ({
               />
             )}
 
-            <SelectInput
+            {/* <SelectInput
               label="Localidad"
               name="localityId"
               value={form.localityId}
               onChange={handleChange}
               options={localities}
-            />
+            /> */}
 
-            <SelectInput
+            {/* <SelectInput
               label="Etapa"
               name="phaseId"
               value={form.phaseId}
               onChange={handleChange}
               options={phases}
-            />
+            /> */}
 
             <SelectInput
               label="Promotor"
