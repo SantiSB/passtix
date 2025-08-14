@@ -33,7 +33,7 @@ const DashboardActions: React.FC<Props> = ({
         ✨ Crear Evento
       </button>
 
-      <button
+      {/* <button
         onClick={onCreatePhase}
         disabled={!isEventSelected}
         title={!isEventSelected ? "Selecciona un evento primero" : ""}
@@ -42,7 +42,7 @@ const DashboardActions: React.FC<Props> = ({
         }`}
       >
         ➕ Crear Fase
-      </button>
+      </button> */}
 
       <button
         onClick={onCreatePromoter}
@@ -55,7 +55,7 @@ const DashboardActions: React.FC<Props> = ({
         👤 Crear Promotor
       </button>
 
-      <button
+      {/* <button
         onClick={onCreateLocality}
         disabled={!isEventSelected}
         title={!isEventSelected ? "Selecciona un evento primero" : ""}
@@ -64,7 +64,7 @@ const DashboardActions: React.FC<Props> = ({
         }`}
       >
         🧭 Crear Localidad
-      </button>
+      </button> */}
 
       <button
         onClick={onCreateTicketType}
